@@ -1,8 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button } from 'native-base';
-import {View, Platform} from 'react-native';
-import {ipHome} from '../services/api'
+import {View, Platform, BackHandler} from 'react-native';
+import {ipShowActivities} from '../services/api'
 
 export const toastr = {
   /***
@@ -45,12 +45,30 @@ export default class Home extends Component {
     });
     this.getPlanesDeTrabajo();
   }
+  
+  componentDidMount()
+  {
+    /** Agregar el metodo handleBackPress al evento de presionar el boton "Back" de android */
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+  }
+
+  componentWillUnmount() {
+    /** Eliminar la funcion para el evento de Back Press */
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+  }
+  /**
+   * Retornar al Home
+   */
+  handleBackPress = () => {
+    this.props.handler2(1,token,[]);
+    return true;
+  }
 
   async getPlanesDeTrabajo()
   {
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
-    await fetch(ipHome, {
+    await fetch(ipShowActivities, {
       method: 'GET',
       headers: {
           'Authorization': auth,
@@ -63,27 +81,23 @@ export default class Home extends Component {
       {
           newToken = JSON.parse(response._bodyInit);
           var actividades = "Actividades";
-          console.log(Object.values(newToken[actividades]));
-          let keys = Object.keys(newToken[actividades]);
+          //console.log(Object.values(newToken[actividades]));
           var i = 0;
           Object.values(newToken[actividades]).forEach(element => {
-            //console.log(JSON.stringify(element.nombre_tabla));
+            //console.log(JSON.stringify(element));
+            console.log(Object.values(element));
+            var valores = Object.values(element)[0];
+            var SUCURSAL = Object.keys(element)[0];
             var item = {
-              name: keys[i],
-              sucursal: element.nombre_sucursal,
-              prioridad: element.id_prioridad,
-              estado: element.estado,
-              id_plan_trabajo: element.id_plan_trabajo,
-              calificacion_pv: element.calificacion_pv,
-              observacion: element.observacion,
-              id_kardex: element.id_kardex,
-              id_apertura: element.id_apertura,
-              id_formula: element.id_formula,
-              id_condiciones: element.id_condiciones,
+              name: valores.nombre_actividad,
+              sucursal: SUCURSAL,
+              fecha_inicio: valores.fecha_inicio,
+              fecha_fin: valores.fecha_fin,
+              id_plan_trabajo: valores.id_plan_trabajo,
               separador: false
             };
-            if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal, separador: true});}
-            if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal, separador: true}); sucursalActual = element.nombre_sucursal}
+            if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true});}
+            if(sucursalActual !== SUCURSAL){items.push({sucursal: SUCURSAL, separador: true}); sucursalActual = SUCURSAL}
             i = i + 1;                                            
             items.push(item);
           });
@@ -91,7 +105,7 @@ export default class Home extends Component {
       }
       else
       {
-          toastr.showToast('No se encontraron planes de trabajo para hoy','warning');
+          toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
       }
       //return response.json();
     });
@@ -105,14 +119,15 @@ export default class Home extends Component {
     return (
       <Container>
         <Header style={{paddingTop: 20}}>
-        <Left/>          
+        <Left>
+            <Button transparent onPress={() => this.props.handler2(1,token,[])}>
+                <Icon ios="ios-arrow-back" android="md-arrow-back" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+            </Button>
+        </Left>          
         <Body>
-          <Title>Home</Title>
+          <Title>Actividades</Title>
         </Body>
         <Right>
-            <Button transparent onPress={() => this.props.handler2(3,token,[])}>
-                <Icon ios="ios-calendar" android="md-calendar" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
-            </Button>
             <Button transparent onPress={() => this.props.handler2(0,null,[])}>
                 <Icon ios="ios-log-out" android="md-log-out" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
             </Button>
@@ -126,32 +141,12 @@ export default class Home extends Component {
               <Text>{item.sucursal}</Text>
             </ListItem>
           :
-            <ListItem icon button onPress={() => this.props.handler2(2,token,item)}>
-              <Left>
-              {
-                item.estado === "activo" && <Icon active ios='ios-time' android='md-time' />
-              }
-              {
-                item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
-              {
-                item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
-              </Left>
+            <ListItem icon button>
+              <Left/>
               <Body>
                 <Text>{item.name}</Text>
               </Body>
-              <Right>
-                {
-                  item.prioridad === 5 && <Badge><Text>urgente</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
-                }
-              </Right>
+              <Right/>
             </ListItem>
         }>
       </List>

@@ -1,7 +1,7 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button } from 'native-base';
-import {View} from 'react-native';
+import {View,Platform, BackHandler} from 'react-native';
 import {ipHome} from '../services/api'
 
 export const toastr = {
@@ -21,7 +21,7 @@ export const toastr = {
 };
 
 let items = null;
-export default class Home extends Component {
+export default class Activity extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,7 +30,6 @@ export default class Home extends Component {
     };
     let token = this.props.token;
     items = this.props.data;
-    let newToken = null;
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -47,7 +46,21 @@ export default class Home extends Component {
 
   componentDidMount()
   {
-    //console.log(this.props.data);
+    /** Agregar el metodo handleBackPress al evento de presionar el boton "Back" de android */
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+  }
+
+  componentWillUnmount() {
+    /** Eliminar la funcion para el evento de Back Press */
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+  }
+
+  /**
+   * Retornar al Home
+   */
+  handleBackPress = () => {
+    this.props.handler2(1,token,[]);
+    return true;
   }
 
   render() {
@@ -56,10 +69,10 @@ export default class Home extends Component {
     }
     return (
       <Container>
-        <Header>
+        <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent onPress={() => this.props.handler(0,null)}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={{fontSize: 20, color: 'white'}}></Icon>
+            <Button transparent onPress={() => this.props.handler2(1,token,[])}>
+                <Icon ios="ios-arrow-back" android="md-arrow-back" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
             </Button>
         </Left>          
         <Body>

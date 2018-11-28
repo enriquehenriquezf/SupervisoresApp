@@ -5,6 +5,7 @@ import * as Expo from 'expo';
 import Login from './Login';
 import Home from './Home';
 import Activity from './Activity';
+import ShowActivities from './ShowActivities';
 
 export default class Index extends Component {
   constructor(props) {
@@ -75,6 +76,8 @@ export default class Index extends Component {
       AppComponent = Home
     } else if(this.state.index == 2){
       AppComponent = Activity
+    } else if(this.state.index == 3){
+      AppComponent = ShowActivities
     }
     return (
       <Root>

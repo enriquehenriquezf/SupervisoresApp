@@ -19,7 +19,7 @@ export default class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: 'ronaldodo@mail.com', 
+      email: 'ne.ko@hotmail.es', 
       password: '123456',
       loading: true,
       error:null,
@@ -72,7 +72,7 @@ export default class Login extends Component {
     }
     return (
       <Container>
-        <Header>
+        <Header style={{paddingTop: 20}}>
         <Left/>          
         <Body>
           <Title>Inicio</Title>
@@ -82,7 +82,7 @@ export default class Login extends Component {
         <Content>
           <Form>
             <Item>
-              <Input placeholder='Usuario' defaultValue="ronaldodo@mail.com" onChangeText={(text) => this.setState({email: text})}/>
+              <Input placeholder='Usuario' defaultValue="ne.ko@hotmail.es" onChangeText={(text) => this.setState({email: text})}/>
             </Item>
             <Item>
               <Input placeholder='Contraseña' defaultValue="123456" secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})}/>
