@@ -7,8 +7,8 @@ import {ipShowActivities} from '../services/api'
 export const toastr = {
   /***
    * Mostrar Toast en la parte de abajo durante 3 segundos con un mensaje y tipo especifico
-   * @param message: mensaje a mostrar en el Toast
-   * @param tipo: tipo de Toast (success,warning,danger)
+   * @param {String} message mensaje a mostrar en el Toast
+   * @param {String} tipo tipo de Toast (success,warning,danger)
    */
   showToast: (message,tipo) => {
     Toast.show({
@@ -63,7 +63,9 @@ export default class Home extends Component {
     this.props.handler2(1,token,[]);
     return true;
   }
-
+  /**
+   * Obtener actividades a realizar durante los proximos 7 días
+   */
   async getPlanesDeTrabajo()
   {
     let bodyInit = JSON.parse(token._bodyInit);
@@ -113,6 +115,9 @@ export default class Home extends Component {
   }
 
   render() {
+    /***
+     * Mostrar layout luego de cargar tipos de fuente
+     */
     if (this.state.loading) {
       return <Expo.AppLoading />;
     }

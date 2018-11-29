@@ -1,14 +1,14 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Thumbnail } from 'native-base';
 import {View, Platform} from 'react-native';
 import {ipHome} from '../services/api'
 
 export const toastr = {
   /***
    * Mostrar Toast en la parte de abajo durante 3 segundos con un mensaje y tipo especifico
-   * @param message: mensaje a mostrar en el Toast
-   * @param tipo: tipo de Toast (success,warning,danger)
+   * @param {String} message mensaje a mostrar en el Toast
+   * @param {String} tipo tipo de Toast (success,warning,danger)
    */
   showToast: (message,tipo) => {
     Toast.show({
@@ -21,6 +21,7 @@ export const toastr = {
 };
 
 let items = [];
+let user = [];
 let sucursalActual = null;
 export default class Home extends Component {
   constructor(props) {
@@ -45,7 +46,9 @@ export default class Home extends Component {
     });
     this.getPlanesDeTrabajo();
   }
-
+  /**
+   * Leer las actividades a realizar durante el día actual.
+   */
   async getPlanesDeTrabajo()
   {
     let bodyInit = JSON.parse(token._bodyInit);
@@ -58,12 +61,15 @@ export default class Home extends Component {
       },
       body: ''
     }).then(function(response) {
-      console.log(response);
+      //console.log(response);
+      newToken = JSON.parse(response._bodyInit);
+      var actividades = "Actividades";
+      var datos_usuario = "datos_usuario";
+      //console.log(newToken[datos_usuario]);
+      user = newToken[datos_usuario];
       if(response.ok === true && response.status === 200)
       {
-          newToken = JSON.parse(response._bodyInit);
-          var actividades = "Actividades";
-          console.log(Object.values(newToken[actividades]));
+          //console.log(Object.values(newToken[actividades]));
           let keys = Object.keys(newToken[actividades]);
           var i = 0;
           Object.values(newToken[actividades]).forEach(element => {
@@ -91,7 +97,7 @@ export default class Home extends Component {
       }
       else
       {
-          toastr.showToast('No se encontraron planes de trabajo para hoy','warning');
+          toastr.showToast(newToken[actividades],'warning');//No se encontraron planes de trabajo para hoy
       }
       //return response.json();
     });
@@ -99,6 +105,9 @@ export default class Home extends Component {
   }
 
   render() {
+    /***
+     * Mostrar layout luego de cargar tipos de fuente
+     */
     if (this.state.loading) {
       return <Expo.AppLoading />;
     }
@@ -119,42 +128,56 @@ export default class Home extends Component {
         </Right>
         </Header>
         <Content>
-        <List dataArray={items}
-        renderRow={(item) =>
-          item.separador === true ?
-            <ListItem itemDivider>
-              <Text>{item.sucursal}</Text>
-            </ListItem>
-          :
-            <ListItem icon button onPress={() => this.props.handler2(2,token,item)}>
+          <List>
+            <ListItem avatar>
               <Left>
-              {
-                item.estado === "activo" && <Icon active ios='ios-time' android='md-time' />
-              }
-              {
-                item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
-              {
-                item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
+                <Thumbnail source={{ uri: ipHome + "/" + user.foto }} />
               </Left>
               <Body>
-                <Text>{item.name}</Text>
+                <Text>{user.nombre} {user.apellido}</Text>
+                <Text note>{user.cedula}</Text>
               </Body>
               <Right>
-                {
-                  item.prioridad === 5 && <Badge><Text>urgente</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
-                }
+                <Text note>{user.id_usuario}</Text>
               </Right>
             </ListItem>
-        }>
-      </List>
+          </List>
+          <List dataArray={items}
+          renderRow={(item) =>
+            item.separador === true ?
+              <ListItem itemDivider>
+                <Text>{item.sucursal}</Text>
+              </ListItem>
+            :
+              <ListItem icon button onPress={() => this.props.handler2(2,token,item)}>
+                <Left>
+                {
+                  item.estado === "activo" && <Icon active ios='ios-time' android='md-time' />
+                }
+                {
+                  item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
+                }
+                {
+                  item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
+                }
+                </Left>
+                <Body>
+                  <Text>{item.name}</Text>
+                </Body>
+                <Right>
+                  {
+                    item.prioridad === 5 && <Badge><Text>urgente</Text></Badge>
+                  }
+                  {                  
+                    item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
+                  }
+                  {                  
+                    item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
+                  }
+                </Right>
+              </ListItem>
+            }>
+          </List>
         </Content>
       </Container>
     );

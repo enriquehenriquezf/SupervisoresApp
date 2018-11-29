@@ -43,17 +43,27 @@ export default class Index extends Component {
 
   /***
    * Obtiene el token y un valor de un layout para cargar otro layout
-   * @param {int} index: valor del layout al cual se quiere acceder
-   * @param token: token obtenido de otro layout
+   * @param {int} index valor del layout al cual se quiere acceder
+   * @param token token obtenido de otro layout
+   * @param {Array} data datos del plan de trabajo seleccionado
    */
   handler2(index,token,data) {
     this.setState({token: token, data: data})
     this.switchScreen(index);
   }
+  /***
+   * Obtiene el token y un valor de un layout para cargar otro layout
+   * @param {int} index valor del layout al cual se quiere acceder
+   * @param token token obtenido de otro layout
+   */
   handler(index,token) {
     this.setState({token: token})
     this.switchScreen(index);
   }
+  /***
+   * Obtiene un valor de un layout para cargar otro layout
+   * @param {int} index valor del layout al cual se quiere acceder
+   */
   handler(index) {
     this.switchScreen(index);
   }
