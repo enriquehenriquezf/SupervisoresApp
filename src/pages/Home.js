@@ -129,16 +129,16 @@ export default class Home extends Component {
         </Header>
         <Content>
           <List>
-            <ListItem avatar>
+            <ListItem avatar style={{marginBottom: 5}}>
               <Left>
-                <Thumbnail source={{ uri: ipHome + "/" + user.foto }} />
+                <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
               </Left>
               <Body>
                 <Text>{user.nombre} {user.apellido}</Text>
                 <Text note>{user.cedula}</Text>
               </Body>
               <Right>
-                <Text note>{user.id_usuario}</Text>
+                <Text note>{user.codigo}</Text>
               </Right>
             </ListItem>
           </List>
@@ -152,7 +152,7 @@ export default class Home extends Component {
               <ListItem icon button onPress={() => this.props.handler2(2,token,item)}>
                 <Left>
                 {
-                  item.estado === "activo" && <Icon active ios='ios-time' android='md-time' />
+                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />
                 }
                 {
                   item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />

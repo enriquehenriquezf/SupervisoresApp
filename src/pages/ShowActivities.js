@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Accordion } from 'native-base';
 import {View, Platform, BackHandler} from 'react-native';
 import {ipShowActivities} from '../services/api'
 
@@ -20,9 +20,9 @@ export const toastr = {
   },
 };
 
-let items = [];
-let sucursalActual = null;
-export default class Home extends Component {
+let dataArray = [];
+let indexArray = 0;
+export default class ShowActivities extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -32,6 +32,8 @@ export default class Home extends Component {
     let token = this.props.token;
     let newToken = null;
     items = [];
+    dataArray = this.props.data;
+    indexArray = this.props.indexArray;
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -60,7 +62,7 @@ export default class Home extends Component {
    * Retornar al Home
    */
   handleBackPress = () => {
-    this.props.handler2(1,token,[]);
+    this.props.handler2(3,token,[]);
     return true;
   }
   /**
@@ -68,51 +70,36 @@ export default class Home extends Component {
    */
   async getPlanesDeTrabajo()
   {
-    let bodyInit = JSON.parse(token._bodyInit);
-    const auth = bodyInit.token_type + " " + bodyInit.access_token;
-    await fetch(ipShowActivities, {
-      method: 'GET',
-      headers: {
-          'Authorization': auth,
-          'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: ''
-    }).then(function(response) {
-      console.log(response);
-      if(response.ok === true && response.status === 200)
-      {
-          newToken = JSON.parse(response._bodyInit);
-          var actividades = "Actividades";
-          //console.log(Object.values(newToken[actividades]));
-          var i = 0;
-          Object.values(newToken[actividades]).forEach(element => {
-            //console.log(JSON.stringify(element));
-            console.log(Object.values(element));
-            var valores = Object.values(element)[0];
-            var SUCURSAL = Object.keys(element)[0];
-            var item = {
-              name: valores.nombre_actividad,
-              sucursal: SUCURSAL,
-              fecha_inicio: valores.fecha_inicio,
-              fecha_fin: valores.fecha_fin,
-              id_plan_trabajo: valores.id_plan_trabajo,
-              separador: false
-            };
-            if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true});}
-            if(sucursalActual !== SUCURSAL){items.push({sucursal: SUCURSAL, separador: true}); sucursalActual = SUCURSAL}
-            i = i + 1;                                            
-            items.push(item);
-          });
-          console.log(items)
-      }
-      else
-      {
-          toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
-      }
-      //return response.json();
-    });
     this.setState({ loading: false });
   }
+
+
+  _renderHeader(title, expanded) {
+    return (
+      <View
+        style={{ flexDirection: "row", padding: 10, justifyContent: "space-between", alignItems: "center", backgroundColor: "#A9DAD6" }}
+      >
+        <Text style={{ fontWeight: "600" }}>
+          {" "}{title}
+        </Text>
+        {expanded ?
+            <Icon style={{ fontSize: 18 }} name="remove-circle" />
+          :  
+            <Icon style={{ fontSize: 18 }} name="add-circle" />
+        }
+      </View>
+    );
+  }
+  _renderContent(content) {
+    return (
+      <Text
+        style={{ backgroundColor: "#e3f1f1", padding: 10, fontStyle: "italic" }}
+      >
+        {content}
+      </Text>
+    );
+  }
+
 
   render() {
     /***
@@ -125,7 +112,7 @@ export default class Home extends Component {
       <Container>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent onPress={() => this.props.handler2(1,token,[])}>
+            <Button transparent onPress={() => this.props.handler2(3,token,[])}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
             </Button>
         </Left>          
@@ -139,22 +126,9 @@ export default class Home extends Component {
         </Right>
         </Header>
         <Content>
-        <List dataArray={items}
-        renderRow={(item) =>
-          item.separador === true ?
-            <ListItem itemDivider>
-              <Text>{item.sucursal}</Text>
-            </ListItem>
-          :
-            <ListItem icon button>
-              <Left/>
-              <Body>
-                <Text>{item.name}</Text>
-              </Body>
-              <Right/>
-            </ListItem>
-        }>
-      </List>
+          <Accordion
+            dataArray={dataArray[indexArray]}
+          />
         </Content>
       </Container>
     );
