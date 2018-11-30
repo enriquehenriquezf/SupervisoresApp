@@ -107,11 +107,7 @@ export default class Index extends Component {
     }
     return (
       <Root>
-        <Container>
-          <Content>
-            <AppComponent handler={this.handler} handler2={this.handler2} handler3={this.handler3} token={this.state.token} data={this.state.data} indexArray={this.state.indexArray}/>
-          </Content>
-        </Container>
+        <AppComponent handler={this.handler} handler2={this.handler2} handler3={this.handler3} token={this.state.token} data={this.state.data} indexArray={this.state.indexArray}/>
       </Root>
     );
   }

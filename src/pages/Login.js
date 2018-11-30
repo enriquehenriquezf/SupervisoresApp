@@ -1,7 +1,7 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon } from 'native-base';
-import {View} from 'react-native';
+import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Card, CardItem } from 'native-base';
+import {View, Dimensions} from 'react-native';
 import {ipLogin} from '../services/api'
 
 export const toastr = {
@@ -83,6 +83,7 @@ export default class Login extends Component {
     if (this.state.loading) {
       return <Expo.AppLoading />;
     }
+    var height = Dimensions.get('window').height;
     return (
       <Container>
         <Header style={{paddingTop: 20}}>
@@ -92,21 +93,27 @@ export default class Login extends Component {
         </Body>
         <Right />
         </Header>
-        <Content>
-          <Form style={{marginBottom: 5}}>
-            <Item>
-              <Icon active ios='ios-person' android='md-person'/>
-              <Input placeholder='Correo' defaultValue="ne.ko@hotmail.es" onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'/>
-            </Item>
-            <Item>
-              <Icon active ios='ios-lock' android='md-lock'/>
-              <Input placeholder='Contraseña' defaultValue="123456" secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'/>
-            </Item>
-          </Form>
-          <Button block style={{marginBottom: 5}} onPress={() => this._OnLogin(this.props.handler)}>
-            <Text>Iniciar Sesión</Text>
-          </Button>          
-        </Content>
+        <Expo.LinearGradient colors={['#062347', '#10A5BA', '#062347']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>
+          <Content>
+            <Card style={{backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0)'}}>
+              <CardItem style={{backgroundColor: 'rgba(255,255,255,0.1)'}}>
+                <Icon active ios='ios-person' android='md-person' style={{color: 'white'}}/>
+                <Input placeholder='Correo' placeholderTextColor='#ddd' defaultValue="ne.ko@hotmail.es" onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={{color: 'white'}}/>
+              </CardItem>
+              <CardItem style={{backgroundColor: 'rgba(255,255,255,0.1)'}}>
+                <Icon active ios='ios-lock' android='md-lock'  style={{color: 'white'}}/>
+                <Input placeholder='Contraseña' placeholderTextColor='#ddd' defaultValue="123456" secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={{color: 'white'}}/>
+              </CardItem>
+              <CardItem style={{backgroundColor: 'rgba(255,255,255,0.1)'}}>
+                <Body>
+                  <Button block onPress={() => this._OnLogin(this.props.handler)}>
+                    <Text>Iniciar Sesión</Text>
+                  </Button> 
+                </Body>
+              </CardItem>              
+            </Card>  
+          </Content>
+        </Expo.LinearGradient>
       </Container>
     );
   }

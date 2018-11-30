@@ -2,7 +2,7 @@
   "expo": {
     "name": "Supervisores",
     "description": "This project is really great.",
-    "slug": "supervisores app",
+    "slug": "supervisoresApp",
     "privacy": "public",
     "sdkVersion": "31.0.0",
     "platforms": ["ios", "android"],

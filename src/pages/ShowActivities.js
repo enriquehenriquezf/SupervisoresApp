@@ -101,7 +101,7 @@ export default class ShowActivities extends Component {
   }
 
 
-  render() {
+  render() { 
     /***
      * Mostrar layout luego de cargar tipos de fuente
      */
