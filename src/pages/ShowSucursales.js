@@ -120,6 +120,7 @@ export default class ShowSucursales extends Component {
       }
       //return response.json();
     });
+    () => this.props.loaded(false);
     this.setState({ loading: false });
   }
 

@@ -33,6 +33,7 @@ export default class Home extends Component {
     let token = this.props.token;
     let newToken = null;
     items = [];
+    this._OnItemPress = this._OnItemPress.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -104,6 +105,12 @@ export default class Home extends Component {
     this.setState({ loading: false });
   }
 
+  _OnItemPress(handler,loaded, item)
+  {
+    loaded(true);
+    handler(2,token,item);
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar tipos de fuente
@@ -143,13 +150,13 @@ export default class Home extends Component {
             </ListItem>
           </List>
           <List dataArray={items}
-          renderRow={(item) =>
+            renderRow={(item) =>
             item.separador === true ?
               <ListItem itemDivider>
                 <Text>{item.sucursal}</Text>
               </ListItem>
             :
-              <ListItem icon button onPress={() => this.props.handler2(2,token,item)}>
+              <ListItem icon button onPress={() => this._OnItemPress(this.props.handler2,this.props.loaded, item)}>
                 <Left>
                 {
                   (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />

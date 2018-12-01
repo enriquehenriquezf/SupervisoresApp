@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Root,Container, Content, Spinner } from 'native-base';
+import { Root, Spinner } from 'native-base';
 import { View } from 'react-native';
 import * as Expo from 'expo';
 import Login from './Login';
@@ -16,18 +16,21 @@ export default class Index extends Component {
       token: null,
       data: null,
       indexArray: 0,
-      loading: true
+      loading: true,
+      loading2: false,
     }
     this.handler = this.handler.bind(this);
     this.handler2 = this.handler2.bind(this);
     this.handler3 = this.handler3.bind(this);
+    this.loaded = this.loaded.bind(this);
     console.ignoredYellowBox = ['Setting a timer', 'Require cycle:'];
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
   /***
    * cambiar el valor del layout a mostrar.
-   * @Ex: 0 = login, 1 = home
+   * @param {int} index indice del layout
+   * @example 0 = login, 1 = home
    */
   switchScreen(index) {
       this.setState({index: index})
@@ -81,6 +84,13 @@ export default class Index extends Component {
   handler(index) {
     this.switchScreen(index);
   }
+   /***
+   * Cambia el valor del state loading2 para hacer que se muestre el spinner mientras carga otro layout
+   * @param {boolean} load verdadero si se desea mostrar el spinner de carga
+   */
+  loaded(load) {
+    this.setState({loading2: load});
+  }
 
   render() {
     /***
@@ -107,7 +117,15 @@ export default class Index extends Component {
     }
     return (
       <Root>
-        <AppComponent handler={this.handler} handler2={this.handler2} handler3={this.handler3} token={this.state.token} data={this.state.data} indexArray={this.state.indexArray}/>
+        <AppComponent handler={this.handler} handler2={this.handler2} handler3={this.handler3} token={this.state.token} data={this.state.data} indexArray={this.state.indexArray} loaded={this.loaded}>
+        
+        {
+          this.state.loading2 === true ?
+            <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
+          :
+            null
+        }
+        </AppComponent>
       </Root>
     );
   }

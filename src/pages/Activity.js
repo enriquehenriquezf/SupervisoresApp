@@ -21,6 +21,7 @@ export const toastr = {
 };
 
 let items = null;
+let loaded = null;
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -30,6 +31,7 @@ export default class Activity extends Component {
     };
     let token = this.props.token;
     items = this.props.data;
+    loaded = this.props.loaded;
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -40,7 +42,8 @@ export default class Activity extends Component {
     await Expo.Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
+    });    
+    loaded(false);
     this.setState({ loading: false });
   }
 
