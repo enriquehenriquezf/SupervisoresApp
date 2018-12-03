@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button, Spinner } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button, Spinner, Textarea, Form, ListItem, Radio } from 'native-base';
 import {View,Platform, BackHandler} from 'react-native';
 import {ipHome} from '../services/api'
 
@@ -26,6 +26,7 @@ export default class Activity extends Component {
     super(props);
     this.state = {
       loading: true,
+      checked: 3 ,
       showToast: false
     };
     let token = this.props.token;
@@ -56,6 +57,15 @@ export default class Activity extends Component {
     return true;
   }
 
+  /**
+   * seleccionar checkbox
+   * @param {int} i indice del checkbox que se seleccionará
+   */
+  SetChecked(i)
+  {    
+    this.setState({ checked: i });
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar los datos
@@ -77,7 +87,58 @@ export default class Activity extends Component {
         <Right />
         </Header>
         <Content>
-            <Text>{items.name}</Text>
+          <Text>{items.name}</Text>
+          {
+            items.id_apertura !== undefined ?
+              <View>
+                <Text>Hora de apertura: </Text>              
+                <ListItem button onPress={() => this.SetChecked(1)}>
+                  <Left>
+                    <Text>Tarde</Text>
+                  </Left>
+                  <Right>
+                    {
+                      this.state.checked === 1 ?                        
+                        <Radio selected={true} onPress={() => this.SetChecked(1)}/>
+                      :
+                        <Radio selected={false} onPress={() => this.SetChecked(1)} />
+                    }
+                  </Right>
+                </ListItem>
+                <ListItem button onPress={() => this.SetChecked(2)}>
+                  <Left>
+                    <Text>Muy Tarde</Text>
+                  </Left>
+                  <Right>                    
+                    {
+                      this.state.checked === 2 ?                        
+                        <Radio selected={true} onPress={() => this.SetChecked(2)}/>
+                      :
+                        <Radio selected={false} onPress={() => this.SetChecked(2)} />
+                    }
+                  </Right>
+                </ListItem>
+                <ListItem button onPress={() => this.SetChecked(3)}>
+                  <Left>
+                    <Text>Puntual</Text>
+                  </Left>
+                  <Right>                    
+                    {
+                      this.state.checked === 3 ?                        
+                        <Radio selected={true} onPress={() => this.SetChecked(3)}/>
+                      :
+                        <Radio selected={false} onPress={() => this.SetChecked(3)} />
+                    }
+                  </Right>
+                </ListItem>
+              </View>
+            :
+              null
+          }
+          <Form>
+            <Textarea rowSpan={3} bordered placeholder="Observaciones" defaultValue={items.observacion} />
+          </Form>
+          <Button success><Text> Finalizar </Text></Button>
         </Content>
       </Container>
     );
