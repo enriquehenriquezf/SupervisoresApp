@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Accordion } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content,Text, Toast, Icon, Button, Accordion, Spinner } from 'native-base';
 import {View, Platform, BackHandler} from 'react-native';
 import {ipShowActivities} from '../services/api'
 
@@ -38,13 +38,6 @@ export default class ShowActivities extends Component {
   }
 
   async componentWillMount() {
-    /***
-     * Cargar tipos de fuentes antes de mostrar el layout.
-     */
-    await Expo.Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
     this.getPlanesDeTrabajo();
   }
   
@@ -103,10 +96,10 @@ export default class ShowActivities extends Component {
 
   render() { 
     /***
-     * Mostrar layout luego de cargar tipos de fuente
+     * Mostrar layout luego de cargar los datos
      */
     if (this.state.loading) {
-      return <Expo.AppLoading />;
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     return (
       <Container>

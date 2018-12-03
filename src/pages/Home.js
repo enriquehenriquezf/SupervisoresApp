@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Thumbnail } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Thumbnail, Spinner } from 'native-base';
 import {View, Platform} from 'react-native';
 import {ipHome} from '../services/api'
 
@@ -38,13 +38,6 @@ export default class Home extends Component {
   }
 
   async componentWillMount() {
-    /***
-     * Cargar tipos de fuentes antes de mostrar el layout.
-     */
-    await Expo.Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
     this.getPlanesDeTrabajo();
   }
   /**
@@ -105,9 +98,8 @@ export default class Home extends Component {
     this.setState({ loading: false });
   }
 
-  _OnItemPress(handler,loaded, item)
+  _OnItemPress(handler, item)
   {
-    loaded(true);
     handler(2,token,item);
   }
 
@@ -116,7 +108,7 @@ export default class Home extends Component {
      * Mostrar layout luego de cargar tipos de fuente
      */
     if (this.state.loading) {
-      return <Expo.AppLoading />;
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     return (
       <Container>
@@ -156,7 +148,7 @@ export default class Home extends Component {
                 <Text>{item.sucursal}</Text>
               </ListItem>
             :
-              <ListItem icon button onPress={() => this._OnItemPress(this.props.handler2,this.props.loaded, item)}>
+              <ListItem icon button onPress={() => this._OnItemPress(this.props.handler2, item)}>
                 <Left>
                 {
                   (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />

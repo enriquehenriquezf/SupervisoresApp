@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Spinner } from 'native-base';
 import {View, Dimensions, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import {ipLogin} from '../services/api'
 
@@ -35,23 +35,15 @@ export default class Login extends Component {
   }
 
   async componentWillMount() {
-    /***
-     * Cargar tipos de fuentes antes de mostrar el layout.
-     */
-    await Expo.Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
     this.setState({ loading: false });
   }
   /**
    * Verificar credenciales de inicio de sesión
    * @param {function} handler Obtiene el token y un valor de un layout para cargar otro layout
    */
-  _OnLogin(handler,loaded){
+  _OnLogin(handler){
     let username = this.state.email;
     let pass = this.state.password;
-    loaded(true);
     fetch(ipLogin, {
     method: 'POST',
     headers: {
@@ -64,28 +56,25 @@ export default class Login extends Component {
         if(response.ok === true)
         {
           token = response;
-          loaded(false);
           handler(1,token);
           toastr.showToast('Se ha logueado Correctamente!','success');
         }
         else
         {
-          loaded(false);
           toastr.showToast('Credenciales incorrectas','danger');
         }
         return response.json();
       }).catch(function(error){
-        loaded(false);
         toastr.showToast('Verifique su conexión a internet','warning');
       });
     }
 
   render() {
     /***
-     * Mostrar layout luego de cargar tipos de fuente
+     * Mostrar layout luego de cargar los componentes
      */
     if (this.state.loading) {
-      return <Expo.AppLoading />;
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     var height = Dimensions.get('window').height;
     return (
@@ -111,7 +100,7 @@ export default class Login extends Component {
                   </Item>
                 <Item rounded style={styles.form}>
                   <Body>
-                    <Button success rounded block onPress={() => this._OnLogin(this.props.handler, this.props.loaded)}>
+                    <Button success rounded block onPress={() => this._OnLogin(this.props.handler)}>
                       <Text>Iniciar Sesión</Text>
                     </Button> 
                   </Body>

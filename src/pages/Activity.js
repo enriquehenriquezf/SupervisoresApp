@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button, Spinner } from 'native-base';
 import {View,Platform, BackHandler} from 'react-native';
 import {ipHome} from '../services/api'
 
@@ -21,7 +21,6 @@ export const toastr = {
 };
 
 let items = null;
-let loaded = null;
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -31,19 +30,10 @@ export default class Activity extends Component {
     };
     let token = this.props.token;
     items = this.props.data;
-    loaded = this.props.loaded;
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
   async componentWillMount() {
-    /***
-     * Cargar tipos de fuentes antes de mostrar el layout.
-     */
-    await Expo.Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });    
-    loaded(false);
     this.setState({ loading: false });
   }
 
@@ -68,10 +58,10 @@ export default class Activity extends Component {
 
   render() {
     /***
-     * Mostrar layout luego de cargar tipos de fuente
+     * Mostrar layout luego de cargar los datos
      */
     if (this.state.loading) {
-      return <Expo.AppLoading />;
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     return (
       <Container>

@@ -22,7 +22,6 @@ export default class Index extends Component {
     this.handler = this.handler.bind(this);
     this.handler2 = this.handler2.bind(this);
     this.handler3 = this.handler3.bind(this);
-    this.loaded = this.loaded.bind(this);
     console.ignoredYellowBox = ['Setting a timer', 'Require cycle:'];
     console.ignoredYellowBox = ['Require cycle:'];
   }
@@ -84,13 +83,6 @@ export default class Index extends Component {
   handler(index) {
     this.switchScreen(index);
   }
-   /***
-   * Cambia el valor del state loading2 para hacer que se muestre el spinner mientras carga otro layout
-   * @param {boolean} load verdadero si se desea mostrar el spinner de carga
-   */
-  loaded(load) {
-    this.setState({loading2: load});
-  }
 
   render() {
     /***
@@ -117,14 +109,12 @@ export default class Index extends Component {
     }
     return (
       <Root>
-        <AppComponent handler={this.handler} handler2={this.handler2} handler3={this.handler3} token={this.state.token} data={this.state.data} indexArray={this.state.indexArray} loaded={this.loaded}>
-        
-        {
-          this.state.loading2 === true ?
-            <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
-          :
-            null
-        }
+        <AppComponent 
+        handler={this.handler} handler2={this.handler2} handler3={this.handler3} 
+        token={this.state.token} 
+        data={this.state.data} 
+        indexArray={this.state.indexArray} 
+        >
         </AppComponent>
       </Root>
     );
