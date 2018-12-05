@@ -70,7 +70,7 @@ export default class Home extends Component {
           let keys = Object.keys(newToken[actividades]);
           var i = 0;
           Object.values(newToken[actividades]).forEach(element => {
-            //console.log(JSON.stringify(element));
+            console.log(JSON.stringify(element));
             var item = {
               name: keys[i],
               sucursal: element.nombre_sucursal,
@@ -80,6 +80,7 @@ export default class Home extends Component {
               calificacion_pv: element.calificacion_pv,
               observaciones: element.observaciones,
               id_kardex: element.id_kardex,
+              id_ingreso_sucursal: element.id_ingreso_sucursal,
               id_apertura: element.id_apertura,
               id_formula: element.id_formula,
               id_condiciones: element.id_condiciones,

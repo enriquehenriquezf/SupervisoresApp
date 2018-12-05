@@ -20,33 +20,20 @@ export const toastr = {
     });
   },
 };
-
 export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      page: 0,
       showToast: false
     };
     let token = this.props.token;
-    this.ChangePage = this.ChangePage.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
   async componentWillMount() {
   }
 
-  /**
-   * cambiar Tab inicial del header
-   * @param {int} page valor de la pagina inicial del header
-   * @example 0 = Activos , 1 = Completados
-   */
-  ChangePage(page)
-  {
-    console.log(page);
-    this.setState({page: page});
-  }
 
   render() {
     return (
@@ -65,7 +52,7 @@ export default class Home extends Component {
               </Button>
           </Right>
         </Header>
-        <Tabs initialPage={this.state.page} onChangeTab={() => this.ChangePage()}>
+        <Tabs>
             <Tab heading={ <TabHeading><Text>Activos</Text></TabHeading>}>
               <Activos handler2={this.props.handler2} token={token} data={this.props.data} ChangePage={this.ChangePage}/>
             </Tab>

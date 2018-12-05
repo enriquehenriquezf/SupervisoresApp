@@ -80,6 +80,7 @@ export default class Home extends Component {
               calificacion_pv: element.calificacion_pv,
               observaciones: element.observaciones,
               id_kardex: element.id_kardex,
+              id_ingreso_sucursal: element.id_ingreso_sucursal,
               id_apertura: element.id_apertura,
               id_formula: element.id_formula,
               id_condiciones: element.id_condiciones,
@@ -111,7 +112,7 @@ export default class Home extends Component {
   _OnItemPress(handler, item, changepage)
   {
     handler(2,token,item);
-    changepage(1);
+    //changepage(1);
   }
 
   render() {
