@@ -1,7 +1,7 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Spinner } from 'native-base';
-import {View, Dimensions, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import {View, Dimensions, KeyboardAvoidingView, StyleSheet, AsyncStorage } from 'react-native';
 import {ipLogin} from '../services/api'
 
 export const toastr = {
@@ -21,11 +21,12 @@ export const toastr = {
 };
 
 export default class Login extends Component {
+  // email de prueba: ne.ko@hotmail.es    pass de prueba: 123456
   constructor(props) {
     super(props);
     this.state = {
-      email: 'ne.ko@hotmail.es', 
-      password: '123456',
+      email: '', 
+      password: '',
       loading: true,
       error:null,
       showToast: false
@@ -35,6 +36,7 @@ export default class Login extends Component {
   }
 
   async componentWillMount() {
+    this._retrieveData();
     this.setState({ loading: false });
   }
   /**
@@ -44,6 +46,7 @@ export default class Login extends Component {
   _OnLogin(handler){
     let username = this.state.email;
     let pass = this.state.password;
+    this._storeData();
     fetch(ipLogin, {
     method: 'POST',
     headers: {
@@ -52,22 +55,49 @@ export default class Login extends Component {
     },
     body: JSON.stringify({username: username, password: pass})
     }).then(function(response) {
-        //console.log(response);
-        if(response.ok === true)
-        {
-          token = response;
-          handler(1,token);
-          toastr.showToast('Se ha logueado Correctamente!','success');
-        }
-        else
-        {
-          toastr.showToast('Credenciales incorrectas','danger');
-        }
-        return response.json();
-      }).catch(function(error){
-        toastr.showToast('Verifique su conexión a internet','warning');
-      });
+      //console.log(response);
+      if(response.ok === true)
+      {
+        token = response;
+        handler(1,token);
+        toastr.showToast('Se ha logueado Correctamente!','success');
+      }
+      else
+      {
+        toastr.showToast('Credenciales incorrectas','danger');
+      }
+      return response.json();
+    }).catch(function(error){
+      console.log(error);
+      toastr.showToast('Verifique su conexión a internet','warning');
+    });
+  }
+
+  /**
+   * Guardar datos de usuario y contraseña en los datos globales de la aplicación
+   */
+  _storeData = async () => {
+    try {
+      await AsyncStorage.multiSet([['USER', this.state.email],['PASS', this.state.password]]);
+    } catch (error) {
+      console.log(error);
     }
+  }
+
+  /**
+   * Obtener datos de usuario y contraseña guardados en los datos globales de la apicación y enviarlos en los inputs correspondientes
+   */
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.multiGet(['USER','PASS']);
+      if (value !== null) {
+        //console.log(value);
+        this.setState({ email: value[0][1] , password: value[1][1]});
+      }
+      } catch (error) {
+        console.log(error);
+      }
+  }
 
   render() {
     /***
@@ -92,11 +122,11 @@ export default class Login extends Component {
               <Form>
                   <Item rounded style={styles.form}>
                     <Icon active ios='ios-person' android='md-person' style={{color: 'white'}}/>
-                    <Input placeholder='Correo' placeholderTextColor='#ddd' defaultValue="ne.ko@hotmail.es" onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={{color: 'white'}}/>
+                    <Input placeholder='Correo' placeholderTextColor='#ddd' defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={{color: 'white'}}/>
                   </Item>
                   <Item rounded style={styles.form}>
                     <Icon active ios='ios-lock' android='md-lock'  style={{color: 'white'}}/>
-                    <Input placeholder='Contraseña' placeholderTextColor='#ddd' defaultValue="123456" secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={{color: 'white'}}/>
+                    <Input placeholder='Contraseña' placeholderTextColor='#ddd' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={{color: 'white'}}/>
                   </Item>
                 <Item rounded style={styles.form}>
                   <Body>

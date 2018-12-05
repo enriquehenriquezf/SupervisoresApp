@@ -3,7 +3,7 @@ import { Root, Spinner } from 'native-base';
 import { View } from 'react-native';
 import * as Expo from 'expo';
 import Login from './Login';
-import Home from './Home';
+import Home from './Home/Home';
 import Activity from './Activity';
 import ShowSucursales from './ShowSucursales';
 import ShowActivities from './ShowActivities';
@@ -29,7 +29,7 @@ export default class Index extends Component {
   /***
    * cambiar el valor del layout a mostrar.
    * @param {int} index indice del layout
-   * @example 0 = login, 1 = home
+   * @example 0 = login, 1 = home, 2 = Activity, 3 = Show Sucursales, 4 = ShowActivities
    */
   switchScreen(index) {
       this.setState({index: index})

@@ -1,8 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Thumbnail, Spinner } from 'native-base';
-import {View, Platform} from 'react-native';
-import {ipHome} from '../services/api'
+import { Left, Body, Right, Content, List,ListItem,Text, Toast, Badge, Icon, Thumbnail, Spinner } from 'native-base';
+import {View, Platform, RefreshControl} from 'react-native';
+import {ipHome} from '../../../services/api'
 
 export const toastr = {
   /***
@@ -28,6 +28,7 @@ export default class Home extends Component {
     super(props);
     this.state = {
       loading: true,
+      refreshing: false,
       showToast: false
     };
     let token = this.props.token;
@@ -45,6 +46,8 @@ export default class Home extends Component {
    */
   async getPlanesDeTrabajo()
   {
+    this.setState({ refreshing: true });
+    items = [];
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     await fetch(ipHome, {
@@ -67,7 +70,7 @@ export default class Home extends Component {
           let keys = Object.keys(newToken[actividades]);
           var i = 0;
           Object.values(newToken[actividades]).forEach(element => {
-            //console.log(JSON.stringify(element.nombre_tabla));
+            //console.log(JSON.stringify(element));
             var item = {
               name: keys[i],
               sucursal: element.nombre_sucursal,
@@ -75,11 +78,13 @@ export default class Home extends Component {
               estado: element.estado,
               id_plan_trabajo: element.id_plan_trabajo,
               calificacion_pv: element.calificacion_pv,
-              observacion: element.observacion,
+              observaciones: element.observaciones,
               id_kardex: element.id_kardex,
               id_apertura: element.id_apertura,
               id_formula: element.id_formula,
               id_condiciones: element.id_condiciones,
+              nombre_tabla: element.nombre_tabla,
+              estado: element.estado,
               separador: false
             };
             if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal, separador: true});}
@@ -95,9 +100,14 @@ export default class Home extends Component {
       }
       //return response.json();
     });
-    this.setState({ loading: false });
+    this.setState({ loading: false, refreshing: false });
   }
 
+  /**
+   * Cambiar al Layout activity al presionar el Item y enviarle los datos de ese item
+   * @param {function} handler 
+   * @param {Array} item 
+   */
   _OnItemPress(handler, item)
   {
     handler(2,token,item);
@@ -111,74 +121,63 @@ export default class Home extends Component {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     return (
-      <Container>
-        <Header style={{paddingTop: 20}}>
-        <Left/>          
-        <Body>
-          <Title>Home</Title>
-        </Body>
-        <Right>
-            <Button transparent onPress={() => this.props.handler2(3,token,[])}>
-                <Icon ios="ios-calendar" android="md-calendar" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
-            </Button>
-            <Button transparent onPress={() => this.props.handler2(0,null,[])}>
-                <Icon ios="ios-log-out" android="md-log-out" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
-            </Button>
-        </Right>
-        </Header>
-        <Content>
-          <List>
-            <ListItem avatar style={{marginBottom: 5}}>
+      <Content refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={() => this.getPlanesDeTrabajo()}
+          />
+        }>
+        <List>
+          <ListItem avatar style={{marginBottom: 5}}>
+            <Left>
+              <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
+            </Left>
+            <Body>
+              <Text>{user.nombre} {user.apellido}</Text>
+              <Text note>{user.cedula}</Text>
+            </Body>
+            <Right>
+              <Text note>{user.codigo}</Text>
+            </Right>
+          </ListItem>
+        </List>
+        <List dataArray={items}
+          renderRow={(item) =>
+          item.separador === true ?
+            <ListItem itemDivider>
+              <Text>{item.sucursal}</Text>
+            </ListItem>
+          :
+            <ListItem icon button onPress={() => this._OnItemPress(this.props.handler2, item)}>
               <Left>
-                <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
+              {
+                (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />
+              }
+              {
+                item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
+              }
+              {
+                item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
+              }
               </Left>
               <Body>
-                <Text>{user.nombre} {user.apellido}</Text>
-                <Text note>{user.cedula}</Text>
+                <Text>{item.name}</Text>
               </Body>
               <Right>
-                <Text note>{user.codigo}</Text>
+                {
+                  item.prioridad === 5 && <Badge><Text>urgente</Text></Badge>
+                }
+                {                  
+                  item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
+                }
+                {                  
+                  item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
+                }
               </Right>
             </ListItem>
-          </List>
-          <List dataArray={items}
-            renderRow={(item) =>
-            item.separador === true ?
-              <ListItem itemDivider>
-                <Text>{item.sucursal}</Text>
-              </ListItem>
-            :
-              <ListItem icon button onPress={() => this._OnItemPress(this.props.handler2, item)}>
-                <Left>
-                {
-                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />
-                }
-                {
-                  item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-                }
-                {
-                  item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-                }
-                </Left>
-                <Body>
-                  <Text>{item.name}</Text>
-                </Body>
-                <Right>
-                  {
-                    item.prioridad === 5 && <Badge><Text>urgente</Text></Badge>
-                  }
-                  {                  
-                    item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
-                  }
-                  {                  
-                    item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
-                  }
-                </Right>
-              </ListItem>
-            }>
-          </List>
-        </Content>
-      </Container>
+          }>
+        </List>
+      </Content>
     );
   }
 }
