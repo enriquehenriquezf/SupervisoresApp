@@ -1,6 +1,7 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Spinner } from 'native-base';
+import { CheckBox } from 'react-native-elements';
 import {View, Dimensions, KeyboardAvoidingView, StyleSheet, AsyncStorage } from 'react-native';
 import {ipLogin} from '../services/api'
 
@@ -29,6 +30,7 @@ export default class Login extends Component {
       password: '',
       loading: true,
       error:null,
+      checked:true,
       showToast: false
     };
     this._OnLogin = this._OnLogin.bind(this);
@@ -77,10 +79,19 @@ export default class Login extends Component {
    * Guardar datos de usuario y contraseña en los datos globales de la aplicación
    */
   _storeData = async () => {
-    try {
-      await AsyncStorage.multiSet([['USER', this.state.email],['PASS', this.state.password]]);
-    } catch (error) {
-      console.log(error);
+    if(this.state.checked){
+      try {
+        await AsyncStorage.multiSet([['USER', this.state.email],['PASS', this.state.password]]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    else{
+      try {
+        await AsyncStorage.multiRemove(['USER', 'PASS']);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -94,9 +105,9 @@ export default class Login extends Component {
         //console.log(value);
         this.setState({ email: value[0][1] , password: value[1][1]});
       }
-      } catch (error) {
-        console.log(error);
-      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {
@@ -109,7 +120,7 @@ export default class Login extends Component {
     var height = Dimensions.get('window').height;
     return (
       <Container>
-        <Expo.LinearGradient colors={['#8baaaa', '#ae8b9c']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>
+        <Expo.LinearGradient colors={['#009efd','#2af598']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] */}
           <Header transparent style={{paddingTop: 20}}>
           <Left/>          
           <Body>
@@ -120,14 +131,15 @@ export default class Login extends Component {
           <Content style={{ marginTop: 5}}>
             <KeyboardAvoidingView behavior="padding" enabled>
               <Form>
-                  <Item rounded style={styles.form}>
-                    <Icon active ios='ios-person' android='md-person' style={{color: 'white'}}/>
-                    <Input placeholder='Correo' placeholderTextColor='#ddd' defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={{color: 'white'}}/>
-                  </Item>
-                  <Item rounded style={styles.form}>
-                    <Icon active ios='ios-lock' android='md-lock'  style={{color: 'white'}}/>
-                    <Input placeholder='Contraseña' placeholderTextColor='#ddd' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={{color: 'white'}}/>
-                  </Item>
+                <Item rounded style={styles.form}>
+                  <Icon active ios='ios-person' android='md-person' style={{color: 'white'}}/>
+                  <Input placeholder='Correo' placeholderTextColor='#ddd' defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={{color: 'white'}}/>
+                </Item>
+                <Item rounded style={styles.form}>
+                  <Icon active ios='ios-lock' android='md-lock'  style={{color: 'white'}}/>
+                  <Input placeholder='Contraseña' placeholderTextColor='#ddd' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={{color: 'white'}}/>
+                </Item>
+                <CheckBox containerStyle={{backgroundColor: 'rgba(255,255,255,0)', borderColor: 'rgba(255,255,255,0)', marginTop: -10}} textStyle={{color: '#fff'}} title='Recordar Usuario' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
                 <Item rounded style={styles.form}>
                   <Body>
                     <Button success rounded block onPress={() => this._OnLogin(this.props.handler)}>

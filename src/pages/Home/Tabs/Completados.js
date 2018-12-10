@@ -47,6 +47,7 @@ export default class Home extends Component {
   async getPlanesDeTrabajo()
   {
     items = [];
+    let handler2 = false;
     this.setState({refreshing: true });
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
@@ -57,7 +58,7 @@ export default class Home extends Component {
           'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: ''
-    }).then(function(response) {
+    }).then(function(response){
       console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var actividades = "Actividades";
@@ -97,11 +98,18 @@ export default class Home extends Component {
       }
       else
       {
-          toastr.showToast(newToken[actividades],'warning');
+        toastr.showToast(newToken[actividades],'warning');
       }
       //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2 = true;
+      console.log(error);
     });
-    this.setState({ loading: false, refreshing: false });
+    if(!handler2){
+      this.setState({ loading: false, refreshing: false });
+    }
+    else{this.props.handler2(0,null,[]);}
   }
 
   /**

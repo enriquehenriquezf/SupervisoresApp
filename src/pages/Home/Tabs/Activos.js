@@ -48,6 +48,7 @@ export default class Home extends Component {
   {
     this.setState({ refreshing: true });
     items = [];
+    let handler2 = false;
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     await fetch(ipHome, {
@@ -100,8 +101,15 @@ export default class Home extends Component {
           toastr.showToast(newToken[actividades],'warning');//No se encontraron planes de trabajo para hoy
       }
       //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2 = true;
+      console.log(error);
     });
-    this.setState({ loading: false, refreshing: false });
+    if(!handler2){
+      this.setState({ loading: false, refreshing: false });
+    }
+    else{this.props.handler2(0,null,[]);}
   }
 
   /**

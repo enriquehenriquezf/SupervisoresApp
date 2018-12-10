@@ -26,7 +26,7 @@ export default class Activity extends Component {
     super(props);
     this.state = {
       loading: true,
-      checked: 3 ,
+      checked: 1 ,
       calificacion_pv: 'Puntual',
       observaciones: '',
       showToast: false
@@ -47,17 +47,17 @@ export default class Activity extends Component {
     /**
      * Seleccionar el radioButton que se obtuvo de la base de datos
      */
-    if(items.calificacion_pv === 'Tarde')
+    if(items.calificacion_pv === 'Puntual')
     {
-      this.SetChecked(1,'Tarde');
+      this.SetChecked(1,'Puntual');
+    }
+    else if(items.calificacion_pv === 'Tarde')
+    {
+      this.SetChecked(2,'Tarde');
     }
     else if(items.calificacion_pv === 'Muy Tarde')
     {
-      this.SetChecked(2,'Muy Tarde');
-    }
-    else if(items.calificacion_pv === 'Puntual')
-    {
-      this.SetChecked(3,'Puntual');
+      this.SetChecked(3,'Muy Tarde');
     }
   }
 
@@ -91,6 +91,7 @@ export default class Activity extends Component {
   FinishActivity(handler)
   {
     let bodyInit = JSON.parse(token._bodyInit);
+    let handler2 = this.props.handler2;
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let id = '';
     if(items.id_apertura !== undefined){
@@ -134,6 +135,10 @@ export default class Activity extends Component {
       {
         toastr.showToast(newToken[message],'warning');
       }
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2(0,null,[]);
+      console.log(error);
     });
   }
 

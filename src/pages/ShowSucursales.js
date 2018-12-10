@@ -65,6 +65,7 @@ export default class ShowSucursales extends Component {
    */
   async getPlanesDeTrabajo()
   {
+    let handler2 = false;
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     await fetch(ipShowActivities, {
@@ -86,18 +87,24 @@ export default class ShowSucursales extends Component {
           var SUCURSAL = null;
           Object.values(newToken[actividades]).forEach(element => {
             //console.log(JSON.stringify(element));
-            console.log(Object.values(element));
+            //console.log(Object.values(element));
             var valores = Object.values(element)[0];
             SUCURSAL = Object.keys(element)[0];
+            var options = { year: 'numeric', month: 'short', day: 'numeric' };
+            var fi = new Date(Date.parse(valores.fecha_inicio.split(' ')[0]));
+            fi.setDate(fi.getDate()+1);
+            var ff = new Date(Date.parse(valores.fecha_fin.split(' ')[0]));
+            ff.setDate(ff.getDate()+1);         
             var item = {
               name: valores.nombre_actividad,
               sucursal: SUCURSAL,
-              fecha_inicio: valores.fecha_inicio,
-              fecha_fin: valores.fecha_fin,
+              fecha_inicio: fi.toLocaleDateString('es-ES', options),
+              fecha_fin: ff.toLocaleDateString('es-ES', options),
               id_plan_trabajo: valores.id_plan_trabajo,
               separador: false
             };
-            contenido.push({title: item.name, content: "fecha inicio: " + JSON.stringify(item.fecha_inicio).split(' ')[0].replace('"','') + "\n" + "fecha fin: " + JSON.stringify(item.fecha_fin).split(' ')[0].replace('"','') });
+            //console.log(JSON.stringify(item));   
+            contenido.push({title: item.name, content: "fecha inicio: " + item.fecha_inicio + "\n" + "fecha fin: " + item.fecha_fin });
             if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true, index: j}); j = j + 1;}
             if(sucursalActual !== SUCURSAL){dataArray.push(contenido); contenido = [];      items.push({sucursal: SUCURSAL, separador: true, index: j}); sucursalActual = SUCURSAL; j = j + 1;}
             i = i + 1;                                            
@@ -112,8 +119,15 @@ export default class ShowSucursales extends Component {
           toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
       }
       //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2 = true;
+      console.log(error);
     });
-    this.setState({ loading: false });
+    if(!handler2){
+      this.setState({ loading: false, refreshing: false });
+    }
+    else{this.props.handler2(0,null,[]);}
   }
 
   render() {
