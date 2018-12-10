@@ -59,6 +59,7 @@ export default class Activity extends Component {
     {
       this.SetChecked(3,'Muy Tarde');
     }
+    this.setState({observaciones: items.observaciones});
   }
 
   componentWillUnmount() {
@@ -93,22 +94,7 @@ export default class Activity extends Component {
     let bodyInit = JSON.parse(token._bodyInit);
     let handler2 = this.props.handler2;
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
-    let id = '';
-    if(items.id_apertura !== undefined){
-      id = items.id_apertura;
-    }
-    else if(items.id_kardex !== undefined){
-      id = items.id_kardex;
-    }
-    else if(items.id_condiciones !== undefined){
-      id = items.id_condiciones;
-    }
-    else if(items.id_formula !== undefined){
-      id = items.id_formula;
-    }
-    else if(items.id_ingreso_sucursal !== undefined){
-      id = items.id_ingreso_sucursal;
-    }
+    let id = items.id_actividad;
     fetch(ipActivity, {
       method: 'POST',
       headers: {
@@ -165,7 +151,7 @@ export default class Activity extends Component {
         <Content>
           <Text>{items.name}</Text>
           {
-            items.id_apertura !== undefined ?
+            items.nombre_tabla === 'apertura' ?
               <View>
                 <Text>Hora de apertura: </Text>                       
                 <ListItem button onPress={() => this.SetChecked(1,'Puntual')}>
@@ -212,7 +198,7 @@ export default class Activity extends Component {
               null
           }
           {
-            items.id_kardex !== undefined ?
+            items.nombre_tabla === 'kardex' ?
               <View>
                 <Text>Elaboración: </Text>              
                 <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
@@ -246,7 +232,7 @@ export default class Activity extends Component {
               null
           }
           {
-            items.id_condiciones !== undefined ?
+            items.nombre_tabla === 'condiciones_locativas' ?
               <View>
                 <Text>Condiciones: </Text>              
                 <ListItem button onPress={() => this.SetChecked(1,'Excelentes')}>
@@ -317,13 +303,47 @@ export default class Activity extends Component {
               </View>
             :
               null
-              // ingreso_sucursal, formula  ,captura_cliente, convenio_exhibicion, documentacion_legal, evaluacion_pedido, excesos, libros_faltantes, libro_agendacliente, libro_vencimiento, papeleria_consignaciones, presupuesto_pedido, remisiones, revision_completa_inventario, seguimiento_vendedores
+          }
+          {
+            items.nombre_tabla === 'convenio_exhibicion' ?
+              <View>
+                <Text>Verificar permanencia de las exhibiciones: </Text>              
+                <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
+                  <Left>
+                    <Text>Completo</Text>
+                  </Left>
+                  <Right>
+                    {
+                      this.state.checked === 1 ?                        
+                        <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
+                      :
+                        <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
+                    }
+                  </Right>
+                </ListItem>
+                <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                  <Left>
+                    <Text>Pendiente</Text>
+                  </Left>
+                  <Right>                    
+                    {
+                      this.state.checked === 2 ?                        
+                        <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
+                      :
+                        <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
+                    }
+                  </Right>
+                </ListItem>
+              </View>
+            :
+              null
+              // ingreso_sucursal, formula  ,captura_cliente, documentacion_legal, evaluacion_pedido, excesos, libros_faltantes, libro_agendacliente, libro_vencimiento, papeleria_consignaciones, presupuesto_pedido, remisiones, revision_completa_inventario, seguimiento_vendedores
           }
           <Form>
             <Textarea rowSpan={3} bordered placeholder="Observaciones" defaultValue={items.observaciones} onChangeText={(text) => this.setState({observaciones: text})} />
           </Form>
           {
-            items.estado === 'Activo' ?
+            items.estado === 'Activo' || items.estado === 'activo' ?
               <Button success onPress={() => this.FinishActivity(this.props.handler2)}><Text> Finalizar </Text></Button>
             :              
               <Button primary onPress={() => this.FinishActivity(this.props.handler2)}><Text> Modificar </Text></Button>

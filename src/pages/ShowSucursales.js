@@ -76,7 +76,7 @@ export default class ShowSucursales extends Component {
       },
       body: ''
     }).then(function(response) {
-      console.log(response);
+      //console.log(response);
       if(response.ok === true && response.status === 200)
       {
           newToken = JSON.parse(response._bodyInit);
@@ -86,11 +86,10 @@ export default class ShowSucursales extends Component {
           var j = 0;
           var SUCURSAL = null;
           Object.values(newToken[actividades]).forEach(element => {
-            //console.log(JSON.stringify(element));
             //console.log(Object.values(element));
             var valores = Object.values(element)[0];
             SUCURSAL = Object.keys(element)[0];
-            var options = { year: 'numeric', month: 'short', day: 'numeric' };
+            var options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'America/New_York' };
             var fi = new Date(Date.parse(valores.fecha_inicio.split(' ')[0]));
             fi.setDate(fi.getDate()+1);
             var ff = new Date(Date.parse(valores.fecha_fin.split(' ')[0]));
@@ -103,7 +102,7 @@ export default class ShowSucursales extends Component {
               id_plan_trabajo: valores.id_plan_trabajo,
               separador: false
             };
-            //console.log(JSON.stringify(item));   
+            console.log(JSON.stringify(item));   
             contenido.push({title: item.name, content: "fecha inicio: " + item.fecha_inicio + "\n" + "fecha fin: " + item.fecha_fin });
             if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true, index: j}); j = j + 1;}
             if(sucursalActual !== SUCURSAL){dataArray.push(contenido); contenido = [];      items.push({sucursal: SUCURSAL, separador: true, index: j}); sucursalActual = SUCURSAL; j = j + 1;}
@@ -116,7 +115,7 @@ export default class ShowSucursales extends Component {
       }
       else
       {
-          toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
+        toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
       }
       //return response.json();
     }).catch(function(error){

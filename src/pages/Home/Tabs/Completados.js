@@ -71,7 +71,26 @@ export default class Home extends Component {
           let keys = Object.keys(newToken[actividades]);
           var i = 0;
           Object.values(newToken[actividades]).forEach(element => {
-            //console.log(JSON.stringify(element));
+            //console.log(JSON.stringify(element));            
+            let id = '';
+            if(element.id_apertura !== undefined){
+              id = element.id_apertura;
+            }
+            else if(element.id_kardex !== undefined){
+              id = element.id_kardex;
+            }
+            else if(element.id_condiciones !== undefined){
+              id = element.id_condiciones;
+            }
+            else if(element.id_formula !== undefined){
+              id = element.id_formula;
+            }
+            else if(element.id_ingreso_sucursal !== undefined){
+              id = element.id_ingreso_sucursal;
+            }
+            else if(element.iid_convenio_exhibicion !== undefined){
+              id = element.iid_convenio_exhibicion;
+            }
             var item = {
               name: keys[i],
               sucursal: element.nombre_sucursal,
@@ -80,11 +99,7 @@ export default class Home extends Component {
               id_plan_trabajo: element.id_plan_trabajo,
               calificacion_pv: element.calificacion_pv,
               observaciones: element.observaciones,
-              id_kardex: element.id_kardex,
-              id_ingreso_sucursal: element.id_ingreso_sucursal,
-              id_apertura: element.id_apertura,
-              id_formula: element.id_formula,
-              id_condiciones: element.id_condiciones,
+              id_actividad: id,
               nombre_tabla: element.nombre_tabla,
               estado: element.estado,
               separador: false
@@ -142,11 +157,11 @@ export default class Home extends Component {
             <Left>
               <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
             </Left>
-            <Body>
+            <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
               <Text>{user.nombre} {user.apellido}</Text>
               <Text note>{user.cedula}</Text>
             </Body>
-            <Right>
+            <Right style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
               <Text note>{user.codigo}</Text>
             </Right>
           </ListItem>
