@@ -88,6 +88,9 @@ export default class Home extends Component {
             else if(element.id_ingreso_sucursal !== undefined){
               id = element.id_ingreso_sucursal;
             }
+            else if(element.id_librofaltante !== undefined){
+              id = element.id_librofaltante;
+            }
             else if(element.iid_convenio_exhibicion !== undefined){
               id = element.iid_convenio_exhibicion;
             }
@@ -102,6 +105,8 @@ export default class Home extends Component {
               id_actividad: id,
               nombre_tabla: element.nombre_tabla,
               estado: element.estado,
+              latitud: 11.0041235,
+              longitud: -74.8130534,
               separador: false
             };
             if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal, separador: true});}
@@ -153,7 +158,7 @@ export default class Home extends Component {
           />
         }>
         <List>
-          <ListItem avatar style={{marginBottom: 5}}>
+          <ListItem thumbnail style={{marginBottom: 5}}>
             <Left>
               <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
             </Left>

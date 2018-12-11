@@ -53,7 +53,7 @@ export default class Home extends Component {
           </Right>
         </Header>
         <Tabs>
-          <Tab style={{backgroundColor: '#FFF'}} heading={ <TabHeading><Text>Activos</Text></TabHeading>}>{/* #E1F5FE */}
+          <Tab style={{backgroundColor: '#f4f4f4'}} heading={ <TabHeading><Text>Activos</Text></TabHeading>}>{/* #E1F5FE */}
             <Activos handler2={this.props.handler2} token={token} data={this.props.data} ChangePage={this.ChangePage}/>
           </Tab>
           <Tab heading={ <TabHeading  ><Text>Completados</Text></TabHeading>}>

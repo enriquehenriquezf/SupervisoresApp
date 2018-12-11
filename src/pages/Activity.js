@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button, Spinner, Textarea, Form, ListItem, Radio } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card } from 'native-base';
 import {View,Platform, BackHandler} from 'react-native';
 import {ipActivity} from '../services/api'
 
@@ -97,18 +97,19 @@ export default class Activity extends Component {
      */
     var lat = 0;
     var long = 0;
+    var RANGO = 0.0005000
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
         console.log("Pos:");
         console.log(position);
-        this.setState({
+        /*this.setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           error: null,
-        });
+        });*/
         lat = position.coords.latitude;
         long = position.coords.longitude;
-        if((lat >= items.latitud-0.0005000 && lat <= items.latitud+0.0005000) && (long >= items.longitud-0.0005000 && long <= items.longitud+0.0005000))
+        if((lat >= items.latitud-RANGO && lat <= items.latitud+RANGO) && (long >= items.longitud-RANGO && long <= items.longitud+RANGO))
         {
           toastr.showToast('Se encuentra dentro de ' + items.sucursal,'info');
         }
@@ -139,6 +140,7 @@ export default class Activity extends Component {
    * Retornar al Home
    */
   handleBackPress = () => {
+    navigator.geolocation.clearWatch(this.watchId);
     this.props.handler2(1,token,[]);
     return true;
   }
@@ -217,238 +219,240 @@ export default class Activity extends Component {
         <Right />
         </Header>
         <Content>
-          <Text>{items.name}</Text>
-          {
-            items.nombre_tabla === 'apertura' ?
-              <View>
-                <Text>Hora de apertura: </Text>                       
-                <ListItem button onPress={() => this.SetChecked(1,'Puntual')}>
-                  <Left>
-                    <Text>Puntual</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 1 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(1,'Puntual')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(1,'Puntual')} />
-                    }
-                  </Right>
-                </ListItem>       
-                <ListItem button onPress={() => this.SetChecked(2,'Tarde')}>
-                  <Left>
-                    <Text>Tarde</Text>
-                  </Left>
-                  <Right>
-                    {
-                      this.state.checked === 2 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(2,'Tarde')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(2,'Tarde')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(3,'Muy Tarde')}>
-                  <Left>
-                    <Text>Muy Tarde</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 3 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(3,'Muy Tarde')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(3,'Muy Tarde')} />
-                    }
-                  </Right>
-                </ListItem>
-              </View>
-            :
-              null
-          }
-          {
-            items.nombre_tabla === 'kardex' ?
-              <View>
-                <Text>Elaboración: </Text>              
-                <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
-                  <Left>
-                    <Text>Completo</Text>
-                  </Left>
-                  <Right>
-                    {
-                      this.state.checked === 1 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
-                  <Left>
-                    <Text>Pendiente</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 2 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                    }
-                  </Right>
-                </ListItem>
-              </View>
-            :
-              null
-          }
-          {
-            items.nombre_tabla === 'condiciones_locativas' ?
-              <View>
-                <Text>Condiciones: </Text>              
-                <ListItem button onPress={() => this.SetChecked(1,'Excelentes')}>
-                  <Left>
-                    <Text>Excelentes</Text>
-                  </Left>
-                  <Right>
-                    {
-                      this.state.checked === 1 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(1,'Excelentes')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(1,'Excelentes')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(2,'Buenas')}>
-                  <Left>
-                    <Text>Buenas</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 2 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(2,'Buenas')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(2,'Buenas')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(3,'Regulares')}>
-                  <Left>
-                    <Text>Regulares</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 3 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(3,'Regulares')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(3,'Regulares')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(4,'Malas')}>
-                  <Left>
-                    <Text>Malas</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 4 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(4,'Malas')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(4,'Malas')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(5,'Pesimas')}>
-                  <Left>
-                    <Text>Pesimas</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 5 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(5,'Pesimas')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(5,'Pesimas')} />
-                    }
-                  </Right>
-                </ListItem>
-              </View>
-            :
-              null
-          }
-          {
-            items.nombre_tabla === 'convenio_exhibicion' ?
-              <View>
-                <Text>Verificar permanencia de las exhibiciones: </Text>              
-                <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
-                  <Left>
-                    <Text>Completo</Text>
-                  </Left>
-                  <Right>
-                    {
-                      this.state.checked === 1 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
-                  <Left>
-                    <Text>Pendiente</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 2 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                    }
-                  </Right>
-                </ListItem>
-              </View>
-            :
-              null
-          }
-          {
-            items.nombre_tabla === 'libros_faltantes' ?
-              <View>
-                <Text>Verificar libros faltantes a la fecha: </Text>              
-                <ListItem button onPress={() => this.SetChecked(1,'Al día')}>
-                  <Left>
-                    <Text>Al día</Text>
-                  </Left>
-                  <Right>
-                    {
-                      this.state.checked === 1 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(1,'Al día')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(1,'Al día')} />
-                    }
-                  </Right>
-                </ListItem>
-                <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
-                  <Left>
-                    <Text>Pendiente</Text>
-                  </Left>
-                  <Right>                    
-                    {
-                      this.state.checked === 2 ?                        
-                        <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                      :
-                        <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                    }
-                  </Right>
-                </ListItem>
-              </View>
-            :
-              null
-              // ingreso_sucursal, formula  ,captura_cliente, documentacion_legal, evaluacion_pedido, excesos, libro_agendacliente, libro_vencimiento, papeleria_consignaciones, presupuesto_pedido, remisiones, revision_completa_inventario, seguimiento_vendedores
-          }
-          <Form>
-            <Textarea rowSpan={3} bordered placeholder="Observaciones" defaultValue={items.observaciones} onChangeText={(text) => this.setState({observaciones: text})} />
-          </Form>
+          <H2 style={{margin: 5}}>{items.name}</H2>
+          <Card style={{marginBottom: 5}}>
+            {
+              items.nombre_tabla === 'apertura' ?
+                <View>
+                  <Text>Hora de apertura: </Text>                       
+                  <ListItem button onPress={() => this.SetChecked(1,'Puntual')}>
+                    <Left>
+                      <Text>Puntual</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 1 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(1,'Puntual')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(1,'Puntual')} />
+                      }
+                    </Right>
+                  </ListItem>       
+                  <ListItem button onPress={() => this.SetChecked(2,'Tarde')}>
+                    <Left>
+                      <Text>Tarde</Text>
+                    </Left>
+                    <Right>
+                      {
+                        this.state.checked === 2 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(2,'Tarde')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(2,'Tarde')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(3,'Muy Tarde')}>
+                    <Left>
+                      <Text>Muy Tarde</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 3 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(3,'Muy Tarde')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(3,'Muy Tarde')} />
+                      }
+                    </Right>
+                  </ListItem>
+                </View>
+              :
+                null
+            }
+            {
+              items.nombre_tabla === 'kardex' ?
+                <View>
+                  <Text>Elaboración: </Text>              
+                  <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
+                    <Left>
+                      <Text>Completo</Text>
+                    </Left>
+                    <Right>
+                      {
+                        this.state.checked === 1 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                    <Left>
+                      <Text>Pendiente</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 2 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
+                      }
+                    </Right>
+                  </ListItem>
+                </View>
+              :
+                null
+            }
+            {
+              items.nombre_tabla === 'condiciones_locativas' ?
+                <View>
+                  <Text>Condiciones: </Text>              
+                  <ListItem button onPress={() => this.SetChecked(1,'Excelentes')}>
+                    <Left>
+                      <Text>Excelentes</Text>
+                    </Left>
+                    <Right>
+                      {
+                        this.state.checked === 1 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(1,'Excelentes')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(1,'Excelentes')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(2,'Buenas')}>
+                    <Left>
+                      <Text>Buenas</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 2 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(2,'Buenas')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(2,'Buenas')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(3,'Regulares')}>
+                    <Left>
+                      <Text>Regulares</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 3 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(3,'Regulares')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(3,'Regulares')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(4,'Malas')}>
+                    <Left>
+                      <Text>Malas</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 4 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(4,'Malas')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(4,'Malas')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(5,'Pesimas')}>
+                    <Left>
+                      <Text>Pesimas</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 5 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(5,'Pesimas')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(5,'Pesimas')} />
+                      }
+                    </Right>
+                  </ListItem>
+                </View>
+              :
+                null
+            }
+            {
+              items.nombre_tabla === 'convenio_exhibicion' ?
+                <View>
+                  <Text>Verificar permanencia de las exhibiciones: </Text>              
+                  <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
+                    <Left>
+                      <Text>Completo</Text>
+                    </Left>
+                    <Right>
+                      {
+                        this.state.checked === 1 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                    <Left>
+                      <Text>Pendiente</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 2 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
+                      }
+                    </Right>
+                  </ListItem>
+                </View>
+              :
+                null
+            }
+            {
+              items.nombre_tabla === 'libros_faltantes' ?
+                <View>
+                  <Text>Verificar libros faltantes a la fecha: </Text>              
+                  <ListItem button onPress={() => this.SetChecked(1,'Al día')}>
+                    <Left>
+                      <Text>Al día</Text>
+                    </Left>
+                    <Right>
+                      {
+                        this.state.checked === 1 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(1,'Al día')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(1,'Al día')} />
+                      }
+                    </Right>
+                  </ListItem>
+                  <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                    <Left>
+                      <Text>Pendiente</Text>
+                    </Left>
+                    <Right>                    
+                      {
+                        this.state.checked === 2 ?                        
+                          <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
+                        :
+                          <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
+                      }
+                    </Right>
+                  </ListItem>
+                </View>
+              :
+                null
+                // ingreso_sucursal, formula  ,captura_cliente, documentacion_legal, evaluacion_pedido, excesos, libro_agendacliente, libro_vencimiento, papeleria_consignaciones, presupuesto_pedido, remisiones, revision_completa_inventario, seguimiento_vendedores
+            }
+            <Form>
+              <Textarea rowSpan={3} bordered placeholder="Observaciones" defaultValue={items.observaciones} onChangeText={(text) => this.setState({observaciones: text})} />
+            </Form>
+          </Card>
           {
             items.estado === 'Activo' || items.estado === 'activo' ?
-              <Button success onPress={() => this.FinishActivity(this.props.handler2)}><Text> Finalizar </Text></Button>
+              <Button success rounded block style={{marginHorizontal: 20}} onPress={() => this.FinishActivity(this.props.handler2)}><Text> Finalizar </Text></Button>
             :              
-              <Button primary onPress={() => this.FinishActivity(this.props.handler2)}><Text> Modificar </Text></Button>
+              <Button primary rounded block style={{marginHorizontal: 20}} onPress={() => this.FinishActivity(this.props.handler2)}><Text> Modificar </Text></Button>
           }
         </Content>
       </Container>

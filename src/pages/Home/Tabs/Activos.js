@@ -1,7 +1,7 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Left, Body, Right, Content, List,ListItem,Text, Toast, Badge, Icon, Thumbnail, Spinner } from 'native-base';
-import {View, Platform, RefreshControl} from 'react-native';
+import { Left, Body, Right, Content, List,ListItem,Text, Toast, Badge, Icon, Thumbnail, Spinner, Card } from 'native-base';
+import {View, Platform, RefreshControl, StyleSheet} from 'react-native';
 import {ipHome} from '../../../services/api'
 
 export const toastr = {
@@ -156,57 +156,72 @@ export default class Home extends Component {
             onRefresh={() => this.getPlanesDeTrabajo()}
           />
         }>
-        <List>
-          <ListItem avatar style={{marginBottom: 5}}>
-            <Left>
-              <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
-            </Left>
-            <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-              <Text>{user.nombre} {user.apellido}</Text>
-              <Text note>{user.cedula}</Text>
-            </Body>
-            <Right style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-              <Text note>{user.codigo}</Text>
-            </Right>
-          </ListItem>
-        </List>
-        <List dataArray={items}
-          renderRow={(item) =>
-          item.separador === true ?
-            <ListItem itemDivider>
-              <Text>{item.sucursal}</Text>
-            </ListItem>
-          :
-            <ListItem icon button onPress={() => this._OnItemPress(this.props.handler2, item)}>
+        <Card>
+          <List>
+            <ListItem thumbnail style={{marginBottom: 5}}>
               <Left>
-              {
-                (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />
-              }
-              {
-                item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
-              {
-                item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
+                <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
               </Left>
-              <Body>
-                <Text>{item.name}</Text>
+              <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                <Text>{user.nombre} {user.apellido}</Text>
+                <Text note>{user.cedula}</Text>
               </Body>
-              <Right>
-                {
-                  item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
-                }
+              <Right style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                <Text note>{user.codigo}</Text>
               </Right>
             </ListItem>
-          }>
-        </List>
+          </List>
+        </Card>
+        <Card>
+          <List dataArray={items}
+            renderRow={(item) =>
+            item.separador === true ?
+              <ListItem itemDivider style={{backgroundColor: "#2196F3"}} >
+                <Text>{item.sucursal}</Text>
+              </ListItem>
+            :
+              <ListItem icon button underlayColor='#BBDEFB' onPress={() => this._OnItemPress(this.props.handler2, item)}>
+                <Left >
+                {
+                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' style={{color: "#2196F3"}}/>
+                }
+                {
+                  item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
+                }
+                {
+                  item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
+                }
+                </Left>
+                <Body style={{borderBottomColor: "#2196F3"}}>
+                  <Text>{item.name}</Text>
+                </Body>
+                <Right style={{borderBottomColor: "#2196F3"}}>
+                  {
+                    item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
+                  }
+                  {                  
+                    item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
+                  }
+                  {                  
+                    item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
+                  }
+                </Right>
+              </ListItem>
+            }>
+          </List>
+        </Card>
       </Content>
     );
   }
 }
+
+
+const styles = StyleSheet.create({
+  form: {
+    borderColor: 'rgba(255,255,255,0)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 10
+  },
+});
