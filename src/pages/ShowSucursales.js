@@ -102,10 +102,13 @@ export default class ShowSucursales extends Component {
               id_plan_trabajo: valores.id_plan_trabajo,
               separador: false
             };
-            console.log(JSON.stringify(item));   
-            contenido.push({title: item.name, content: "fecha inicio: " + item.fecha_inicio + "\n" + "fecha fin: " + item.fecha_fin });
+            //console.log(JSON.stringify(item));
+            var conte =  {title: item.name, content: "fecha inicio: " + item.fecha_inicio + "\n" + "fecha fin: " + item.fecha_fin };
             if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true, index: j}); j = j + 1;}
-            if(sucursalActual !== SUCURSAL){dataArray.push(contenido); contenido = [];      items.push({sucursal: SUCURSAL, separador: true, index: j}); sucursalActual = SUCURSAL; j = j + 1;}
+            if(sucursalActual === SUCURSAL){
+              contenido.push(conte);
+            }
+            if(sucursalActual !== SUCURSAL){dataArray.push(contenido); contenido = [];   contenido.push(conte);   items.push({sucursal: SUCURSAL, separador: true, index: j}); sucursalActual = SUCURSAL; j = j + 1;}
             i = i + 1;                                            
             //items.push(item);
           });

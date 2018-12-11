@@ -29,6 +29,9 @@ export default class Activity extends Component {
       checked: 1 ,
       calificacion_pv: 'Puntual',
       observaciones: '',
+      latitude: null,
+      longitude: null,
+      error:null,
       showToast: false
     };
     let token = this.props.token;
@@ -37,11 +40,38 @@ export default class Activity extends Component {
   }
 
   async componentWillMount() {
+    /**
+     * Verificar que el dispositivo no sea un emulador
+     */
+    if (Platform.OS === 'android' && !Expo.Constants.isDevice) {
+      this.setState({
+        errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
+      });
+    } else {
+      this._getLocationAsync();
+    }
+    navigator.geolocation.clearWatch(this.watchId);
+
     this.setState({ loading: false });
   }
 
+  /**
+   * Verificar que los permisos de GPS sean concedidos.
+   */
+  _getLocationAsync = async() => {    
+    let { status } = await Expo.Permissions.askAsync(Expo.Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage: 'Permiso para acceder al gps denegado',
+      });
+      console.log('Permiso para acceder al gps denegado');
+    }
+    else{console.log('Permiso Concedido');}
+}
+
   componentDidMount()
   {
+    //console.log(items);
     /** Agregar el metodo handleBackPress al evento de presionar el boton "Back" de android */
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     /**
@@ -60,6 +90,44 @@ export default class Activity extends Component {
       this.SetChecked(3,'Muy Tarde');
     }
     this.setState({observaciones: items.observaciones});
+    
+    /**
+     * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
+     * @example rango: a una distancia de 5000*10^-7 grados de latitud y longitud
+     */
+    var lat = 0;
+    var long = 0;
+    this.watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        console.log("Pos:");
+        console.log(position);
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null,
+        });
+        lat = position.coords.latitude;
+        long = position.coords.longitude;
+        if((lat >= items.latitud-0.0005000 && lat <= items.latitud+0.0005000) && (long >= items.longitud-0.0005000 && long <= items.longitud+0.0005000))
+        {
+          toastr.showToast('Se encuentra dentro de ' + items.sucursal,'info');
+        }
+        else
+        {
+          toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
+          this.handleBackPress();
+        }
+      },
+      (error) => {
+        console.log(error);
+        if(error.code === 'E_LOCATION_SERVICES_DISABLED'){
+          toastr.showToast('Por favor active el GPS!','danger');
+          this.handleBackPress();
+        }
+        //this.setState({ error: error.message })
+      },
+      { enableHighAccuracy: false, timeout: 60000, maximumAge: 1000 },
+    );
   }
 
   componentWillUnmount() {
@@ -86,7 +154,7 @@ export default class Activity extends Component {
   }
 
   /**
-   * Enviar datos de la actividad a la base de datos
+   * Enviar calificaciones de la actividad a la base de datos
    * @param {function} handler ir al layout de home luego de enviar los datos.
    */
   FinishActivity(handler)
@@ -337,7 +405,41 @@ export default class Activity extends Component {
               </View>
             :
               null
-              // ingreso_sucursal, formula  ,captura_cliente, documentacion_legal, evaluacion_pedido, excesos, libros_faltantes, libro_agendacliente, libro_vencimiento, papeleria_consignaciones, presupuesto_pedido, remisiones, revision_completa_inventario, seguimiento_vendedores
+          }
+          {
+            items.nombre_tabla === 'libros_faltantes' ?
+              <View>
+                <Text>Verificar libros faltantes a la fecha: </Text>              
+                <ListItem button onPress={() => this.SetChecked(1,'Al día')}>
+                  <Left>
+                    <Text>Al día</Text>
+                  </Left>
+                  <Right>
+                    {
+                      this.state.checked === 1 ?                        
+                        <Radio selected={true} onPress={() => this.SetChecked(1,'Al día')}/>
+                      :
+                        <Radio selected={false} onPress={() => this.SetChecked(1,'Al día')} />
+                    }
+                  </Right>
+                </ListItem>
+                <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                  <Left>
+                    <Text>Pendiente</Text>
+                  </Left>
+                  <Right>                    
+                    {
+                      this.state.checked === 2 ?                        
+                        <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
+                      :
+                        <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
+                    }
+                  </Right>
+                </ListItem>
+              </View>
+            :
+              null
+              // ingreso_sucursal, formula  ,captura_cliente, documentacion_legal, evaluacion_pedido, excesos, libro_agendacliente, libro_vencimiento, papeleria_consignaciones, presupuesto_pedido, remisiones, revision_completa_inventario, seguimiento_vendedores
           }
           <Form>
             <Textarea rowSpan={3} bordered placeholder="Observaciones" defaultValue={items.observaciones} onChangeText={(text) => this.setState({observaciones: text})} />

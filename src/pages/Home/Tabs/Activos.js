@@ -88,6 +88,9 @@ export default class Home extends Component {
             else if(element.id_ingreso_sucursal !== undefined){
               id = element.id_ingreso_sucursal;
             }
+            else if(element.id_librofaltante !== undefined){
+              id = element.id_librofaltante;
+            }
             else if(element.iid_convenio_exhibicion !== undefined){
               id = element.iid_convenio_exhibicion;
             }
@@ -102,6 +105,8 @@ export default class Home extends Component {
               id_actividad: id,
               nombre_tabla: element.nombre_tabla,
               estado: element.estado,
+              latitud: 11.0041235,
+              longitud: -74.8130534,
               separador: false
             };
             if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal, separador: true});}
@@ -189,7 +194,7 @@ export default class Home extends Component {
               </Body>
               <Right>
                 {
-                  item.prioridad === 5 && <Badge><Text>urgente</Text></Badge>
+                  item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
                 }
                 {                  
                   item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>

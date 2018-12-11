@@ -190,7 +190,7 @@ export default class Home extends Component {
               </Body>
               <Right>
                 {
-                  item.prioridad === 5 && <Badge><Text>urgente</Text></Badge>
+                  item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
                 }
                 {                  
                   item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
