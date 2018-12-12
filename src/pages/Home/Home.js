@@ -41,7 +41,7 @@ export default class Home extends Component {
         <Header hasTabs style={{paddingTop: 20, elevation:0}}>
           <Left/>          
           <Body>
-            <Title>Home</Title>
+            <Title>Actividades</Title>
           </Body>
           <Right>
               <Button transparent onPress={() => this.props.handler2(3,token,[])}>

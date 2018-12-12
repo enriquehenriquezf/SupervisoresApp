@@ -181,9 +181,11 @@ export default class Home extends Component {
           <List dataArray={items}
             renderRow={(item) =>
             item.separador === true ?
-              <ListItem itemDivider style={{backgroundColor: "#2196F3", borderRadius: 5}} >
-                <Text>{item.sucursal}</Text>
-              </ListItem>
+              <Expo.LinearGradient colors={['#039BE5','#29B6F6']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
+                <ListItem itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}} >
+                  <Text>{item.sucursal}</Text>
+                </ListItem>
+              </Expo.LinearGradient>
             :
               <ListItem icon button underlayColor='#BBDEFB' onPress={() => this._OnItemPress(this.props.handler2, item)}>
                 <Left >

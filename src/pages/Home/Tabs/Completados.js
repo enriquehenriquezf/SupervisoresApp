@@ -1,7 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Thumbnail, Spinner } from 'native-base';
-import {View, Platform, RefreshControl, StyleSheet} from 'react-native';
+import {View, Platform, RefreshControl} from 'react-native';
+import styles from '../../../styles/Home';
 import {ipHomeCompletados} from '../../../services/api'
 
 export const toastr = {
@@ -102,7 +103,7 @@ export default class Home extends Component {
               estado: element.estado,
               id_plan_trabajo: element.id_plan_trabajo,
               calificacion_pv: element.calificacion_pv,
-              observaciones: element.observaciones,
+              observaciones: element.observacion,/** FIXME: cambiar observacion por observaciones en el backend */
               id_actividad: id,
               nombre_tabla: element.nombre_tabla,
               estado: element.estado,
@@ -214,29 +215,3 @@ export default class Home extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  form: {
-    borderColor: 'rgba(255,255,255,0)',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 10
-  },
-  separador:{
-    alignContent:'center',
-    borderRightWidth:1,
-    borderRightColor: '#000',//'#2196F3',
-    height:30,
-    marginLeft:8,
-    marginRight:-8,
-    marginTop:'auto',
-    marginBottom:'auto'
-  },
-  ConBorde:{
-    borderBottomColor: "#2196F3"
-  },
-  SinBorde:{
-    borderBottomColor: 'rgba(255,255,255,0)'
-  }
-});
