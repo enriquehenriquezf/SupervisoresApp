@@ -2,7 +2,8 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Spinner, H1 } from 'native-base';
 import { CheckBox } from 'react-native-elements';
-import {View, Dimensions, KeyboardAvoidingView, StyleSheet, AsyncStorage } from 'react-native';
+import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform } from 'react-native';
+import styles from '../styles/Login';
 import {ipLogin} from '../services/api'
 
 export const toastr = {
@@ -128,9 +129,9 @@ export default class Login extends Component {
           </Body>
           <Right />
           </Header>
-          <Content style={{ marginTop: 5}}>
-            <KeyboardAvoidingView behavior="padding" enabled>
-              <Form>
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>
+            <Content style={{ marginTop: 5}}>
+              <Form style={{paddingTop:height/4}}>
                 <Item regular style={styles.form}>
                   <Icon active ios='ios-person' android='md-person' style={styles.icon}/>
                   <Input placeholder='Correo' placeholderTextColor='#f0f0f0' defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={styles.input}/>
@@ -146,60 +147,12 @@ export default class Login extends Component {
                       <Text style={styles.text}>Iniciar Sesión</Text>
                     </Button> 
                   </Body>
-                </Item>              
+                </Item>          
               </Form>
-            </KeyboardAvoidingView>
-          </Content>
+            </Content>
+          </KeyboardAvoidingView>
         </Expo.LinearGradient>
       </Container>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  form: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderColor: '#FFF',//rgba(255,255,255,0)
-    borderBottomWidth: 2,
-    borderLeftWidth: 2,
-    borderRightWidth: 2,
-    borderTopWidth: 2,
-    borderRadius: 10,
-    height: 40,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20
-  },
-  boton: {
-    borderColor: 'rgba(255,255,255,0)',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 10,
-    height: 40,
-    marginLeft: 50,
-    marginRight: 50,
-    marginBottom: 10
-  },
-  boton2: {
-    borderColor: 'rgba(255,255,255,0)',
-    borderRadius: 10,
-    height: 40
-  },
-  input:{
-    color: 'white',
-    borderLeftWidth: 1,
-    borderLeftColor: '#FFF',
-    height: 37
-  },
-  icon:{
-    color: 'white',
-    width: 36
-  },
-  text:{
-    fontSize: 16
-  },
-  checkbox:{
-    backgroundColor: 'rgba(255,255,255,0)',
-    borderColor: 'rgba(255,255,255,0)', 
-    marginTop: -10
-  }
-});

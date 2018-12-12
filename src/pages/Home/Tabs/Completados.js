@@ -1,7 +1,7 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Thumbnail, Spinner } from 'native-base';
-import {View, Platform, RefreshControl} from 'react-native';
+import {View, Platform, RefreshControl, StyleSheet} from 'react-native';
 import {ipHomeCompletados} from '../../../services/api'
 
 export const toastr = {
@@ -70,6 +70,7 @@ export default class Home extends Component {
           //console.log(Object.values(newToken[actividades]));
           let keys = Object.keys(newToken[actividades]);
           var i = 0;
+          var j = 0;
           Object.values(newToken[actividades]).forEach(element => {
             //console.log(JSON.stringify(element));            
             let id = '';
@@ -107,13 +108,15 @@ export default class Home extends Component {
               estado: element.estado,
               latitud: 11.0041235,
               longitud: -74.8130534,
-              separador: false
+              separador: false,
+              borde: true
             };
             if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal, separador: true});}
-            if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal, separador: true}); sucursalActual = element.nombre_sucursal}
-            i = i + 1;                                            
+            if(sucursalActual !== element.nombre_sucursal){items[j].borde = false; items.push({sucursal: element.nombre_sucursal, separador: true}); j = j + 1; sucursalActual = element.nombre_sucursal}                                    
             items.push(item);
+            i = i + 1;       j = j + 1;   
           });
+          items[j].borde = false;
           console.log(items)
       }
       else
@@ -211,3 +214,29 @@ export default class Home extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  form: {
+    borderColor: 'rgba(255,255,255,0)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 10
+  },
+  separador:{
+    alignContent:'center',
+    borderRightWidth:1,
+    borderRightColor: '#000',//'#2196F3',
+    height:30,
+    marginLeft:8,
+    marginRight:-8,
+    marginTop:'auto',
+    marginBottom:'auto'
+  },
+  ConBorde:{
+    borderBottomColor: "#2196F3"
+  },
+  SinBorde:{
+    borderBottomColor: 'rgba(255,255,255,0)'
+  }
+});

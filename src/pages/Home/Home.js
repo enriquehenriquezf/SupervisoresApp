@@ -38,7 +38,7 @@ export default class Home extends Component {
   render() {
     return (
       <Container>
-        <Header hasTabs style={{paddingTop: 20}}>
+        <Header hasTabs style={{paddingTop: 20, elevation:0}}>
           <Left/>          
           <Body>
             <Title>Home</Title>
@@ -52,7 +52,7 @@ export default class Home extends Component {
               </Button>
           </Right>
         </Header>
-        <Tabs>
+        <Tabs tabContainerStyle={{elevation:0}}>
           <Tab style={{backgroundColor: '#f4f4f4'}} heading={ <TabHeading><Text>Activos</Text></TabHeading>}>{/* #E1F5FE */}
             <Activos handler2={this.props.handler2} token={token} data={this.props.data} ChangePage={this.ChangePage}/>
           </Tab>
