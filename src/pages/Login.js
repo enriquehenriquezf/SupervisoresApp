@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Spinner } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Spinner, H1 } from 'native-base';
 import { CheckBox } from 'react-native-elements';
 import {View, Dimensions, KeyboardAvoidingView, StyleSheet, AsyncStorage } from 'react-native';
 import {ipLogin} from '../services/api'
@@ -120,30 +120,30 @@ export default class Login extends Component {
     var height = Dimensions.get('window').height;
     return (
       <Container>
-        <Expo.LinearGradient colors={['#009efd','#2af598']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] */}
+        <Expo.LinearGradient colors={['#00CDAC','#02AAB0']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] ['#00CDAC','#02AAB0'] ['#5A288E','#02AAB0']*/}
           <Header transparent style={{paddingTop: 20}}>
           <Left/>          
           <Body>
-            <Title>Inicio</Title>
+            <H1 style={{color: '#FFF'}}>Inicio</H1>
           </Body>
           <Right />
           </Header>
           <Content style={{ marginTop: 5}}>
             <KeyboardAvoidingView behavior="padding" enabled>
               <Form>
-                <Item rounded style={styles.form}>
-                  <Icon active ios='ios-person' android='md-person' style={{color: 'white'}}/>
-                  <Input placeholder='Correo' placeholderTextColor='#ddd' defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={{color: 'white'}}/>
+                <Item regular style={styles.form}>
+                  <Icon active ios='ios-person' android='md-person' style={styles.icon}/>
+                  <Input placeholder='Correo' placeholderTextColor='#f0f0f0' defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={styles.input}/>
                 </Item>
-                <Item rounded style={styles.form}>
-                  <Icon active ios='ios-lock' android='md-lock'  style={{color: 'white'}}/>
-                  <Input placeholder='Contraseña' placeholderTextColor='#ddd' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={{color: 'white'}}/>
+                <Item regular style={styles.form}>
+                  <Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>
+                  <Input placeholder='Contraseña' placeholderTextColor='#f0f0f0' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.input}/>
                 </Item>
-                <CheckBox containerStyle={{backgroundColor: 'rgba(255,255,255,0)', borderColor: 'rgba(255,255,255,0)', marginTop: -10}} textStyle={{color: '#fff'}} title='Recordar Usuario' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
-                <Item rounded style={styles.form}>
+                <CheckBox center containerStyle={styles.checkbox} textStyle={{color: '#fff'}} title='Recordar Contraseña' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
+                <Item regular style={styles.boton}>
                   <Body>
-                    <Button success rounded block onPress={() => this._OnLogin(this.props.handler)}>
-                      <Text>Iniciar Sesión</Text>
+                    <Button success regular block onPress={() => this._OnLogin(this.props.handler)} style={styles.boton2}>
+                      <Text style={styles.text}>Iniciar Sesión</Text>
                     </Button> 
                   </Body>
                 </Item>              
@@ -158,10 +158,48 @@ export default class Login extends Component {
 
 const styles = StyleSheet.create({
   form: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderColor: '#FFF',//rgba(255,255,255,0)
+    borderBottomWidth: 2,
+    borderLeftWidth: 2,
+    borderRightWidth: 2,
+    borderTopWidth: 2,
+    borderRadius: 10,
+    height: 40,
+    marginBottom: 10,
+    marginLeft: 20,
+    marginRight: 20
+  },
+  boton: {
     borderColor: 'rgba(255,255,255,0)',
     backgroundColor: 'rgba(255,255,255,0.1)',
-    marginLeft: 20,
-    marginRight: 20,
+    borderRadius: 10,
+    height: 40,
+    marginLeft: 50,
+    marginRight: 50,
     marginBottom: 10
   },
+  boton2: {
+    borderColor: 'rgba(255,255,255,0)',
+    borderRadius: 10,
+    height: 40
+  },
+  input:{
+    color: 'white',
+    borderLeftWidth: 1,
+    borderLeftColor: '#FFF',
+    height: 37
+  },
+  icon:{
+    color: 'white',
+    width: 36
+  },
+  text:{
+    fontSize: 16
+  },
+  checkbox:{
+    backgroundColor: 'rgba(255,255,255,0)',
+    borderColor: 'rgba(255,255,255,0)', 
+    marginTop: -10
+  }
 });

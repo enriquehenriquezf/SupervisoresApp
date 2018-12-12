@@ -70,8 +70,9 @@ export default class Home extends Component {
           //console.log(Object.values(newToken[actividades]));
           let keys = Object.keys(newToken[actividades]);
           var i = 0;
+          var j = 0;
           Object.values(newToken[actividades]).forEach(element => {
-            console.log(JSON.stringify(element));
+            //console.log(JSON.stringify(element));
             let id = '';
             if(element.id_apertura !== undefined){
               id = element.id_apertura;
@@ -107,13 +108,15 @@ export default class Home extends Component {
               estado: element.estado,
               latitud: 11.0041235,
               longitud: -74.8130534,
-              separador: false
+              separador: false,
+              borde: true
             };
             if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal, separador: true});}
-            if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal, separador: true}); sucursalActual = element.nombre_sucursal}
-            i = i + 1;                                            
+            if(sucursalActual !== element.nombre_sucursal){items[j].borde = false; items.push({sucursal: element.nombre_sucursal, separador: true}); j = j + 1; sucursalActual = element.nombre_sucursal}
             items.push(item);
+            i = i + 1;          j = j + 1;
           });
+          items[j].borde = false;
           console.log(items)
       }
       else
@@ -161,6 +164,7 @@ export default class Home extends Component {
             <ListItem thumbnail style={{marginBottom: 5}}>
               <Left>
                 <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
+                <View style={styles.separador}></View>
               </Left>
               <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                 <Text>{user.nombre} {user.apellido}</Text>
@@ -172,11 +176,11 @@ export default class Home extends Component {
             </ListItem>
           </List>
         </Card>
-        <Card>
+        <Card style={{borderRadius: 5}}>
           <List dataArray={items}
             renderRow={(item) =>
             item.separador === true ?
-              <ListItem itemDivider style={{backgroundColor: "#2196F3"}} >
+              <ListItem itemDivider style={{backgroundColor: "#2196F3", borderRadius: 5}} >
                 <Text>{item.sucursal}</Text>
               </ListItem>
             :
@@ -192,10 +196,10 @@ export default class Home extends Component {
                   item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
                 }
                 </Left>
-                <Body style={{borderBottomColor: "#2196F3"}}>
+                <Body style={item.borde ? styles.ConBorde : styles.SinBorde}>
                   <Text>{item.name}</Text>
                 </Body>
-                <Right style={{borderBottomColor: "#2196F3"}}>
+                <Right style={item.borde ? styles.ConBorde : styles.SinBorde}>
                   {
                     item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
                   }
@@ -224,4 +228,20 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginBottom: 10
   },
+  separador:{
+    alignContent:'center',
+    borderRightWidth:1,
+    borderRightColor: '#000',//'#2196F3',
+    height:30,
+    marginLeft:8,
+    marginRight:-8,
+    marginTop:'auto',
+    marginBottom:'auto'
+  },
+  ConBorde:{
+    borderBottomColor: "#2196F3"
+  },
+  SinBorde:{
+    borderBottomColor: 'rgba(255,255,255,0)'
+  }
 });
