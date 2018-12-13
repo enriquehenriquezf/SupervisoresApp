@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Thumbnail, Spinner } from 'native-base';
+import { Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Thumbnail, Spinner, Card } from 'native-base';
 import {View, Platform, RefreshControl} from 'react-native';
 import styles from '../../../styles/Home';
 import {ipHomeCompletados} from '../../../services/api'
@@ -103,7 +103,7 @@ export default class Home extends Component {
               estado: element.estado,
               id_plan_trabajo: element.id_plan_trabajo,
               calificacion_pv: element.calificacion_pv,
-              observaciones: element.observacion,/** FIXME: cambiar observacion por observaciones en el backend */
+              observacion: element.observacion,
               id_actividad: id,
               nombre_tabla: element.nombre_tabla,
               estado: element.estado,
@@ -159,58 +159,66 @@ export default class Home extends Component {
           <RefreshControl
             refreshing={this.state.refreshing}
             onRefresh={() => this.getPlanesDeTrabajo()}
+            colors={["#29B6F6"]}
           />
-        }>
-        <List>
-          <ListItem thumbnail style={{marginBottom: 5}}>
-            <Left>
-              <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
-            </Left>
-            <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-              <Text>{user.nombre} {user.apellido}</Text>
-              <Text note>{user.cedula}</Text>
-            </Body>
-            <Right style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-              <Text note>{user.codigo}</Text>
-            </Right>
-          </ListItem>
-        </List>
-        <List dataArray={items}
-          renderRow={(item) =>
-          item.separador === true ?
-            <ListItem itemDivider>
-              <Text>{item.sucursal}</Text>
-            </ListItem>
-          :
-            <ListItem icon button onPress={() => this._OnItemPress(this.props.handler2, item, this.props.ChangePage)}>
+        }>        
+        <Card style={{borderRadius: 5}}>
+          <List>
+            <ListItem thumbnail style={{marginBottom: 5}}>
               <Left>
-              {
-                (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />
-              }
-              {
-                item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
-              {
-                item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-              }
+                <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
+                <View style={styles.separador}></View>
               </Left>
-              <Body>
-                <Text>{item.name}</Text>
+              <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                <Text>{user.nombre} {user.apellido}</Text>
+                <Text note>{user.cedula}</Text>
               </Body>
-              <Right>
-                {
-                  item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
-                }
-                {                  
-                  item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
-                }
+              <Right style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                <Text note>{user.codigo}</Text>
               </Right>
             </ListItem>
-          }>
-        </List>
+          </List>
+        </Card>
+        <Card style={{borderRadius: 5}}>
+          <List dataArray={items}
+            renderRow={(item) =>
+            item.separador === true ?
+              <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
+                <ListItem itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}}>
+                  <Text style={{color: '#FFF'}}>{item.sucursal}</Text>
+                </ListItem>
+              </Expo.LinearGradient>
+            :
+              <ListItem icon button underlayColor='#BBDEFB' onPress={() => this._OnItemPress(this.props.handler2, item, this.props.ChangePage)}>
+                <Left>
+                {
+                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />
+                }
+                {
+                  item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' style={{color: "#29B6F6"}}/>
+                }
+                {
+                  item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' style={{color: "#29B6F6"}}/>
+                }
+                </Left>
+                <Body style={item.borde ? styles.ConBorde : styles.SinBorde}>
+                  <Text>{item.name}</Text>
+                </Body>
+                <Right style={item.borde ? styles.ConBorde : styles.SinBorde}>
+                  {
+                    item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
+                  }
+                  {                  
+                    item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
+                  }
+                  {                  
+                    item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
+                  }
+                </Right>
+              </ListItem>
+            }>
+          </List>
+        </Card>
       </Content>
     );
   }

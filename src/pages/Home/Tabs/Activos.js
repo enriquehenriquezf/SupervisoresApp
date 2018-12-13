@@ -60,7 +60,7 @@ export default class Home extends Component {
       },
       body: ''
     }).then(function(response) {
-      //console.log(response);
+      console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var actividades = "Actividades";
       var datos_usuario = "datos_usuario";
@@ -103,7 +103,7 @@ export default class Home extends Component {
               estado: element.estado,
               id_plan_trabajo: element.id_plan_trabajo,
               calificacion_pv: element.calificacion_pv,
-              observaciones: element.observaciones,
+              observacion: element.observacion,
               id_actividad: id,
               nombre_tabla: element.nombre_tabla,
               estado: element.estado,
@@ -158,9 +158,10 @@ export default class Home extends Component {
           <RefreshControl
             refreshing={this.state.refreshing}
             onRefresh={() => this.getPlanesDeTrabajo()}
+            colors={["#29B6F6"]}
           />
         }>
-        <Card>
+        <Card style={{borderRadius: 5}}>
           <List>
             <ListItem thumbnail style={{marginBottom: 5}}>
               <Left>
@@ -181,16 +182,16 @@ export default class Home extends Component {
           <List dataArray={items}
             renderRow={(item) =>
             item.separador === true ?
-              <Expo.LinearGradient colors={['#039BE5','#29B6F6']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
+              <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
                 <ListItem itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}} >
-                  <Text>{item.sucursal}</Text>
+                  <Text style={{color: '#FFF'}}>{item.sucursal}</Text>
                 </ListItem>
               </Expo.LinearGradient>
             :
               <ListItem icon button underlayColor='#BBDEFB' onPress={() => this._OnItemPress(this.props.handler2, item)}>
                 <Left >
                 {
-                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' style={{color: "#2196F3"}}/>
+                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' style={{color: "#29B6F6"}}/>
                 }
                 {
                   item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
@@ -203,15 +204,15 @@ export default class Home extends Component {
                   <Text>{item.name}</Text>
                 </Body>
                 <Right style={item.borde ? styles.ConBorde : styles.SinBorde}>
-                  {
-                    item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
-                  }
-                  {                  
-                    item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
-                  }
-                  {                  
-                    item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
-                  }
+                {
+                  item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
+                }
+                {                  
+                  item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
+                }
+                {                  
+                  item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
+                }
                 </Right>
               </ListItem>
             }>

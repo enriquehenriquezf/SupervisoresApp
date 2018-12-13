@@ -63,7 +63,7 @@ export default class Login extends Component {
       {
         token = response;
         handler(1,token);
-        toastr.showToast('Se ha logueado Correctamente!','success');
+        toastr.showToast('Ha iniciado sesión!','success');
       }
       else
       {

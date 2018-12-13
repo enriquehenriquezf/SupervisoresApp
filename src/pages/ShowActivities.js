@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content,Text, Toast, Icon, Button, Accordion, Spinner } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content,Text, Toast, Icon, Button, Accordion, Spinner, Card } from 'native-base';
 import {View, Platform, BackHandler} from 'react-native';
 import {ipShowActivities} from '../services/api'
 
@@ -72,14 +72,9 @@ export default class ShowActivities extends Component {
       <View
         style={{ flexDirection: "row", padding: 10, justifyContent: "space-between", alignItems: "center", backgroundColor: "#A9DAD6" }}
       >
-        <Text style={{ fontWeight: "600" }}>
+        <Text>
           {" "}{title}
         </Text>
-        {expanded ?
-            <Icon style={{ fontSize: 18 }} name="remove-circle" />
-          :  
-            <Icon style={{ fontSize: 18 }} name="add-circle" />
-        }
       </View>
     );
   }
@@ -118,10 +113,10 @@ export default class ShowActivities extends Component {
             </Button>
         </Right>
         </Header>
-        <Content>
-          <Accordion
-            dataArray={dataArray[indexArray]}
-          />
+        <Content>          
+          <Card style={{borderRadius: 5}}>
+            <Accordion style={{borderRadius: 5}} dataArray={dataArray[indexArray]} expanded headerStyle={{ backgroundColor: "#039BE5", color: '#FFFFFF' }} contentStyle={{ backgroundColor: "#29B6F6" }}/>
+          </Card>
         </Content>
       </Container>
     );

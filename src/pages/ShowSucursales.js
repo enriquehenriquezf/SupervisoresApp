@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Spinner } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Spinner, Card } from 'native-base';
 import {View, Platform, BackHandler} from 'react-native';
 import {ipShowActivities} from '../services/api'
 
@@ -157,22 +157,24 @@ export default class ShowSucursales extends Component {
         </Right>
         </Header>
         <Content>
-          <List dataArray={items}
-            renderRow={(item) =>
-            item.separador === true ?
-              <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)}>
-                <Text>{item.sucursal}</Text>
-              </ListItem>
-            :
-              <ListItem icon button>
-                <Left/>
-                <Body>
-                  <Text>{item.name}</Text>
-                </Body>
-                <Right/>
-              </ListItem>
-            }>
-          </List>
+          <Card>
+            <List dataArray={items}
+              renderRow={(item) =>
+              item.separador === true ?
+                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)}>
+                  <Text>{item.sucursal}</Text>
+                </ListItem>
+              :
+                <ListItem icon button>
+                  <Left/>
+                  <Body>
+                    <Text>{item.name}</Text>
+                  </Body>
+                  <Right/>
+                </ListItem>
+              }>
+            </List>
+          </Card>
         </Content>
       </Container>
     );
