@@ -112,8 +112,8 @@ export default class Home extends Component {
               separador: false,
               borde: true
             };
-            if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal, separador: true});}
-            if(sucursalActual !== element.nombre_sucursal){items[j].borde = false; items.push({sucursal: element.nombre_sucursal, separador: true}); j = j + 1; sucursalActual = element.nombre_sucursal}
+            if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true});}
+            if(sucursalActual !== element.nombre_sucursal){items[j].borde = false; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true}); j = j + 1; sucursalActual = element.nombre_sucursal}
             items.push(item);
             i = i + 1;          j = j + 1;
           });
@@ -183,7 +183,7 @@ export default class Home extends Component {
             renderRow={(item) =>
             item.separador === true ?
               <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
-                <ListItem itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}} >
+                <ListItem button underlayColor='#29B6F6' itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}} onPress={() => toastr.showToast(item.direccion,'info')} >
                   <Text style={{color: '#FFF'}}>{item.sucursal}</Text>
                 </ListItem>
               </Expo.LinearGradient>
