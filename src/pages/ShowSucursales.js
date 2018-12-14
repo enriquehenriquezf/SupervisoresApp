@@ -79,42 +79,42 @@ export default class ShowSucursales extends Component {
       //console.log(response);
       if(response.ok === true && response.status === 200)
       {
-          newToken = JSON.parse(response._bodyInit);
-          var actividades = "Actividades";
-          //console.log(Object.values(newToken[actividades]));
-          var i = 0;
-          var j = 0;
-          var SUCURSAL = null;
-          Object.values(newToken[actividades]).forEach(element => {
-            //console.log(Object.values(element));
-            var valores = Object.values(element)[0];
-            SUCURSAL = Object.keys(element)[0];
-            var options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'America/New_York' };
-            var fi = new Date(Date.parse(valores.fecha_inicio.split(' ')[0]));
-            fi.setDate(fi.getDate()+1);
-            var ff = new Date(Date.parse(valores.fecha_fin.split(' ')[0]));
-            ff.setDate(ff.getDate()+1);         
-            var item = {
-              name: valores.nombre_actividad,
-              sucursal: SUCURSAL,
-              fecha_inicio: fi.toLocaleDateString('es-ES', options),
-              fecha_fin: ff.toLocaleDateString('es-ES', options),
-              id_plan_trabajo: valores.id_plan_trabajo,
-              separador: false
-            };
-            //console.log(JSON.stringify(item));
-            var conte =  {title: item.name, content: "fecha inicio: " + item.fecha_inicio + "\n" + "fecha fin: " + item.fecha_fin };
-            if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true, index: j}); j = j + 1;}
-            if(sucursalActual === SUCURSAL){
-              contenido.push(conte);
-            }
-            if(sucursalActual !== SUCURSAL){dataArray.push(contenido); contenido = [];   contenido.push(conte);   items.push({sucursal: SUCURSAL, separador: true, index: j}); sucursalActual = SUCURSAL; j = j + 1;}
-            i = i + 1;                                            
-            //items.push(item);
-          });
-          dataArray.push(contenido); contenido = [];
-          console.log(dataArray);
-          //console.log(items)
+        newToken = JSON.parse(response._bodyInit);
+        var actividades = "Actividades";
+        //console.log(Object.values(newToken[actividades]));
+        var i = 0;
+        var j = 0;
+        var SUCURSAL = null;
+        Object.values(newToken[actividades]).forEach(element => {
+          //console.log(Object.values(element));
+          var valores = Object.values(element)[0];
+          SUCURSAL = Object.keys(element)[0];
+          var options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'America/New_York' };
+          var fi = new Date(Date.parse(valores.fecha_inicio.split(' ')[0]));
+          fi.setDate(fi.getDate()+1);
+          var ff = new Date(Date.parse(valores.fecha_fin.split(' ')[0]));
+          ff.setDate(ff.getDate()+1);         
+          var item = {
+            name: valores.nombre_actividad,
+            sucursal: SUCURSAL,
+            fecha_inicio: fi.toLocaleDateString('es-ES', options),
+            fecha_fin: ff.toLocaleDateString('es-ES', options),
+            id_plan_trabajo: valores.id_plan_trabajo,
+            separador: false
+          };
+          //console.log(JSON.stringify(item));
+          var conte =  {title: item.name, content: {fecha_inicio: item.fecha_inicio , fecha_fin: item.fecha_fin} };
+          if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true, index: j}); j = j + 1;}
+          if(sucursalActual === SUCURSAL){
+            contenido.push(conte);
+          }
+          if(sucursalActual !== SUCURSAL){dataArray.push(contenido); contenido = [];   contenido.push(conte);   items.push({sucursal: SUCURSAL, separador: true, index: j}); sucursalActual = SUCURSAL; j = j + 1;}
+          i = i + 1;
+          //items.push(item);
+        });
+        dataArray.push(contenido); contenido = [];
+        //console.log(dataArray);
+        //console.log(items)
       }
       else
       {
@@ -160,17 +160,13 @@ export default class ShowSucursales extends Component {
           <Card>
             <List dataArray={items}
               renderRow={(item) =>
-              item.separador === true ?
-                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)}>
+              item.index !== items.length-1 ?
+                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)} style={{borderBottomColor: "#29B6F6"}}>
                   <Text>{item.sucursal}</Text>
                 </ListItem>
               :
-                <ListItem icon button>
-                  <Left/>
-                  <Body>
-                    <Text>{item.name}</Text>
-                  </Body>
-                  <Right/>
+                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                  <Text>{item.sucursal}</Text>
                 </ListItem>
               }>
             </List>

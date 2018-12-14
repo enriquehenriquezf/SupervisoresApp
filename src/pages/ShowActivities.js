@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content,Text, Toast, Icon, Button, Accordion, Spinner, Card } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content,Text, Toast, Icon, Button, Spinner, Card } from 'native-base';
 import {View, Platform, BackHandler} from 'react-native';
 import {ipShowActivities} from '../services/api'
 
@@ -22,6 +22,7 @@ export const toastr = {
 
 let dataArray = [];
 let indexArray = 0;
+let items = [];
 export default class ShowActivities extends Component {
   constructor(props) {
     super(props);
@@ -59,35 +60,33 @@ export default class ShowActivities extends Component {
     return true;
   }
   /**
-   * Obtener actividades a realizar durante los proximos 7 días
+   * Obtener actividades a realizar durante los proximos 7 días en dicha sucursal y organizarlas por planes de trabajo
    */
   async getPlanesDeTrabajo()
   {
+    var nombreActual = null;
+    var i = 0;
+    var content = [];
+    dataArray[indexArray].forEach(element => {
+      //console.log(element);
+      if(i === 0){
+        nombreActual = element.title;
+      }
+      if(nombreActual === element.title){
+        content.push(element.content);
+      }
+      else{
+        items.push({title: nombreActual, content: content});
+        content = [];
+        content.push(element.content);
+        nombreActual = element.title;
+      }
+      i++;
+    });
+    items.push({title: nombreActual, content: content});
+    //console.log(items);
     this.setState({ loading: false });
   }
-
-
-  _renderHeader(title, expanded) {
-    return (
-      <View
-        style={{ flexDirection: "row", padding: 10, justifyContent: "space-between", alignItems: "center", backgroundColor: "#A9DAD6" }}
-      >
-        <Text>
-          {" "}{title}
-        </Text>
-      </View>
-    );
-  }
-  _renderContent(content) {
-    return (
-      <Text
-        style={{ backgroundColor: "#e3f1f1", padding: 10, fontStyle: "italic" }}
-      >
-        {content}
-      </Text>
-    );
-  }
-
 
   render() { 
     /***
@@ -96,6 +95,26 @@ export default class ShowActivities extends Component {
     if (this.state.loading) {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
+    /**
+     * mostrar las fechas de una actividad dentro de un solo componente
+     */
+    const activities = items.map((data) => {
+      return(
+        <Card key={Math.floor(Math.random() * 1000) + 1} style={{borderRadius: 5, backgroundColor: "#039BE5"}}>
+          <Text> {data.title}</Text>
+          {
+            data.content.map((data2) => {
+              return(             
+                <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderRadius: 5}}>
+                  <Text> Fecha inicio: {data2.fecha_inicio}</Text>
+                  <Text> Fecha fin: {data2.fecha_fin}</Text>
+                </Card>
+              )
+            })
+          }
+        </Card>
+      )
+    })
     return (
       <Container>
         <Header style={{paddingTop: 20}}>
@@ -114,9 +133,7 @@ export default class ShowActivities extends Component {
         </Right>
         </Header>
         <Content>          
-          <Card style={{borderRadius: 5}}>
-            <Accordion style={{borderRadius: 5}} dataArray={dataArray[indexArray]} expanded headerStyle={{ backgroundColor: "#039BE5", color: '#FFFFFF' }} contentStyle={{ backgroundColor: "#29B6F6" }}/>
-          </Card>
+          {activities}
         </Content>
       </Container>
     );

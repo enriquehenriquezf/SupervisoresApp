@@ -121,7 +121,7 @@ export default class Login extends Component {
     var height = Dimensions.get('window').height;
     return (
       <Container>
-        <Expo.LinearGradient colors={['#00CDAC','#02AAB0']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] ['#00CDAC','#02AAB0'] ['#5A288E','#02AAB0']*/}
+        <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] ['#00CDAC','#02AAB0'] ['#5A288E','#02AAB0'] ['#29B6F6','#039BE5']*/}
           <Header transparent style={{paddingTop: 20}}>
           <Left/>          
           <Body>

@@ -454,7 +454,7 @@ export default class Activity extends Component {
               items.estado === 'Activo' || items.estado === 'activo' ?
                 <Button success regular block style={styles.boton} onPress={() => this.FinishActivity(this.props.handler2)}><Text> Finalizar </Text></Button>
               :              
-                <Button primary regular block style={styles.boton} onPress={() => this.FinishActivity(this.props.handler2)}><Text> Modificar </Text></Button>
+                <Button info regular block style={styles.boton} onPress={() => this.FinishActivity(this.props.handler2)}><Text> Modificar </Text></Button>
             }
           </Content>
         </KeyboardAvoidingView>
