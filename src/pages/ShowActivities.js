@@ -1,24 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content,Text, Toast, Icon, Button, Spinner, Card } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content,Text, Icon, Button, Spinner, Card } from 'native-base';
 import {View, Platform, BackHandler} from 'react-native';
 import {ipShowActivities} from '../services/api'
-
-export const toastr = {
-  /***
-   * Mostrar Toast en la parte de abajo durante 3 segundos con un mensaje y tipo especifico
-   * @param {String} message mensaje a mostrar en el Toast
-   * @param {String} tipo tipo de Toast (success,warning,danger)
-   */
-  showToast: (message,tipo) => {
-    Toast.show({
-      text: message,
-      duration: 3000,
-      buttonText: "Ok",
-      type: tipo
-    });
-  },
-};
 
 let dataArray = [];
 let indexArray = 0;
@@ -27,8 +11,7 @@ export default class ShowActivities extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
-      showToast: false
+      loading: true
     };
     let token = this.props.token;
     let newToken = null;

@@ -1,26 +1,11 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Toast, Icon, Spinner, H1 } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Icon, Spinner, H1 } from 'native-base';
+import {toastr} from '../components/Toast';
 import { CheckBox } from 'react-native-elements';
 import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform } from 'react-native';
 import styles from '../styles/Login';
 import {ipLogin} from '../services/api'
-
-export const toastr = {
-  /***
-   * Mostrar Toast en la parte de abajo durante 3 segundos con un mensaje y tipo especifico
-   * @param {String} message mensaje a mostrar en el Toast
-   * @param {String} tipo tipo de Toast (success,warning,danger)
-   */
-  showToast: (message,tipo) => {
-    Toast.show({
-      text: message,
-      duration: 3000,
-      buttonText: "Ok",
-      type: tipo
-    });
-  },
-};
 
 export default class Login extends Component {
   // email de prueba: ne.ko@hotmail.es    pass de prueba: 123456

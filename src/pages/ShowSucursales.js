@@ -1,24 +1,9 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Toast, Badge, Icon, Button, Spinner, Card } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Icon, Button, Spinner, Card } from 'native-base';
+import {toastr} from '../components/Toast';
 import {View, Platform, BackHandler} from 'react-native';
 import {ipShowActivities} from '../services/api'
-
-export const toastr = {
-  /***
-   * Mostrar Toast en la parte de abajo durante 3 segundos con un mensaje y tipo especifico
-   * @param {String} message mensaje a mostrar en el Toast
-   * @param {String} tipo tipo de Toast (success,warning,danger)
-   */
-  showToast: (message,tipo) => {
-    Toast.show({
-      text: message,
-      duration: 3000,
-      buttonText: "Ok",
-      type: tipo
-    });
-  },
-};
 
 let items = [];
 let sucursalActual = null;

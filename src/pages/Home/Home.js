@@ -1,25 +1,11 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title,Text, Toast, Icon, Button, Tabs, Tab, TabHeading } from 'native-base';
+import { Container, Header, Left, Body, Right, Title,Text, Icon, Button, Tabs, Tab, TabHeading } from 'native-base';
 import {View, Platform} from 'react-native';
 import Activos from './Tabs/Activos';
 import Completados from './Tabs/Completados';
 
-export const toastr = {
-  /***
-   * Mostrar Toast en la parte de abajo durante 3 segundos con un mensaje y tipo especifico
-   * @param {String} message mensaje a mostrar en el Toast
-   * @param {String} tipo tipo de Toast (success,warning,danger)
-   */
-  showToast: (message,tipo) => {
-    Toast.show({
-      text: message,
-      duration: 3000,
-      buttonText: "Ok",
-      type: tipo
-    });
-  },
-};
+
 export default class Home extends Component {
   constructor(props) {
     super(props);

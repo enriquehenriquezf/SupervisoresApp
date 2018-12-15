@@ -1,25 +1,10 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Toast, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card } from 'native-base';
+import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView} from 'react-native';
 import styles from '../styles/Activity';
 import {ipActivity} from '../services/api'
-
-export const toastr = {
-  /***
-   * Mostrar Toast en la parte de abajo durante 3 segundos con un mensaje y tipo especifico
-   * @param {String} message mensaje a mostrar en el Toast
-   * @param {String} tipo tipo de Toast (success,warning,danger)
-   */
-  showToast: (message,tipo) => {
-    Toast.show({
-      text: message,
-      duration: 3000,
-      buttonText: "Ok",
-      type: tipo
-    });
-  },
-};
 
 let items = null;
 export default class Activity extends Component {
@@ -273,8 +258,8 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'kardex' ?
                   <View>
-                    <Text>Elaboración: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
+                    <Text style={{margin: 10}}>Elaboración: </Text>              
+                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Completo</Text>
                       </Left>
@@ -287,7 +272,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Pendiente</Text>
                       </Left>
@@ -307,8 +292,8 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'condiciones_locativas' ?
                   <View>
-                    <Text>Condiciones: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Excelentes')}>
+                    <Text style={{margin: 10}}>Condiciones: </Text>              
+                    <ListItem button onPress={() => this.SetChecked(1,'Excelentes')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Excelentes</Text>
                       </Left>
@@ -321,7 +306,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Buenas')}>
+                    <ListItem button onPress={() => this.SetChecked(2,'Buenas')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Buenas</Text>
                       </Left>
@@ -334,7 +319,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(3,'Regulares')}>
+                    <ListItem button onPress={() => this.SetChecked(3,'Regulares')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Regulares</Text>
                       </Left>
@@ -347,7 +332,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(4,'Malas')}>
+                    <ListItem button onPress={() => this.SetChecked(4,'Malas')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Malas</Text>
                       </Left>
@@ -360,7 +345,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(5,'Pesimas')}>
+                    <ListItem button onPress={() => this.SetChecked(5,'Pesimas')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Pesimas</Text>
                       </Left>
@@ -380,8 +365,8 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'convenio_exhibicion' ?
                   <View>
-                    <Text>Verificar permanencia de las exhibiciones: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')}>
+                    <Text style={{margin: 10}}>Verificar permanencia de las exhibiciones: </Text>              
+                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Completo</Text>
                       </Left>
@@ -394,7 +379,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Pendiente</Text>
                       </Left>
@@ -414,8 +399,8 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'libros_faltantes' ?
                   <View>
-                    <Text>Verificar libros faltantes a la fecha: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Al día')}>
+                    <Text style={{margin: 10}}>Verificar libros faltantes a la fecha: </Text>              
+                    <ListItem button onPress={() => this.SetChecked(1,'Al día')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Al día</Text>
                       </Left>
@@ -428,7 +413,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')}>
+                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Pendiente</Text>
                       </Left>
