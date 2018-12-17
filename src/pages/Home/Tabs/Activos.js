@@ -81,6 +81,42 @@ export default class Home extends Component {
             else if(element.iid_convenio_exhibicion !== undefined){
               id = element.iid_convenio_exhibicion;
             }
+            else if(element.id_ingreso_sucursal !== undefined){
+              id = element.id_ingreso_sucursal;
+            }
+            else if(element.id_captura_cliente !== undefined){
+              id = element.id_captura_cliente;
+            }
+            else if(element.id_documentacion !== undefined){
+              id = element.id_documentacion;
+            }
+            else if(element.id_evaluacion_pedidos !== undefined){
+              id = element.id_evaluacion_pedidos;
+            }
+            else if(element.id_excesos !== undefined){
+              id = element.id_excesos;
+            }
+            else if(element.id_libro_agendaclientes !== undefined){
+              id = element.id_libro_agendaclientes;
+            }
+            else if(element.id_libro_vencimientos !== undefined){
+              id = element.id_libro_vencimientos;
+            }
+            else if(element.id_papel_consignaciones !== undefined){
+              id = element.id_papel_consignaciones;
+            }
+            else if(element.id_presupuesto_pedido !== undefined){
+              id = element.id_presupuesto_pedido;
+            }
+            else if(element.id_remision !== undefined){
+              id = element.id_remision;
+            }
+            else if(element.id_revision !== undefined){
+              id = element.id_revision;
+            }
+            else if(element.id_seguimiento !== undefined){
+              id = element.id_seguimiento;
+            }
             var item = {
               name: keys[i],
               sucursal: element.nombre_sucursal,

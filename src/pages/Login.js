@@ -114,7 +114,7 @@ export default class Login extends Component {
           </Body>
           <Right />
           </Header>
-          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>{/**TODO: Logo de UniDrogas */}
             <Content style={{ marginTop: 5}}>
               <Form style={{paddingTop:height/4}}>
                 <Item regular style={styles.form}>
