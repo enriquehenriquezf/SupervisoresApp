@@ -17,10 +17,6 @@ export default class Home extends Component {
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
-  async componentWillMount() {
-  }
-
-
   render() {
     return (
       <Container>     
@@ -40,10 +36,10 @@ export default class Home extends Component {
           </Header>
         <Tabs tabContainerStyle={{elevation:0}}>
           <Tab style={{backgroundColor: '#f4f4f4'}} heading={ <TabHeading><Text>Activos</Text></TabHeading>}>{/* #E1F5FE */}
-            <Activos handler2={this.props.handler2} token={token} data={this.props.data} ChangePage={this.ChangePage}/>
+            <Activos handler2={this.props.handler2} token={token} data={this.props.data}/>
           </Tab>
           <Tab style={{backgroundColor: '#f4f4f4'}} heading={ <TabHeading  ><Text>Completados</Text></TabHeading>}>
-            <Completados handler2={this.props.handler2} token={token} data={this.props.data} ChangePage={this.ChangePage}/>
+            <Completados handler2={this.props.handler2} token={token} data={this.props.data}/>
           </Tab>
         </Tabs>
       </Container>

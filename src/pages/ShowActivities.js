@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content,Text, Icon, Button, Spinner, Card } from 'native-base';
 import {View, Platform, BackHandler} from 'react-native';
-import {ipShowActivities} from '../services/api'
+import {api} from '../services/api'
 
 let dataArray = [];
 let indexArray = 0;

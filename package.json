@@ -13,7 +13,7 @@
     "native-base": "^2.8.1",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
-    "react-native-elements": "^1.0.0-beta7",
+    "react-native-elements": "git+https://github.com/react-native-training/react-native-elements.git#next",
     "react-native-scripts": "^2.0.1"
   },
   "devDependencies": {

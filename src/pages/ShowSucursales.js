@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Icon, Button, Spinner, Card } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View, Platform, BackHandler} from 'react-native';
-import {ipShowActivities} from '../services/api'
+import {api} from '../services/api'
 
 let items = [];
 let sucursalActual = null;
@@ -53,7 +53,7 @@ export default class ShowSucursales extends Component {
     let handler2 = false;
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
-    await fetch(ipShowActivities, {
+    await fetch(api.ipShowActivities, {
       method: 'GET',
       headers: {
           'Authorization': auth,

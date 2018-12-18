@@ -5,6 +5,7 @@ import * as Expo from 'expo';
 import Login from './Login';
 import Home from './Home/Home';
 import Activity from './Activity';
+import Profile from './Profile';
 import ShowSucursales from './ShowSucursales';
 import ShowActivities from './ShowActivities';
 
@@ -106,6 +107,8 @@ export default class Index extends Component {
       AppComponent = ShowSucursales
     } else if(this.state.index == 4){
       AppComponent = ShowActivities
+    } else if(this.state.index == 5){
+      AppComponent = Profile
     }
     return (
       <Root>

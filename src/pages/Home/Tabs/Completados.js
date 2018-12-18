@@ -4,7 +4,7 @@ import { Left, Body, Right, Title, Content, List,ListItem,Text, Badge, Icon, Thu
 import {toastr} from '../../../components/Toast';
 import {View, Platform, RefreshControl} from 'react-native';
 import styles from '../../../styles/Home';
-import {ipHomeCompletados} from '../../../services/api'
+import {api} from '../../../services/api'
 
 let items = [];
 let user = [];
@@ -37,7 +37,7 @@ export default class Home extends Component {
     this.setState({refreshing: true });
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
-    await fetch(ipHomeCompletados, {
+    await fetch(api.ipHomeCompletados, {
       method: 'GET',
       headers: {
           'Authorization': auth,
@@ -45,7 +45,7 @@ export default class Home extends Component {
       },
       body: ''
     }).then(function(response){
-      console.log(response);
+      //console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var actividades = "Actividades";
       var datos_usuario = "datos_usuario";
@@ -60,6 +60,7 @@ export default class Home extends Component {
           Object.values(newToken[actividades]).forEach(element => {
             //console.log(JSON.stringify(element));            
             let id = '';
+            //#region planes de trabajo #00FF00
             if(element.id_apertura !== undefined){
               id = element.id_apertura;
             }
@@ -117,6 +118,7 @@ export default class Home extends Component {
             else if(element.id_seguimiento !== undefined){
               id = element.id_seguimiento;
             }
+            //#endregion
             var item = {
               name: keys[i],
               sucursal: element.nombre_sucursal,
@@ -139,7 +141,7 @@ export default class Home extends Component {
             i = i + 1;       j = j + 1;   
           });
           items[j].borde = false;
-          console.log(items)
+          //console.log(items)
       }
       else
       {
@@ -162,10 +164,9 @@ export default class Home extends Component {
    * @param {function} handler 
    * @param {Array} item 
    */
-  _OnItemPress(handler, item, changepage)
+  _OnItemPress(index,handler, item)
   {
-    handler(2,token,item);
-    //changepage(1);
+    handler(index,token,item);
   }
 
   render() {
@@ -185,9 +186,9 @@ export default class Home extends Component {
         }>        
         <Card style={{borderRadius: 5}}>
           <List>
-            <ListItem thumbnail style={{marginBottom: 5}}>
+            <ListItem thumbnail button style={{marginBottom: 5}}  onPress={() => this._OnItemPress(5,this.props.handler2, user)}>
               <Left>
-                <Thumbnail source={{ uri: 'https://banner2.kisspng.com/20180410/bbw/kisspng-avatar-user-medicine-surgery-patient-avatar-5acc9f7a7cb983.0104600115233596105109.jpg' }} />
+                <Thumbnail source={{ uri: 'https://png.pngtree.com/svg/20160304/ajb_address_book_user_avatar_183015.png' }} />
                 <View style={styles.separador}></View>
               </Left>
               <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
@@ -210,7 +211,7 @@ export default class Home extends Component {
                 </ListItem>
               </Expo.LinearGradient>
             :
-              <ListItem icon button underlayColor='#BBDEFB' onPress={() => this._OnItemPress(this.props.handler2, item, this.props.ChangePage)}>
+              <ListItem icon button underlayColor='#BBDEFB' onPress={() => this._OnItemPress(2,this.props.handler2, item)}>
                 <Left>
                 {
                   (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' />

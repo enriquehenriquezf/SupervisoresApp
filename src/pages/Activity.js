@@ -5,9 +5,10 @@ import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView} from 'react-native';
 import {Overlay} from 'react-native-elements';
 import styles from '../styles/Activity';
-import {ipActivity} from '../services/api'
+import {api} from '../services/api'
 
 let items = null;
+let info = '';
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -39,6 +40,29 @@ export default class Activity extends Component {
       this._getLocationAsync();
     }
     navigator.geolocation.clearWatch(this.watchId);
+
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    await fetch(api.ipDescripcion + '?nombre_tabla=' + items.nombre_tabla, {
+      method: 'GET',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      
+      body: ''
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true && response.status === 200)
+      {
+        var token2 = JSON.parse(response._bodyInit)
+        //console.log(token2["message"]);
+        info = token2["message"].descripcion;
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
 
     this.setState({ loading: false });
   }
@@ -153,7 +177,7 @@ export default class Activity extends Component {
     let handler2 = this.props.handler2;
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let id = items.id_actividad;
-    fetch(ipActivity, {
+    fetch(api.ipActivity, {
       method: 'POST',
       headers: {
           'Authorization': auth,
@@ -899,7 +923,7 @@ export default class Activity extends Component {
             width="auto"
             height="auto"
           >
-            <Text style={{color:'white'}}>Información Plan de Trabajo</Text>
+            <Text style={{color:'white'}}>{info}</Text>
           </Overlay>
       </Container>
     );

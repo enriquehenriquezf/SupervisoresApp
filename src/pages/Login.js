@@ -5,7 +5,7 @@ import {toastr} from '../components/Toast';
 import { CheckBox } from 'react-native-elements';
 import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform } from 'react-native';
 import styles from '../styles/Login';
-import {ipLogin} from '../services/api'
+import {api} from '../services/api'
 
 export default class Login extends Component {
   // email de prueba: ne.ko@hotmail.es    pass de prueba: 123456
@@ -35,7 +35,7 @@ export default class Login extends Component {
     let username = this.state.email;
     let pass = this.state.password;
     this._storeData();
-    fetch(ipLogin, {
+    fetch(api.ipLogin, {
     method: 'POST',
     headers: {
         'Authorization': 'Access',
