@@ -114,7 +114,7 @@ export default class ShowSucursales extends Component {
     if(!handler2){
       this.setState({ loading: false, refreshing: false });
     }
-    else{this.props.handler2(0,null,[]);}
+    else{this.props.handler2(-1,token,[]);}
   }
 
   render() {
@@ -136,7 +136,7 @@ export default class ShowSucursales extends Component {
           <Title>Actividades</Title>
         </Body>
         <Right>
-            <Button transparent onPress={() => this.props.handler2(0,null,[])}>
+            <Button transparent onPress={() => this.props.handler2(-1,token,[])}>
                 <Icon ios="ios-log-out" android="md-log-out" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
             </Button>
         </Right>

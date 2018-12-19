@@ -156,7 +156,7 @@ export default class Home extends Component {
     if(!handler2){
       this.setState({ loading: false, refreshing: false });
     }
-    else{this.props.handler2(0,null,[]);}
+    else{this.props.handler2(-1,token,[]);}
   }
 
   /**
@@ -217,10 +217,7 @@ export default class Home extends Component {
                   (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' style={{color: "#29B6F6"}}/>
                 }
                 {
-                  item.estado === "terminado" && <Icon active ios='ios-checkmark' android='md-checkmark' />
-                }
-                {
-                  item.estado === "completo" && <Icon active ios='ios-checkmark' android='md-checkmark' />
+                  (item.estado === "terminado" || item.estado === "completo") && <Icon active ios='ios-checkmark' android='md-checkmark' style={{color: "#29B6F6"}} />
                 }
                 </Left>
                 <Body style={item.borde ? styles.ConBorde : styles.SinBorde}>

@@ -3,6 +3,7 @@
  */
 export const api = {
  ipLogin : "http://192.168.1.4/supervisores_api/public/api/login",
+ ipLogout : "http://192.168.1.4/supervisores_api/public/api/logout",
  ipHome : "http://192.168.1.4/supervisores_api/public/api/homeSupervisor",
  ipHomeCompletados : "http://192.168.1.4/supervisores_api/public/api/actividades_completas",
  ipShowActivities : "http://192.168.1.4/supervisores_api/public/api/mostrarActividades",

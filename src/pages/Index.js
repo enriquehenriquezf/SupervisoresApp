@@ -8,6 +8,7 @@ import Activity from './Activity';
 import Profile from './Profile';
 import ShowSucursales from './ShowSucursales';
 import ShowActivities from './ShowActivities';
+import {api} from '../services/api'
 
 export default class Index extends Component {
   constructor(props) {
@@ -23,6 +24,7 @@ export default class Index extends Component {
     this.handler = this.handler.bind(this);
     this.handler2 = this.handler2.bind(this);
     this.handler3 = this.handler3.bind(this);
+    this._OnLogout = this._OnLogout.bind(this);
     console.ignoredYellowBox = ['Setting a timer', 'Require cycle:'];
     console.ignoredYellowBox = ['Require cycle:'];
   }
@@ -45,6 +47,31 @@ export default class Index extends Component {
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
     });
     this.setState({ loading: false });
+  }
+
+  /**
+   * Elimina el token
+   */
+  async _OnLogout(){
+    let bodyInit = JSON.parse(this.state.token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    await fetch(api.ipLogout, {
+      method: 'POST',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/json'
+      },      
+      body: ''
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true && response.status === 200)
+      {
+        var token2 = JSON.parse(response._bodyInit)
+        console.log(token2["message"]);
+      }
+    }).catch(function(error){
+      console.log(error);
+    });   
   }
 
   /***
@@ -109,6 +136,9 @@ export default class Index extends Component {
       AppComponent = ShowActivities
     } else if(this.state.index == 5){
       AppComponent = Profile
+    } else if(this.state.index == -1){
+      this._OnLogout();
+      AppComponent = Login
     }
     return (
       <Root>

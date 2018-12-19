@@ -40,7 +40,14 @@ export default class Activity extends Component {
       this._getLocationAsync();
     }
     navigator.geolocation.clearWatch(this.watchId);
+    this.Descripcion();
+    this.setState({ loading: false });
+  }
 
+  /**
+   * Obtener la descripción del plan de trabajo a realizar
+   */
+  Descripcion = async() => {
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     await fetch(api.ipDescripcion + '?nombre_tabla=' + items.nombre_tabla, {
@@ -48,8 +55,7 @@ export default class Activity extends Component {
       headers: {
           'Authorization': auth,
           'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      
+      },      
       body: ''
     }).then(function(response) {
       //console.log(response);
@@ -63,8 +69,6 @@ export default class Activity extends Component {
       //toastr.showToast('Su sesión expiró','danger');
       console.log(error);
     });
-
-    this.setState({ loading: false });
   }
 
   /**
@@ -77,8 +81,13 @@ export default class Activity extends Component {
         errorMessage: 'Permiso para acceder al gps denegado',
       });
       console.log('Permiso para acceder al gps denegado');
+      toastr.showToast('Debe conceder los permisos de GPS!','danger');
+      this.handleBackPress();
     }
-    else{console.log('Permiso Concedido');}
+    else{
+      navigator.geolocation.clearWatch(this.watchId);
+      console.log('Permiso Concedido');
+    }
 }
 
   componentDidMount()
@@ -205,7 +214,7 @@ export default class Activity extends Component {
       }
     }).catch(function(error){
       toastr.showToast('Su sesión expiró','danger');
-      handler2(0,null,[]);
+      handler2(-1,token,[]);
       console.log(error);
     });
   }
@@ -230,7 +239,7 @@ export default class Activity extends Component {
         </Body>
         <Right>          
           <Button transparent onPress={() => this.setState({isVisible: true})}>
-              <Icon ios="ios-help" android="md-help" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+              <Icon ios="ios-help" android="md-help" style={{fontSize: Platform.OS === 'ios' ? 30 : 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
           </Button>
         </Right>
         </Header>
