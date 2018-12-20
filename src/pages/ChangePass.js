@@ -9,7 +9,7 @@ import {api} from '../services/api'
 import {View,Platform, BackHandler} from 'react-native';
 
 let items = null;
-export default class Profile extends Component {
+export default class ChangePass extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,7 +18,6 @@ export default class Profile extends Component {
     };
     let token = this.props.token;
     items = this.props.data;
-    this.ChangePass = this.ChangePass.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -48,30 +47,6 @@ export default class Profile extends Component {
     return true;
   }
 
-  /**
-   * Enviar correo de cambio de contraseña e ir al layout de cambio de contraseña
-   */
-  ChangePass(handler)
-  {
-    fetch(api.ipChangePassword, {
-      method: 'POST',
-      headers: {
-          'Authorization': 'Access',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({email: items.correo})
-      }).then(function(response) {
-        console.log(response);
-        if(response.ok === true)
-        {
-          handler(7,token,items);
-        }
-        return response.json();
-      }).catch(function(error){
-        console.log(error);
-      });
-  }
-
   render() {
     /***
      * Mostrar layout luego de cargar los datos
@@ -89,21 +64,12 @@ export default class Profile extends Component {
             </Button>
         </Left>          
         <Body>
-          <Title>Perfil</Title>
+          <Title>Cambiar Contraseña</Title>
         </Body>
         <Right/>
         </Header>
           <Content>
             <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
-                <Avatar size="xlarge" rounded
-                title={items.nombre.substring(0,1) + items.apellido.substring(0,1)}
-                titleStyle={{color:'#039BE5',backgroundColor: 'rgba(255,255,255,0)'}}
-                avatarStyle={{backgroundColor: 'rgba(255,255,255,0)'}}
-                containerStyle={{marginLeft:'auto', marginRight:'auto', borderWidth:4, borderColor:'#FFF'}}
-                source={{uri: "https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585"}}// https://png.pngtree.com/svg/20160304/ajb_address_book_user_avatar_183015.png
-                onPress={() => console.log("Works!")}
-                activeOpacity={0.5}
-                />
                 <H2 style={{margin: 5, marginLeft:'auto', marginRight:'auto'}}>{items.nombre} {items.apellido}</H2>
                 <Item style={{borderBottomColor: '#039BE5'}}>
                     <Icon ios="ios-card" android="md-card" style={{color: '#039BE5'}}></Icon>
@@ -125,8 +91,7 @@ export default class Profile extends Component {
                     <Text style={styles.text}>  tels:     </Text>
                     <Text>{items.telefono}</Text>
                 </Item>
-                <Button info regular block style={styles.boton} onPress={() => this.ChangePass(this.props.handler2)}><Text> Cambiar Contraseña </Text></Button>
-                <Button danger regular block style={styles.boton} onPress={() => this.props.handler2(-1,token,[])}><Text> Cerrar Sesión </Text></Button>
+                <Button info regular block style={styles.boton} ><Text> Cambiar Contraseña </Text></Button>
             </View>
           </Content>
           </Expo.LinearGradient>

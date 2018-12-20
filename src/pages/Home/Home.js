@@ -1,7 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title,Text, Icon, Button, Tabs, Tab, TabHeading } from 'native-base';
-import {View, Platform} from 'react-native';
+import {View} from 'react-native';
+import IconStyles from '../../styles/Icons';
 import Activos from './Tabs/Activos';
 import Completados from './Tabs/Completados';
 
@@ -27,10 +28,10 @@ export default class Home extends Component {
             </Body>
             <Right>
                 <Button transparent onPress={() => this.props.handler2(3,token,[])}>
-                    <Icon ios="ios-calendar" android="md-calendar" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+                    <Icon ios="ios-calendar" android="md-calendar" style={IconStyles.header}></Icon>
                 </Button>
                 <Button transparent onPress={() => this.props.handler2(-1,token,[])}>
-                    <Icon ios="ios-log-out" android="md-log-out" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+                    <Icon ios="ios-log-out" android="md-log-out" style={IconStyles.header}></Icon>
                 </Button>
             </Right>
           </Header>

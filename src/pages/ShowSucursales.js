@@ -2,7 +2,8 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Icon, Button, Spinner, Card } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View, Platform, BackHandler} from 'react-native';
+import {View, BackHandler} from 'react-native';
+import IconStyles from '../styles/Icons';
 import {api} from '../services/api'
 
 let items = [];
@@ -88,7 +89,7 @@ export default class ShowSucursales extends Component {
             separador: false
           };
           //console.log(JSON.stringify(item));
-          var conte =  {title: item.name, content: {fecha_inicio: item.fecha_inicio , fecha_fin: item.fecha_fin} };
+          var conte =  {title: item.name, content: {fecha_inicio: item.fecha_inicio , fecha_fin: item.fecha_fin}, sucursal: SUCURSAL };
           if(i === 0){sucursalActual = SUCURSAL; items.push({sucursal: SUCURSAL, separador: true, index: j}); j = j + 1;}
           if(sucursalActual === SUCURSAL){
             contenido.push(conte);
@@ -129,7 +130,7 @@ export default class ShowSucursales extends Component {
         <Header style={{paddingTop: 20}}>
         <Left>
             <Button transparent onPress={() => this.props.handler2(1,token,[])}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          
         <Body>
@@ -137,16 +138,16 @@ export default class ShowSucursales extends Component {
         </Body>
         <Right>
             <Button transparent onPress={() => this.props.handler2(-1,token,[])}>
-                <Icon ios="ios-log-out" android="md-log-out" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+                <Icon ios="ios-log-out" android="md-log-out" style={IconStyles.header}></Icon>
             </Button>
         </Right>
         </Header>
         <Content>
-          <Card>
+          <Card style={{borderRadius:5}}>
             <List dataArray={items}
               renderRow={(item) =>
               item.index !== items.length-1 ?
-                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)} style={{borderBottomColor: "#29B6F6"}}>
+                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)} style={{borderBottomColor: "#29B6F6", borderBottomWidth:1.5}}>
                   <Text>{item.sucursal}</Text>
                 </ListItem>
               :

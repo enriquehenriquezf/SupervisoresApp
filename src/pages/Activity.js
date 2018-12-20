@@ -5,6 +5,7 @@ import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView} from 'react-native';
 import {Overlay} from 'react-native-elements';
 import styles from '../styles/Activity';
+import IconStyles from '../styles/Icons';
 import {api} from '../services/api'
 
 let items = null;
@@ -59,7 +60,7 @@ export default class Activity extends Component {
       body: ''
     }).then(function(response) {
       //console.log(response);
-      if(response.ok === true && response.status === 200)
+      if(response.ok === true)
       {
         var token2 = JSON.parse(response._bodyInit)
         //console.log(token2["message"]);
@@ -231,7 +232,7 @@ export default class Activity extends Component {
         <Header style={{paddingTop: 20}}>
         <Left>
             <Button transparent onPress={() => this.props.handler2(1,token,[])}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          
         <Body>
@@ -239,7 +240,7 @@ export default class Activity extends Component {
         </Body>
         <Right>          
           <Button transparent onPress={() => this.setState({isVisible: true})}>
-              <Icon ios="ios-help" android="md-help" style={{fontSize: Platform.OS === 'ios' ? 30 : 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+              <Icon ios="ios-help" android="md-help" style={IconStyles.help}></Icon>
           </Button>
         </Right>
         </Header>

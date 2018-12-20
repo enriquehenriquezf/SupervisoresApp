@@ -1,12 +1,15 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content,Text, Icon, Button, Spinner, Card } from 'native-base';
-import {View, Platform, BackHandler} from 'react-native';
+import {Divider} from 'react-native-elements';
+import {View, BackHandler} from 'react-native';
+import IconStyles from '../styles/Icons';
 import {api} from '../services/api'
 
 let dataArray = [];
 let indexArray = 0;
 let items = [];
+let SUCURSAL = 'Sucursal';
 export default class ShowActivities extends Component {
   constructor(props) {
     super(props);
@@ -49,24 +52,27 @@ export default class ShowActivities extends Component {
   {
     var nombreActual = null;
     var i = 0;
+    var j = 0;
     var content = [];
     dataArray[indexArray].forEach(element => {
       //console.log(element);
       if(i === 0){
         nombreActual = element.title;
+        SUCURSAL = element.sucursal;
       }
       if(nombreActual === element.title){
         content.push(element.content);
       }
       else{
-        items.push({title: nombreActual, content: content});
+        items.push({title: nombreActual, content: content, index: j});
         content = [];
         content.push(element.content);
         nombreActual = element.title;
+        j++;
       }
       i++;
     });
-    items.push({title: nombreActual, content: content});
+    items.push({title: nombreActual, content: content, index: j});
     //console.log(items);
     this.setState({ loading: false });
   }
@@ -83,8 +89,8 @@ export default class ShowActivities extends Component {
      */
     const activities = items.map((data) => {
       return(
-        <Card key={Math.floor(Math.random() * 1000) + 1} style={{borderRadius: 5, backgroundColor: "#039BE5"}}>
-          <Text> {data.title}</Text>
+        <Card key={Math.floor(Math.random() * 1000) + 1} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0}}>
+          <Text style={{color: "#039BE5", fontSize:20}}> {data.title}</Text>
           {
             data.content.map((data2) => {
               return(             
@@ -95,6 +101,13 @@ export default class ShowActivities extends Component {
               )
             })
           }
+          {
+            data.index !== items.length-1 ? 
+              <Divider style={{backgroundColor:'#039BE5', marginLeft:10, marginRight:10, marginTop:10, height:1.5,
+              elevation:2, shadowOpacity:0.2, shadowColor:'#039BE5' }} />
+            :
+              null
+          }
         </Card>
       )
     })
@@ -102,16 +115,16 @@ export default class ShowActivities extends Component {
       <Container>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent onPress={() => this.props.handler2(3,token,[])}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+            <Button transparent style={{marginLeft:5}} onPress={() => this.props.handler2(3,token,[])}>
+                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          
         <Body>
-          <Title>Actividades</Title>
+          <Title>{SUCURSAL.substring(0,1) + SUCURSAL.substring(1,SUCURSAL.length).toLowerCase()}</Title>
         </Body>
         <Right>
             <Button transparent onPress={() => this.props.handler2(-1,token,[])}>
-                <Icon ios="ios-log-out" android="md-log-out" style={{fontSize: 20, color: Platform.OS === 'ios' ? 'black' : 'white'}}></Icon>
+                <Icon ios="ios-log-out" android="md-log-out" style={IconStyles.header}></Icon>
             </Button>
         </Right>
         </Header>
