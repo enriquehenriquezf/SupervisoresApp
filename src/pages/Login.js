@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Icon, Spinner, H1 } from 'native-base';
 import {toastr} from '../components/Toast';
 import { CheckBox } from 'react-native-elements';
-import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform } from 'react-native';
+import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image } from 'react-native';
 import styles from '../styles/Login';
 import {api} from '../services/api'
 
@@ -114,8 +114,10 @@ export default class Login extends Component {
           </Body>
           <Right />
           </Header>
-          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>{/**TODO: Logo de UniDrogas */}
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>
             <Content style={{ marginTop: 5}}>
+              {/*<Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/4)}} 
+                source={require('../../assets/unidrogas.png')}/> */}
               <Form style={{paddingTop:height/4}}>
                 <Item regular style={styles.form}>
                   <Icon active ios='ios-person' android='md-person' style={styles.icon}/>

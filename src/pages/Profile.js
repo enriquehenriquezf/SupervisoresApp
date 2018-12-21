@@ -4,7 +4,7 @@ import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Butto
 import {Avatar} from 'react-native-elements';
 import styles from '../styles/Profile';
 import IconStyles from '../styles/Icons';
-//import {toastr} from '../components/Toast';
+import {toastr} from '../components/Toast';
 import {api} from '../services/api'
 import {View,Platform, BackHandler} from 'react-native';
 
@@ -43,7 +43,6 @@ export default class Profile extends Component {
    * Retornar al Home
    */
   handleBackPress = () => {
-    navigator.geolocation.clearWatch(this.watchId);
     this.props.handler2(1,token,[]);
     return true;
   }
@@ -64,8 +63,10 @@ export default class Profile extends Component {
         console.log(response);
         if(response.ok === true)
         {
-          handler(7,token,items);
+          toastr.showToast(JSON.parse(response._bodyInit),'success');
+          handler(6,token,items);
         }
+        else{toastr.showToast('Error al enviar el correo','danger');}
         return response.json();
       }).catch(function(error){
         console.log(error);

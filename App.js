@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-
+import {Preload} from './src/services/Preload';
 import Index from './src/pages/Index';
 
 export default class App extends Component {
@@ -10,6 +10,7 @@ export default class App extends Component {
   }
 
   render() { 
+    Preload.images();
     return (
         <Index/>
     );

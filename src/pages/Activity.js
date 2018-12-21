@@ -86,7 +86,7 @@ export default class Activity extends Component {
       this.handleBackPress();
     }
     else{
-      navigator.geolocation.clearWatch(this.watchId);
+      //navigator.geolocation.clearWatch(this.watchId);
       console.log('Permiso Concedido');
     }
 }
