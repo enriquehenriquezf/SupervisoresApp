@@ -1,12 +1,13 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Icon, Spinner, H1 } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Icon, Spinner, H1, CheckBox, ListItem } from 'native-base';
 import {toastr} from '../components/Toast';
-import { CheckBox } from 'react-native-elements';
 import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image } from 'react-native';
 import styles from '../styles/Login';
 import {api} from '../services/api'
 
+let fail = 0;
+let swChange = false;
 export default class Login extends Component {
   // email de prueba: ne.ko@hotmail.es    pass de prueba: 123456
   constructor(props) {
@@ -20,6 +21,7 @@ export default class Login extends Component {
       showToast: false
     };
     this._OnLogin = this._OnLogin.bind(this);
+    this.ChangePass = this.ChangePass.bind(this);
     let token = null;
   }
 
@@ -47,17 +49,20 @@ export default class Login extends Component {
       if(response.ok === true)
       {
         token = response;
+        fail = 0;
         handler(1,token);
         toastr.showToast('Ha iniciado sesión!','success');
       }
       else
       {
         toastr.showToast('Credenciales incorrectas','danger');
+        fail += 1;
       }
       return response.json();
     }).catch(function(error){
       console.log(error);
       toastr.showToast('Verifique su conexión a internet','warning');
+      if(error.toString().includes('Network request failed')){toastr.showToast('Contactese con el administrador','warning');}
     });
   }
 
@@ -96,6 +101,41 @@ export default class Login extends Component {
     }
   }
 
+  /**
+   * Enviar correo de cambio de contraseña e ir al layout de cambio de contraseña
+   */
+  ChangePass(handler)
+  {
+    var items = null;
+    var correo = this.state.email;
+    if(!swChange){
+      swChange = true;
+      fetch(api.ipChangePassword, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Access',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({email: correo})
+      }).then(function(response) {
+        //console.log(response);
+        if(response.ok === true)
+        {
+          items = {correo: correo, nombre: '', apellido: '', FromLogin:true};
+          //console.log(items);
+          toastr.showToast(JSON.parse(response._bodyInit),'success');
+          fail = 0;
+          handler(6,null,items);
+          swChange = false;
+        }
+        else{toastr.showToast('Error al enviar el correo','danger');}
+        return response.json();
+      }).catch(function(error){
+        console.log(error);
+      });
+    }
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar los componentes
@@ -127,7 +167,14 @@ export default class Login extends Component {
                   <Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>
                   <Input placeholder='Contraseña' placeholderTextColor='#f0f0f0' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.input}/>
                 </Item>
-                <CheckBox center containerStyle={styles.checkbox} textStyle={{color: '#fff'}} title='Recordar Contraseña' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
+                {/*<CheckBox center containerStyle={styles.checkbox} textStyle={{color: '#fff'}} title='Recordar Credenciales' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>*/}
+                <ListItem underlayColor='#29B6F6' style={styles.checkbox2} button onPress={() => this.setState({checked: !this.state.checked})}>
+                  <CheckBox color='#5cb85c' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
+                  <Body>
+                    <Text style={{color:'white'}}>Recordar Credenciales</Text>
+                  </Body>
+                </ListItem>
+                {fail >= 1 && <Text style={styles.forgotPass} onPress={() => this.ChangePass(this.props.handler2)}>Olvidaste tu contraseña?</Text>}
                 <Item regular style={styles.boton}>
                   <Body>
                     <Button success regular block onPress={() => this._OnLogin(this.props.handler)} style={styles.boton2}>

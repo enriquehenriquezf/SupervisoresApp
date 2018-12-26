@@ -1,12 +1,11 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item } from 'native-base';
-import {Avatar} from 'react-native-elements';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item, Thumbnail } from 'native-base';
 import styles from '../styles/Profile';
 import IconStyles from '../styles/Icons';
 import {toastr} from '../components/Toast';
 import {api} from '../services/api'
-import {View,Platform, BackHandler} from 'react-native';
+import {View, BackHandler} from 'react-native';
 
 let items = null;
 export default class Profile extends Component {
@@ -23,7 +22,7 @@ export default class Profile extends Component {
   }
 
   async componentWillMount() {
-    //console.log(items);
+    console.log(items);
     this.setState({ loading: false });
   }
 
@@ -67,7 +66,7 @@ export default class Profile extends Component {
           handler(6,token,items);
         }
         else{toastr.showToast('Error al enviar el correo','danger');}
-        return response.json();
+        //return response.json();
       }).catch(function(error){
         console.log(error);
       });
@@ -85,7 +84,7 @@ export default class Profile extends Component {
         <Expo.LinearGradient colors={['#0277BD','#FFF', '#FFF']} style={{ flex: 1}} start={[0.5,0.01]} end={[0.5,0.99]}>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent onPress={() => this.props.handler2(1,token,[])}>
+            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          
@@ -96,7 +95,7 @@ export default class Profile extends Component {
         </Header>
           <Content>
             <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
-                <Avatar size="xlarge" rounded
+                {/*<Avatar size="xlarge" rounded
                 title={items.nombre.substring(0,1) + items.apellido.substring(0,1)}
                 titleStyle={{color:'#039BE5',backgroundColor: 'rgba(255,255,255,0)'}}
                 avatarStyle={{backgroundColor: 'rgba(255,255,255,0)'}}
@@ -104,6 +103,10 @@ export default class Profile extends Component {
                 source={{uri: "https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585"}}// https://png.pngtree.com/svg/20160304/ajb_address_book_user_avatar_183015.png
                 onPress={() => console.log("Works!")}
                 activeOpacity={0.5}
+                />*/}
+                <Thumbnail large
+                source={{uri: "https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585"}}
+                style={{marginLeft:'auto', marginRight:'auto', borderWidth:4, borderColor:'#FFF', width: 160, height: 160, borderRadius:80}}
                 />
                 <H2 style={{margin: 5, marginLeft:'auto', marginRight:'auto'}}>{items.nombre} {items.apellido}</H2>
                 <Item style={{borderBottomColor: '#039BE5'}}>

@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Left, Body, Right, Title, Content, List,ListItem,Text, Badge, Icon, Thumbnail, Spinner, Card } from 'native-base';
 import {toastr} from '../../../components/Toast';
-import {View, Platform, RefreshControl} from 'react-native';
+import {View, RefreshControl} from 'react-native';
 import styles from '../../../styles/Home';
 import {api} from '../../../services/api'
 

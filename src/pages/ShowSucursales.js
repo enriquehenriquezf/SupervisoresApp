@@ -129,7 +129,7 @@ export default class ShowSucursales extends Component {
       <Container>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent onPress={() => this.props.handler2(1,token,[])}>
+            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          

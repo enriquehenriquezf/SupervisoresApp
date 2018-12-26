@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card, Input } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView} from 'react-native';
-import {Overlay} from 'react-native-elements';
+import Overlay from 'react-native-modal-overlay';
 import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
 import {api} from '../services/api'
@@ -231,7 +231,7 @@ export default class Activity extends Component {
       <Container>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent onPress={() => this.props.handler2(1,token,[])}>
+            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          
@@ -926,12 +926,12 @@ export default class Activity extends Component {
           </Content>
         </KeyboardAvoidingView>
           <Overlay
-            isVisible={this.state.isVisible}
-            onBackdropPress={() => this.setState({isVisible: false})}
-            windowBackgroundColor="rgba(0, 0, 0, .5)"
-            overlayBackgroundColor="rgba(0, 0, 0, .5)"
-            width="auto"
-            height="auto"
+            visible={this.state.isVisible}
+            closeOnTouchOutside 
+            animationType="zoomIn"
+            onClose={() => this.setState({isVisible: false})}
+            containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
+            childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
           >
             <Text style={{color:'white'}}>{info}</Text>
           </Overlay>

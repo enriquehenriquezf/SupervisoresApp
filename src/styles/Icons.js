@@ -8,5 +8,8 @@ export default StyleSheet.create({
     help: {
         fontSize: Platform.OS === 'ios' ? 30 : 20,
         color: Platform.OS === 'ios' ? 'black' : 'white'
+    },
+    back: {
+        marginLeft: Platform.OS === 'ios' ? 5 : 0
     }
 });

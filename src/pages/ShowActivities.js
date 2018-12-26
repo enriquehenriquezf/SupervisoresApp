@@ -1,7 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content,Text, Icon, Button, Spinner, Card } from 'native-base';
-import {Divider} from 'react-native-elements';
 import {View, BackHandler} from 'react-native';
 import IconStyles from '../styles/Icons';
 import {api} from '../services/api'
@@ -103,7 +102,7 @@ export default class ShowActivities extends Component {
           }
           {
             data.index !== items.length-1 ? 
-              <Divider style={{backgroundColor:'#039BE5', marginLeft:10, marginRight:10, marginTop:10, height:1.5,
+              <View style={{backgroundColor:'#039BE5', marginLeft:10, marginRight:10, marginTop:10, height:1.5,
               elevation:2, shadowOpacity:0.2, shadowColor:'#039BE5' }} />
             :
               null
@@ -115,7 +114,7 @@ export default class ShowActivities extends Component {
       <Container>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent style={{marginLeft:5}} onPress={() => this.props.handler2(3,token,[])}>
+            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(3,token,[])}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          

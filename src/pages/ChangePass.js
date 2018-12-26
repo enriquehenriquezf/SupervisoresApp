@@ -46,7 +46,12 @@ export default class ChangePass extends Component {
    * Retornar al Home
    */
   handleBackPress = () => {
-    this.props.handler2(5,token,[]);
+    if(items.FromLogin){
+      this.props.handler2(0,null,[]);
+    }
+    else{
+      this.props.handler2(5,token,items);
+    }
     return true;
   }
 
@@ -68,7 +73,12 @@ export default class ChangePass extends Component {
         if(response.ok === true)
         {
           toastr.showToast(JSON.parse(response._bodyInit),'success');
-          handler(5,token,items);
+          if(items.FromLogin){
+            handler(0,null,[]);
+          }
+          else{
+            handler(5,token,items);
+          }
         }
         else{toastr.showToast('Credenciales incorrectas','danger');}
         return response.json();
@@ -90,7 +100,7 @@ export default class ChangePass extends Component {
         <Expo.LinearGradient colors={['#0277BD','#0277BD', '#FFF']} style={{ flex: 1}} start={[0.5,0.01]} end={[0.5,0.99]}>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent onPress={() => this.props.handler2(5,token,[])}>
+            <Button transparent style={IconStyles.back} onPress={() => this.handleBackPress()}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          

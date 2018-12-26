@@ -44,5 +44,20 @@ export default StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0)',
         borderColor: 'rgba(255,255,255,0)', 
         marginTop: -10
+    },
+    checkbox2:{
+        backgroundColor: 'rgba(255,255,255,0)',
+        borderColor: 'rgba(255,255,255,0)',
+        marginLeft: 50,
+        marginRight: 20,
+        paddingTop:-5,
+        paddingBottom:-5,
+        marginBottom:5
+    },
+    forgotPass: {
+        color: 'white',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        marginBottom:10
     }
 });
