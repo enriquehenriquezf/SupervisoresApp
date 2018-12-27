@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card, Input } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View,Platform, BackHandler, KeyboardAvoidingView} from 'react-native';
+import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, CameraRoll, Image, ScrollView} from 'react-native';
 import Overlay from 'react-native-modal-overlay';
 import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
@@ -10,6 +10,8 @@ import {api} from '../services/api'
 
 let items = null;
 let info = '';
+let time = 0;
+let timeInit = 0;
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -22,10 +24,14 @@ export default class Activity extends Component {
       longitude: null,
       error:null,
       isVisible: false,
+      isVisible2: false,
+      photos: [],
       showToast: false
     };
     let token = this.props.token;
     items = this.props.data;
+    time = 0;
+    timeInit = new Date().getTime();
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -42,6 +48,7 @@ export default class Activity extends Component {
     }
     navigator.geolocation.clearWatch(this.watchId);
     this.Descripcion();
+    this._retrieveData();
     this.setState({ loading: false });
   }
 
@@ -163,6 +170,7 @@ export default class Activity extends Component {
    */
   handleBackPress = () => {
     navigator.geolocation.clearWatch(this.watchId);
+    this._storeData();
     this.props.handler2(1,token,[]);
     return true;
   }
@@ -187,6 +195,7 @@ export default class Activity extends Component {
     let handler2 = this.props.handler2;
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let id = items.id_actividad;
+    this._storeData();
     fetch(api.ipActivity, {
       method: 'POST',
       headers: {
@@ -201,7 +210,7 @@ export default class Activity extends Component {
         observaciones: this.state.observacion
       })
     }).then(function(response) {
-      console.log(response);
+      //console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var message = "message";
       if(response.ok === true && response.status === 200)
@@ -219,6 +228,59 @@ export default class Activity extends Component {
       console.log(error);
     });
   }
+  
+  /**
+   * Guardar datos del tiempo actual del plan de trabajo
+   */
+  _storeData = async () => {
+    var tl = new Date();
+    tl.setMilliseconds(tl.getMilliseconds() + parseFloat(time));
+    var timeLast = tl.getTime();
+    time = timeLast-timeInit;
+    try {
+      await AsyncStorage.setItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad, time.toString());
+      console.log("tiempo: " + time);
+    } catch (error) {
+      console.log(error);
+    }
+    /* Borrar datos
+    try {
+      await AsyncStorage.removeItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
+    } catch (error) {
+      console.log(error);
+    }*/
+  }
+
+  /**
+   * Obtener datos de tiempo actual del plan de trabajo
+   */
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
+      if (value !== null) {
+        time = value;
+        //console.log(time);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /**
+   * Mostrar las imagenes de la galeria
+   */
+  getFile(){
+    CameraRoll.getPhotos({
+      first: 20,
+      assetType: 'Photos',
+    })
+    .then(r => {
+      this.setState({ photos: r.edges, isVisible2:true });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
 
   render() {
     /***
@@ -231,7 +293,7 @@ export default class Activity extends Component {
       <Container>
         <Header style={{paddingTop: 20}}>
         <Left>
-            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
+            <Button transparent style={IconStyles.back} onPress={() => this.handleBackPress()}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          
@@ -602,6 +664,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
+                    <Button info regular block style={styles.boton} onPress={() => this.getFile()}><Text> Subir Imagen </Text></Button>
                   </View>
                 :
                   null
@@ -925,16 +988,53 @@ export default class Activity extends Component {
             }
           </Content>
         </KeyboardAvoidingView>
-          <Overlay
-            visible={this.state.isVisible}
-            closeOnTouchOutside 
-            animationType="zoomIn"
-            onClose={() => this.setState({isVisible: false})}
-            containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
-            childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
-          >
-            <Text style={{color:'white'}}>{info}</Text>
-          </Overlay>
+        <Overlay
+          visible={this.state.isVisible}
+          closeOnTouchOutside 
+          animationType="zoomIn"
+          onClose={() => this.setState({isVisible: false})}
+          containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
+          childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
+        >
+          <Text style={{color:'white'}}>{info}</Text>
+        </Overlay>
+        <Overlay
+          visible={this.state.isVisible2}
+          closeOnTouchOutside 
+          animationType="zoomIn"
+          onClose={() => this.setState({isVisible2: false})}
+          containerStyle={{backgroundColor: "rgba(0, 0, 0, .6)", width:"auto",height:"auto"}}
+          childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .8)", borderRadius: 10}}
+        >
+          <ScrollView>
+            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
+            {this.state.photos.map((p, i) => {
+              return (
+                i % 3 == 0 ?
+                  <Image
+                    key={i}
+                    style={{
+                      width: 80,
+                      height: 80,
+                    }}
+                    source={{ uri: p.node.image.uri }}
+                  />
+                :
+                  <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Image
+                      key={i}
+                      style={{
+                        width: 80,
+                        height: 80,
+                      }}
+                      source={{ uri: p.node.image.uri }}
+                    />
+                  </View>
+              );
+            })}
+            </View>
+          </ScrollView>
+        </Overlay>
       </Container>
     );
   }

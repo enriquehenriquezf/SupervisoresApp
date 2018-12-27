@@ -181,7 +181,7 @@ export default class Home extends Component {
           <RefreshControl
             refreshing={this.state.refreshing}
             onRefresh={() => this.getPlanesDeTrabajo()}
-            colors={["#29B6F6"]}
+            colors={["#5cb85c"]}
           />
         }>        
         <Card style={{borderRadius: 5}}>
@@ -205,19 +205,19 @@ export default class Home extends Component {
           <List dataArray={items}
             renderRow={(item) =>
             item.separador === true ?
-              <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
-                <ListItem button underlayColor='#29B6F6' itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}}  onPress={() => toastr.showToast(item.direccion,'info')}>
+              <Expo.LinearGradient colors={['#5cb85c','#43A047']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
+                <ListItem button underlayColor='#5cb85c' itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}}  onPress={() => toastr.showToast(item.direccion,'info')}>
                   <Text style={{color: '#FFF'}}>{item.sucursal}</Text>
                 </ListItem>
               </Expo.LinearGradient>
             :
-              <ListItem icon button underlayColor='#BBDEFB' onPress={() => this._OnItemPress(2,this.props.handler2, item)}>
+              <ListItem icon button underlayColor='#C8E6C9' onPress={() => this._OnItemPress(2,this.props.handler2, item)}>
                 <Left>
                 {
-                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' style={{color: "#29B6F6"}} />
+                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' style={{color: "#5cb85c"}} />
                 }
                 {
-                  (item.estado === "terminado" || item.estado === "completo") && <Icon active ios='ios-checkmark' android='md-checkmark' style={{color: "#29B6F6"}} />
+                  (item.estado === "terminado" || item.estado === "completo") && <Icon active ios='ios-checkmark' android='md-checkmark' style={{color: "#5cb85c"}} />
                 }
                 </Left>
                 <Body style={item.borde ? styles.ConBorde : styles.SinBorde}>

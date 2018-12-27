@@ -20,7 +20,7 @@ export default StyleSheet.create({
         height: 40,
         marginLeft: 50,
         marginRight: 50,
-        marginBottom: 10
+        marginTop: 10
     },
     boton2: {
         borderColor: 'rgba(255,255,255,0)',
@@ -58,6 +58,7 @@ export default StyleSheet.create({
         color: 'white',
         marginLeft: 'auto',
         marginRight: 'auto',
-        marginBottom:10
+        textDecorationLine: 'underline',
+        marginBottom:2
     }
 });
