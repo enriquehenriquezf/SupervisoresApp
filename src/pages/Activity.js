@@ -272,7 +272,7 @@ export default class Activity extends Component {
   getFile(){
     CameraRoll.getPhotos({
       first: 20,
-      assetType: 'Photos',
+      assetType: 'All',
     })
     .then(r => {
       this.setState({ photos: r.edges, isVisible2:true });
@@ -281,6 +281,29 @@ export default class Activity extends Component {
       console.log(err);
     });
   }
+
+  /**
+   * Subir imagen al servidor
+   */
+  subirImagen(image){
+    console.log(image);
+    this.setState({isVisible2: false});
+  }
+  //TODO: Expo DocumentPicker
+  /*openFilePicker = async () => {
+    let file = await DocumentPicker.getDocumentAsync();
+
+    if (file.type == "success") { // user has selected a file if type is success
+      this.attachment = {
+        name: file.name,
+        uri: file.uri,
+        type: "file",
+        file_type: mime.contentType(file.name) // get mime type
+      };
+
+      Alert.alert("Success", "File attached!");
+    }
+  }*/
 
   render() {
     /***
@@ -999,41 +1022,29 @@ export default class Activity extends Component {
           <Text style={{color:'white'}}>{info}</Text>
         </Overlay>
         <Overlay
-          visible={this.state.isVisible2}
-          closeOnTouchOutside 
+          visible={this.state.isVisible2} 
           animationType="zoomIn"
           onClose={() => this.setState({isVisible2: false})}
-          containerStyle={{backgroundColor: "rgba(0, 0, 0, .6)", width:"auto",height:"auto"}}
-          childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .8)", borderRadius: 10}}
+          containerStyle={{backgroundColor: "rgba(0, 0, 0, .7)", width:"auto",height:"auto"}}
+          childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
         >
           <ScrollView>
-            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
             {this.state.photos.map((p, i) => {
               return (
-                i % 3 == 0 ?
+                <ListItem key={i} button onPress={() => this.subirImagen(p.node)} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                   <Image
                     key={i}
                     style={{
-                      width: 80,
-                      height: 80,
+                      width: 200,
+                      height: 200,
                     }}
                     source={{ uri: p.node.image.uri }}
                   />
-                :
-                  <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <Image
-                      key={i}
-                      style={{
-                        width: 80,
-                        height: 80,
-                      }}
-                      source={{ uri: p.node.image.uri }}
-                    />
-                  </View>
+                </ListItem>
               );
             })}
-            </View>
           </ScrollView>
+          <Button success regular block style={[styles.boton, {marginTop:10}]} onPress={() => this.setState({isVisible2:false})}><Text> Cerrar </Text></Button>
         </Overlay>
       </Container>
     );
