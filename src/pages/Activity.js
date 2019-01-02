@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card, Input } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, CameraRoll, Image, ScrollView} from 'react-native';
+import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image} from 'react-native';
 import Overlay from 'react-native-modal-overlay';
 import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
@@ -16,6 +16,8 @@ export default class Activity extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      archivo: {},
+      archivo2: {},
       loading: true,
       checked: 1 ,
       calificacion_pv: 'Puntual',
@@ -24,8 +26,6 @@ export default class Activity extends Component {
       longitude: null,
       error:null,
       isVisible: false,
-      isVisible2: false,
-      photos: [],
       showToast: false
     };
     let token = this.props.token;
@@ -119,7 +119,12 @@ export default class Activity extends Component {
       this.SetChecked(3,'Muy Tarde');
     }
     this.setState({observacion: items.observacion});
-    
+    if(items.documento_vencido === '' || items.documento_vencido === null){//FIXME: modificar imagen no disponible
+      this._img1.setNativeProps({src: [{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png'}]});
+    }
+    if(items.documento_renovado === '' || items.documento_renovado === null){
+      this._img2.setNativeProps({src: [{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png'}]});
+    }
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
      * @example rango: a una distancia de 5000*10^-7 grados de latitud y longitud
@@ -170,7 +175,7 @@ export default class Activity extends Component {
    */
   handleBackPress = () => {
     navigator.geolocation.clearWatch(this.watchId);
-    this._storeData();
+    //this._storeData();
     this.props.handler2(1,token,[]);
     return true;
   }
@@ -189,14 +194,26 @@ export default class Activity extends Component {
    * Enviar calificaciones de la actividad a la base de datos
    * @param {function} handler ir al layout de home luego de enviar los datos.
    */
-  FinishActivity(handler)
+  async FinishActivity(handler)
   {
     let bodyInit = JSON.parse(token._bodyInit);
     let handler2 = this.props.handler2;
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let id = items.id_actividad;
     this._storeData();
-    fetch(api.ipActivity, {
+    let file1 = null;
+    let file2 = null;
+    if(this.state.archivo.hasOwnProperty('uri')){
+      await Expo.FileSystem.readAsStringAsync(this.state.archivo.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+        file1 = response;
+      });
+    }
+    if(this.state.archivo2.hasOwnProperty('uri')){
+      await Expo.FileSystem.readAsStringAsync(this.state.archivo2.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+        file2 = response;
+      });
+    }
+    await fetch(api.ipActivity, {
       method: 'POST',
       headers: {
           'Authorization': auth,
@@ -207,10 +224,13 @@ export default class Activity extends Component {
         nombre_tabla: items.nombre_tabla,
         id_plan_trabajo: items.id_plan_trabajo, 
         id_actividad: id,
-        observaciones: this.state.observacion
+        observaciones: this.state.observacion,        
+        documento_vencido: file1,
+        documento_renovado: file2,
+        tiempo_actividad: time
       })
     }).then(function(response) {
-      //console.log(response);
+      console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var message = "message";
       if(response.ok === true && response.status === 200)
@@ -234,7 +254,7 @@ export default class Activity extends Component {
    */
   _storeData = async () => {
     var tl = new Date();
-    tl.setMilliseconds(tl.getMilliseconds() + parseFloat(time));
+    //tl.setMilliseconds(tl.getMilliseconds() + parseFloat(time));
     var timeLast = tl.getTime();
     time = timeLast-timeInit;
     try {
@@ -252,58 +272,77 @@ export default class Activity extends Component {
   }
 
   /**
+   * Guardar datos del tiempo inicial del plan de trabajo
+   */
+  _storeDataInit = async () => {
+    var tl = new Date();
+    var timeLast = tl.getTime();
+    time = timeLast;//-timeInit;
+    try {
+      await AsyncStorage.setItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad, time.toString());
+      console.log("TIMEINIT: " + time);
+    } catch (error) {
+      console.log(error);
+    }
+    /* Borrar datos
+    try {
+      await AsyncStorage.removeItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
+    } catch (error) {
+      console.log(error);
+    }*/
+  }
+
+  /**
    * Obtener datos de tiempo actual del plan de trabajo
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
+      //const value = await AsyncStorage.getItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
+      const value = await AsyncStorage.getItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad);
       if (value !== null) {
         time = value;
+        timeInit = time;//NEW
         //console.log(time);
       }
+      else{this._storeDataInit()}
     } catch (error) {
       console.log(error);
     }
   }
 
   /**
-   * Mostrar las imagenes de la galeria
+   * Seleccionar un archivo desde el UI del dispositivo
    */
-  getFile(){
-    CameraRoll.getPhotos({
-      first: 20,
-      assetType: 'All',
-    })
-    .then(r => {
-      this.setState({ photos: r.edges, isVisible2:true });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
-
-  /**
-   * Subir imagen al servidor
-   */
-  subirImagen(image){
-    console.log(image);
-    this.setState({isVisible2: false});
-  }
-  //TODO: Expo DocumentPicker
-  /*openFilePicker = async () => {
-    let file = await DocumentPicker.getDocumentAsync();
-
-    if (file.type == "success") { // user has selected a file if type is success
-      this.attachment = {
-        name: file.name,
-        uri: file.uri,
-        type: "file",
-        file_type: mime.contentType(file.name) // get mime type
-      };
-
-      Alert.alert("Success", "File attached!");
+  openFilePicker = async (vencido) => {
+    try{
+      let file = await Expo.DocumentPicker.getDocumentAsync({type: '*/*'});
+      //console.log(file);
+      if (file.type == "success") {
+        var tipo = file.name.split('.')[1];
+        let attachment = {
+          name: file.name,
+          uri: file.uri,
+          type: "file",
+          file_type: tipo
+        };
+        //console.log(attachment);
+        var imgsource = null;
+        await Expo.FileSystem.readAsStringAsync(attachment.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+          imgsource = response;
+        });
+        if(vencido){
+          this._img1.setNativeProps({src: [{uri: 'data:image/png;base64,' + imgsource}]});
+          this.setState({archivo: attachment});
+        }else{
+          this._img2.setNativeProps({src: [{uri: 'data:image/png;base64,' + imgsource}]});
+          this.setState({archivo2: attachment});
+        }
+      }
     }
-  }*/
+    catch(error){
+      console.log(error);
+    }
+  }
 
   render() {
     /***
@@ -687,7 +726,16 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
-                    <Button info regular block style={styles.boton} onPress={() => this.getFile()}><Text> Subir Imagen </Text></Button>
+                    <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
+                      <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_vencido}}></Image>
+                      <Input placeholder='Documento Vencido' disabled value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+                    </View>
+                    <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                    <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
+                      <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_renovado}}></Image>
+                      <Input placeholder='Documento Renovado' disabled value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+                    </View>
+                    <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                   </View>
                 :
                   null
@@ -1020,31 +1068,6 @@ export default class Activity extends Component {
           childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
         >
           <Text style={{color:'white'}}>{info}</Text>
-        </Overlay>
-        <Overlay
-          visible={this.state.isVisible2} 
-          animationType="zoomIn"
-          onClose={() => this.setState({isVisible2: false})}
-          containerStyle={{backgroundColor: "rgba(0, 0, 0, .7)", width:"auto",height:"auto"}}
-          childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
-        >
-          <ScrollView>
-            {this.state.photos.map((p, i) => {
-              return (
-                <ListItem key={i} button onPress={() => this.subirImagen(p.node)} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                  <Image
-                    key={i}
-                    style={{
-                      width: 200,
-                      height: 200,
-                    }}
-                    source={{ uri: p.node.image.uri }}
-                  />
-                </ListItem>
-              );
-            })}
-          </ScrollView>
-          <Button success regular block style={[styles.boton, {marginTop:10}]} onPress={() => this.setState({isVisible2:false})}><Text> Cerrar </Text></Button>
         </Overlay>
       </Container>
     );

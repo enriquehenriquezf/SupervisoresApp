@@ -12,6 +12,7 @@ export const api = {
  ipDescripcion : "http://192.168.1.4/supervisores_api/public/api/descripcionActividad",
  ipChangePassword : "http://192.168.1.4/supervisores_api/public/api/changePass",
  ipVerify : "http://192.168.1.4/supervisores_api/public/api/verifyPass",
+ ipImg: "http://192.168.1.4/supervisores_api/storage/app/public/img/",
 
  ip2 : "http://192.168.1.185/supervisores_api/public/api/login",//cudris
  ip3 : "http://192.168.1.136/supervisores_api/public/api/login",//ronaldo
@@ -27,4 +28,5 @@ export const api = {
     ipDescripcion : "http://200.116.66.129/supervisores_api/public/api/descripcionActividad",
     ipChangePassword : "http://200.116.66.129/supervisores_api/public/api/changePass",
     ipVerify : "http://200.116.66.129/supervisores_api/public/api/verifyPass",
+    ipImg: "http://200.116.66.129/supervisores_api/storage/app/public/img/",
 }*/

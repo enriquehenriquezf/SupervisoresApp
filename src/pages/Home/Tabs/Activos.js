@@ -59,66 +59,6 @@ export default class Home extends Component {
           var j = 0;
           Object.values(newToken[actividades]).forEach(element => {
             //console.log(JSON.stringify(element));
-            let id = '';
-            //#region planes de trabajo #00FF00
-            if(element.id_apertura !== undefined){
-              id = element.id_apertura;
-            }
-            else if(element.id_kardex !== undefined){
-              id = element.id_kardex;
-            }
-            else if(element.id_condiciones !== undefined){
-              id = element.id_condiciones;
-            }
-            else if(element.id_formula !== undefined){
-              id = element.id_formula;
-            }
-            else if(element.id_ingreso_sucursal !== undefined){
-              id = element.id_ingreso_sucursal;
-            }
-            else if(element.id_librofaltante !== undefined){
-              id = element.id_librofaltante;
-            }
-            else if(element.iid_convenio_exhibicion !== undefined){
-              id = element.iid_convenio_exhibicion;
-            }
-            else if(element.id_ingreso_sucursal !== undefined){
-              id = element.id_ingreso_sucursal;
-            }
-            else if(element.id_captura_cliente !== undefined){
-              id = element.id_captura_cliente;
-            }
-            else if(element.id_documentacion !== undefined){
-              id = element.id_documentacion;
-            }
-            else if(element.id_evaluacion_pedidos !== undefined){
-              id = element.id_evaluacion_pedidos;
-            }
-            else if(element.id_excesos !== undefined){
-              id = element.id_excesos;
-            }
-            else if(element.id_libro_agendaclientes !== undefined){
-              id = element.id_libro_agendaclientes;
-            }
-            else if(element.id_libro_vencimientos !== undefined){
-              id = element.id_libro_vencimientos;
-            }
-            else if(element.id_papel_consignaciones !== undefined){
-              id = element.id_papel_consignaciones;
-            }
-            else if(element.id_presupuesto_pedido !== undefined){
-              id = element.id_presupuesto_pedido;
-            }
-            else if(element.id_remision !== undefined){
-              id = element.id_remision;
-            }
-            else if(element.id_revision !== undefined){
-              id = element.id_revision;
-            }
-            else if(element.id_seguimiento !== undefined){
-              id = element.id_seguimiento;
-            }
-            //#endregion
             var item = {
               name: keys[i],
               sucursal: element.nombre_sucursal,
@@ -127,9 +67,12 @@ export default class Home extends Component {
               id_plan_trabajo: element.id_plan_trabajo,
               calificacion_pv: element.calificacion_pv,
               observacion: element.observacion,
-              id_actividad: id,
+              id_actividad: element.id,
               nombre_tabla: element.nombre_tabla,
               estado: element.estado,
+              documento_vencido: element.documento_vencido,
+              documento_renovado: element.documento_renovado,
+              tiempo_actividad: element.tiempo_actividad,
               latitud: 11.0041235,
               longitud: -74.8130534,
               separador: false,
