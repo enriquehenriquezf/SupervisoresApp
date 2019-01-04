@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card, Input } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image} from 'react-native';
+import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity} from 'react-native';
 import Overlay from 'react-native-modal-overlay';
 import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
@@ -12,6 +12,11 @@ let items = null;
 let info = '';
 let time = 0;
 let timeInit = 0;
+let totalTime = 0;
+let totalTimeInit = 0;
+let imgOverlay = '';
+let imgTemp1 = '';
+let imgTemp2 = '';
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -26,12 +31,18 @@ export default class Activity extends Component {
       longitude: null,
       error:null,
       isVisible: false,
+      isVisible2: false,
       showToast: false
     };
     let token = this.props.token;
     items = this.props.data;
     time = 0;
+    totalTime = 0;
     timeInit = new Date().getTime();
+    totalTimeInit = new Date().getTime();
+    imgOverlay = '';
+    imgTemp1 = api.ipImg + items.documento_vencido;
+    imgTemp2 = api.ipImg + items.documento_renovado;
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -48,6 +59,7 @@ export default class Activity extends Component {
     }
     navigator.geolocation.clearWatch(this.watchId);
     this.Descripcion();
+    this._retrieveDataInit();
     this._retrieveData();
     this.setState({ loading: false });
   }
@@ -118,12 +130,17 @@ export default class Activity extends Component {
     {
       this.SetChecked(3,'Muy Tarde');
     }
+    /**
+     * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
+     */
     this.setState({observacion: items.observacion});
     if(items.documento_vencido === '' || items.documento_vencido === null){//FIXME: modificar imagen no disponible
-      this._img1.setNativeProps({src: [{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png'}]});
+      imgTemp1 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png';
+      this._img1.setNativeProps({src: [{uri: imgTemp1}]});
     }
     if(items.documento_renovado === '' || items.documento_renovado === null){
-      this._img2.setNativeProps({src: [{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png'}]});
+      imgTemp2 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png';
+      this._img2.setNativeProps({src: [{uri: imgTemp2}]});
     }
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -175,7 +192,7 @@ export default class Activity extends Component {
    */
   handleBackPress = () => {
     navigator.geolocation.clearWatch(this.watchId);
-    //this._storeData();
+    this._storeData();
     this.props.handler2(1,token,[]);
     return true;
   }
@@ -201,6 +218,8 @@ export default class Activity extends Component {
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let id = items.id_actividad;
     this._storeData();
+    var totalTl = new Date().getTime();
+    totalTime = totalTl - totalTimeInit;
     let file1 = null;
     let file2 = null;
     if(this.state.archivo.hasOwnProperty('uri')){
@@ -227,7 +246,8 @@ export default class Activity extends Component {
         observaciones: this.state.observacion,        
         documento_vencido: file1,
         documento_renovado: file2,
-        tiempo_actividad: time
+        tiempo_actividad: time,
+        tiempo_total: totalTime
       })
     }).then(function(response) {
       console.log(response);
@@ -254,7 +274,7 @@ export default class Activity extends Component {
    */
   _storeData = async () => {
     var tl = new Date();
-    //tl.setMilliseconds(tl.getMilliseconds() + parseFloat(time));
+    tl.setMilliseconds(tl.getMilliseconds() + parseFloat(time));
     var timeLast = tl.getTime();
     time = timeLast-timeInit;
     try {
@@ -277,34 +297,46 @@ export default class Activity extends Component {
   _storeDataInit = async () => {
     var tl = new Date();
     var timeLast = tl.getTime();
-    time = timeLast;//-timeInit;
+    totalTimeInit = timeLast;
     try {
-      await AsyncStorage.setItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad, time.toString());
-      console.log("TIMEINIT: " + time);
+      await AsyncStorage.setItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad, totalTimeInit.toString());
+      console.log("TOTAL TIME INIT: " + totalTimeInit);
     } catch (error) {
       console.log(error);
     }
     /* Borrar datos
     try {
-      await AsyncStorage.removeItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
+      await AsyncStorage.removeItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad);
     } catch (error) {
       console.log(error);
     }*/
   }
 
   /**
+   * Obtener datos de tiempo inicial del plan de trabajo
+   */
+  _retrieveDataInit = async () => {
+    try {
+      const value = await AsyncStorage.getItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad);
+      if (value !== null) {
+        totalTimeInit = value;
+        console.log("TOTAL TIME:" + totalTimeInit);
+      }
+      else{this._storeDataInit()}
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  /**
    * Obtener datos de tiempo actual del plan de trabajo
    */
   _retrieveData = async () => {
     try {
-      //const value = await AsyncStorage.getItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
-      const value = await AsyncStorage.getItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad);
+      const value = await AsyncStorage.getItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
       if (value !== null) {
         time = value;
-        timeInit = time;//NEW
-        //console.log(time);
+        console.log(time);
       }
-      else{this._storeDataInit()}
     } catch (error) {
       console.log(error);
     }
@@ -312,6 +344,7 @@ export default class Activity extends Component {
 
   /**
    * Seleccionar un archivo desde el UI del dispositivo
+   * @param {boolean} vencido verifica si se va a modificar la imagen de documento vencido
    */
   openFilePicker = async (vencido) => {
     try{
@@ -326,15 +359,13 @@ export default class Activity extends Component {
           file_type: tipo
         };
         //console.log(attachment);
-        var imgsource = null;
-        await Expo.FileSystem.readAsStringAsync(attachment.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
-          imgsource = response;
-        });
         if(vencido){
-          this._img1.setNativeProps({src: [{uri: 'data:image/png;base64,' + imgsource}]});
+          imgTemp1 = attachment.uri;
+          this._img1.setNativeProps({src: [{uri: imgTemp1}]});
           this.setState({archivo: attachment});
         }else{
-          this._img2.setNativeProps({src: [{uri: 'data:image/png;base64,' + imgsource}]});
+          imgTemp2 = attachment.uri;
+          this._img2.setNativeProps({src: [{uri: imgTemp2}]});//'data:image/png;base64,' + imgsource
           this.setState({archivo2: attachment});
         }
       }
@@ -342,6 +373,18 @@ export default class Activity extends Component {
     catch(error){
       console.log(error);
     }
+  }
+
+  /**
+   * Muestra el overlay con la imagen en pantalla completa
+   * @param {boolean} vencido 
+   */
+  verImagen(vencido){
+    if(vencido){
+      imgOverlay = imgTemp1;
+    }
+    else{imgOverlay = imgTemp2;}
+    this.setState({isVisible2: true});
   }
 
   render() {
@@ -727,12 +770,16 @@ export default class Activity extends Component {
                       </Right>
                     </ListItem>
                     <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
-                      <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_vencido}}></Image>
+                      <TouchableOpacity onPress={() => this.verImagen(true)}>
+                        <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_vencido}}></Image>
+                      </TouchableOpacity>
                       <Input placeholder='Documento Vencido' disabled value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
                     </View>
                     <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                     <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
-                      <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_renovado}}></Image>
+                      <TouchableOpacity onPress={() => this.verImagen(false)}>
+                        <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_renovado}}></Image>
+                      </TouchableOpacity>
                       <Input placeholder='Documento Renovado' disabled value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
                     </View>
                     <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
@@ -1067,7 +1114,20 @@ export default class Activity extends Component {
           containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
           childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
         >
-          <Text style={{color:'white'}}>{info}</Text>
+          <Text style={{color:'white', textAlign:'justify'}}>{info}</Text>
+        </Overlay>
+        <Overlay
+          visible={this.state.isVisible2}
+          closeOnTouchOutside 
+          animationType="zoomIn"
+          onClose={() => this.setState({isVisible2: false})}
+          containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
+          childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
+        >
+          <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center'}}>
+            <Text onPress={() => this.setState({isVisible2: false})} style={{color: 'white', textAlign:'right', alignSelf:'flex-end'}}>X</Text>
+            <Image style={{height: 500, width:280}} source={{uri: imgOverlay}}></Image>
+          </View>
         </Overlay>
       </Container>
     );

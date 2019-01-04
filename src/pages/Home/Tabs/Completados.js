@@ -60,7 +60,7 @@ export default class Home extends Component {
           Object.values(newToken[actividades]).forEach(element => {
             //console.log(JSON.stringify(element));  
             var item = {
-              name: keys[i],
+              name: keys[i].split('-')[0],
               sucursal: element.nombre_sucursal,
               prioridad: element.id_prioridad,
               estado: element.estado,

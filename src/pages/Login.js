@@ -146,7 +146,7 @@ export default class Login extends Component {
     var height = Dimensions.get('window').height;
     return (
       <Container>
-        <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1}} start={[0.01,0.01]} end={[0.99,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] ['#00CDAC','#02AAB0'] ['#5A288E','#02AAB0'] ['#29B6F6','#039BE5']*/}
+        <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1}} start={[0.5,0.01]} end={[0.5,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] ['#00CDAC','#02AAB0'] ['#5A288E','#02AAB0'] ['#29B6F6','#039BE5']*/}
           <Header transparent style={{paddingTop: 20}}>
           <Left/>          
           <Body>
@@ -167,7 +167,6 @@ export default class Login extends Component {
                   <Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>
                   <Input placeholder='Contraseña' placeholderTextColor='#f0f0f0' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.input}/>
                 </Item>
-                {/*<CheckBox center containerStyle={styles.checkbox} textStyle={{color: '#fff'}} title='Recordar Credenciales' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>*/}
                 <ListItem underlayColor='#29B6F6' style={styles.checkbox2} button onPress={() => this.setState({checked: !this.state.checked})}>
                   <CheckBox color='#5cb85c' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
                   <Body>

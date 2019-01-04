@@ -22,7 +22,7 @@ export default class Profile extends Component {
   }
 
   async componentWillMount() {
-    console.log(items);
+    //console.log(items);
     this.setState({ loading: false });
   }
 
