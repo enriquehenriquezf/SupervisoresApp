@@ -4,7 +4,8 @@ import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input
 import {toastr} from '../components/Toast';
 import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image } from 'react-native';
 import styles from '../styles/Login';
-import {api} from '../services/api'
+import {api} from '../services/api';
+import {Imagen} from '../components/Imagenes';
 
 let fail = 0;
 let swChange = false;
@@ -41,7 +42,8 @@ export default class Login extends Component {
     method: 'POST',
     headers: {
         'Authorization': 'Access',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
     },
     body: JSON.stringify({username: username, password: pass})
     }).then(function(response) {
@@ -55,8 +57,14 @@ export default class Login extends Component {
       }
       else
       {
-        toastr.showToast('Credenciales incorrectas','danger');
-        fail += 1;
+        console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else{
+          toastr.showToast('Credenciales incorrectas','danger');
+          fail += 1;
+        }
       }
       return response.json();
     }).catch(function(error){
@@ -114,7 +122,8 @@ export default class Login extends Component {
         method: 'POST',
         headers: {
             'Authorization': 'Access',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept':'application/json'
         },
         body: JSON.stringify({email: correo})
       }).then(function(response) {
@@ -128,7 +137,16 @@ export default class Login extends Component {
           handler(6,null,items);
           swChange = false;
         }
-        else{toastr.showToast('Error al enviar el correo','danger');}
+        else
+        {
+          console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else{
+            toastr.showToast('Error al enviar el correo','danger');
+          }
+        }
         return response.json();
       }).catch(function(error){
         console.log(error);
@@ -156,8 +174,8 @@ export default class Login extends Component {
           </Header>
           <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>
             <Content style={{ marginTop: 5}}>
-              {/*<Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/4)}} 
-                source={require('../../assets/unidrogas.png')}/> */}
+              <Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/4)}} 
+                source={Imagen.unidrogas}/>{/*FIXME: Cambiar imagen */}
               <Form style={{paddingTop:height/4}}>
                 <Item regular style={styles.form}>
                   <Icon active ios='ios-person' android='md-person' style={styles.icon}/>

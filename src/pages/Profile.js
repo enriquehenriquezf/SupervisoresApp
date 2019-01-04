@@ -4,7 +4,8 @@ import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Butto
 import styles from '../styles/Profile';
 import IconStyles from '../styles/Icons';
 import {toastr} from '../components/Toast';
-import {api} from '../services/api'
+import {api} from '../services/api';
+import {Imagen} from '../components/Imagenes';
 import {View, BackHandler} from 'react-native';
 
 let items = null;
@@ -55,7 +56,8 @@ export default class Profile extends Component {
       method: 'POST',
       headers: {
           'Authorization': 'Access',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept':'application/json'
       },
       body: JSON.stringify({email: items.correo})
       }).then(function(response) {
@@ -65,7 +67,16 @@ export default class Profile extends Component {
           toastr.showToast(JSON.parse(response._bodyInit),'success');
           handler(6,token,items);
         }
-        else{toastr.showToast('Error al enviar el correo','danger');}
+        else
+        {
+          console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else{
+            toastr.showToast('Error al enviar el correo','danger');
+          }
+        }
         //return response.json();
       }).catch(function(error){
         console.log(error);
@@ -95,17 +106,8 @@ export default class Profile extends Component {
         </Header>
           <Content>
             <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
-                {/*<Avatar size="xlarge" rounded
-                title={items.nombre.substring(0,1) + items.apellido.substring(0,1)}
-                titleStyle={{color:'#039BE5',backgroundColor: 'rgba(255,255,255,0)'}}
-                avatarStyle={{backgroundColor: 'rgba(255,255,255,0)'}}
-                containerStyle={{marginLeft:'auto', marginRight:'auto', borderWidth:4, borderColor:'#FFF'}}
-                source={{uri: "https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585"}}// https://png.pngtree.com/svg/20160304/ajb_address_book_user_avatar_183015.png
-                onPress={() => console.log("Works!")}
-                activeOpacity={0.5}
-                />*/}
                 <Thumbnail large
-                source={{uri: "https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585"}}
+                source={{uri: Imagen.avatar2}}
                 style={{marginLeft:'auto', marginRight:'auto', borderWidth:4, borderColor:'#FFF', width: 160, height: 160, borderRadius:80}}
                 />
                 <H2 style={{margin: 5, marginLeft:'auto', marginRight:'auto'}}>{items.nombre} {items.apellido}</H2>

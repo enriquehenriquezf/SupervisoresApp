@@ -6,7 +6,8 @@ import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,To
 import Overlay from 'react-native-modal-overlay';
 import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
-import {api} from '../services/api'
+import {api} from '../services/api';
+import {Imagen} from '../components/Imagenes';
 
 let items = null;
 let info = '';
@@ -74,7 +75,8 @@ export default class Activity extends Component {
       method: 'GET',
       headers: {
           'Authorization': auth,
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
       },      
       body: ''
     }).then(function(response) {
@@ -135,11 +137,11 @@ export default class Activity extends Component {
      */
     this.setState({observacion: items.observacion});
     if(items.documento_vencido === '' || items.documento_vencido === null){//FIXME: modificar imagen no disponible
-      imgTemp1 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png';
+      imgTemp1 = Imagen.noDisponible;
       this._img1.setNativeProps({src: [{uri: imgTemp1}]});
     }
     if(items.documento_renovado === '' || items.documento_renovado === null){
-      imgTemp2 = 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1024px-Imagen_no_disponible.svg.png';
+      imgTemp2 = Imagen.noDisponible;
       this._img2.setNativeProps({src: [{uri: imgTemp2}]});
     }
     /**
@@ -227,16 +229,27 @@ export default class Activity extends Component {
         file1 = response;
       });
     }
+    else{
+      if(items.documento_vencido !== ''){
+        file1 = imgTemp1;
+      }
+    }
     if(this.state.archivo2.hasOwnProperty('uri')){
       await Expo.FileSystem.readAsStringAsync(this.state.archivo2.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
         file2 = response;
       });
     }
+    else{
+      if(items.documento_renovado !== ''){
+        file2 = imgTemp2;
+      }
+    }
     await fetch(api.ipActivity, {
       method: 'POST',
       headers: {
           'Authorization': auth,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept':'application/json'
       },
       body: JSON.stringify({
         calificacion_pv: this.state.calificacion_pv, 
@@ -247,10 +260,11 @@ export default class Activity extends Component {
         documento_vencido: file1,
         documento_renovado: file2,
         tiempo_actividad: time,
-        tiempo_total: totalTime
+        tiempo_total: totalTime,
+        motivo_ausencia: 'no ausentado'
       })
     }).then(function(response) {
-      console.log(response);
+      //console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var message = "message";
       if(response.ok === true && response.status === 200)
@@ -260,7 +274,17 @@ export default class Activity extends Component {
       }
       else
       {
-        toastr.showToast(newToken[message],'warning');
+        console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+          handler2(-1,token,[]);
+        }
+        else{
+          toastr.showToast(newToken[message],'warning');
+        }
       }
     }).catch(function(error){
       toastr.showToast('Su sesión expiró','danger');
@@ -279,7 +303,7 @@ export default class Activity extends Component {
     time = timeLast-timeInit;
     try {
       await AsyncStorage.setItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad, time.toString());
-      console.log("tiempo: " + time);
+      //console.log("tiempo: " + time);
     } catch (error) {
       console.log(error);
     }
@@ -300,7 +324,7 @@ export default class Activity extends Component {
     totalTimeInit = timeLast;
     try {
       await AsyncStorage.setItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad, totalTimeInit.toString());
-      console.log("TOTAL TIME INIT: " + totalTimeInit);
+      //console.log("*TOTAL TIME INIT: " + totalTimeInit);
     } catch (error) {
       console.log(error);
     }
@@ -320,7 +344,7 @@ export default class Activity extends Component {
       const value = await AsyncStorage.getItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad);
       if (value !== null) {
         totalTimeInit = value;
-        console.log("TOTAL TIME:" + totalTimeInit);
+        //console.log("TOTAL TIME INIT: " + totalTimeInit);
       }
       else{this._storeDataInit()}
     } catch (error) {
@@ -335,7 +359,7 @@ export default class Activity extends Component {
       const value = await AsyncStorage.getItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
       if (value !== null) {
         time = value;
-        console.log(time);
+        //console.log("TIME: " + time);
       }
     } catch (error) {
       console.log(error);
@@ -771,16 +795,16 @@ export default class Activity extends Component {
                     </ListItem>
                     <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
                       <TouchableOpacity onPress={() => this.verImagen(true)}>
-                        <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_vencido}}></Image>
+                        <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: imgTemp1}}></Image>
                       </TouchableOpacity>
-                      <Input placeholder='Documento Vencido' disabled value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+                      <Input placeholder='Documento Vencido' disabled defaultValue={imgTemp1} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
                     </View>
                     <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                     <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
                       <TouchableOpacity onPress={() => this.verImagen(false)}>
-                        <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: api.ipImg + items.documento_renovado}}></Image>
+                        <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: imgTemp2}}></Image>
                       </TouchableOpacity>
-                      <Input placeholder='Documento Renovado' disabled value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+                      <Input placeholder='Documento Renovado' disabled defaultValue={imgTemp2} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
                     </View>
                     <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                   </View>

@@ -65,7 +65,8 @@ export default class ChangePass extends Component {
         method: 'POST',
         headers: {
             'Authorization': 'Access',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept':'application/json'
         },
         body: JSON.stringify({email: items.correo,password: this.state.pass, codigo: this.state.code})
       }).then(function(response) {
@@ -80,7 +81,16 @@ export default class ChangePass extends Component {
             handler(5,token,items);
           }
         }
-        else{toastr.showToast('Credenciales incorrectas','danger');}
+        else
+        {
+          console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else{
+            toastr.showToast('Credenciales incorrectas','danger');
+          }
+        }
         return response.json();
       }).catch(function(error){
         console.log(error);

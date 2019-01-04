@@ -2,31 +2,32 @@
  * url de la api
  * @example: localhost: 192.168.1.4 | public: 200.116.66.129
  */
+var baseUrl ='http://192.168.1.4';// Servidor
+var baseUrl2 ='http://192.168.1.185';//cudris
+var baseUrl3 ='http://192.168.1.136';//ronaldo
 export const api = {
- ipLogin : "http://192.168.1.4/supervisores_api/public/api/login",
- ipLogout : "http://192.168.1.4/supervisores_api/public/api/logout",
- ipHome : "http://192.168.1.4/supervisores_api/public/api/homeSupervisor",
- ipHomeCompletados : "http://192.168.1.4/supervisores_api/public/api/actividades_completas",
- ipShowActivities : "http://192.168.1.4/supervisores_api/public/api/mostrarActividades",
- ipActivity : "http://192.168.1.4/supervisores_api/public/api/actividad",
- ipDescripcion : "http://192.168.1.4/supervisores_api/public/api/descripcionActividad",
- ipChangePassword : "http://192.168.1.4/supervisores_api/public/api/changePass",
- ipVerify : "http://192.168.1.4/supervisores_api/public/api/verifyPass",
- ipImg: "http://192.168.1.4/supervisores_api/storage/app/public/img/",
-
- ip2 : "http://192.168.1.185/supervisores_api/public/api/login",//cudris
- ip3 : "http://192.168.1.136/supervisores_api/public/api/login",//ronaldo
+ ipLogin : baseUrl + "/supervisores_api/public/api/login",
+ ipLogout : baseUrl + "/supervisores_api/public/api/logout",
+ ipHome : baseUrl + "/supervisores_api/public/api/homeSupervisor",
+ ipHomeCompletados : baseUrl + "/supervisores_api/public/api/actividades_completas",
+ ipShowActivities : baseUrl + "/supervisores_api/public/api/mostrarActividades",
+ ipActivity : baseUrl + "/supervisores_api/public/api/actividad",
+ ipDescripcion : baseUrl + "/supervisores_api/public/api/descripcionActividad",
+ ipChangePassword : baseUrl + "/supervisores_api/public/api/changePass",
+ ipVerify : baseUrl + "/supervisores_api/public/api/verifyPass",
+ ipImg: baseUrl + "/supervisores_api/storage/app/public/img/",
 }
  /*//Public
+var baseUrl ='http://200.116.66.129'; // Servidor
 export const api = {
-    ipLogin : "http://200.116.66.129/supervisores_api/public/api/login",
-    ipLogout : "http://200.116.66.129/supervisores_api/public/api/logout",
-    ipHome : "http://200.116.66.129/supervisores_api/public/api/homeSupervisor",
-    ipHomeCompletados : "http://200.116.66.129/supervisores_api/public/api/actividades_completas",
-    ipShowActivities : "http://200.116.66.129/supervisores_api/public/api/mostrarActividades",
-    ipActivity : "http://200.116.66.129/supervisores_api/public/api/actividad",
-    ipDescripcion : "http://200.116.66.129/supervisores_api/public/api/descripcionActividad",
-    ipChangePassword : "http://200.116.66.129/supervisores_api/public/api/changePass",
-    ipVerify : "http://200.116.66.129/supervisores_api/public/api/verifyPass",
-    ipImg: "http://200.116.66.129/supervisores_api/storage/app/public/img/",
+    ipLogin : baseUrl + "/supervisores_api/public/api/login",
+    ipLogout : baseUrl + "/supervisores_api/public/api/logout",
+    ipHome : baseUrl + "/supervisores_api/public/api/homeSupervisor",
+    ipHomeCompletados : baseUrl + "/supervisores_api/public/api/actividades_completas",
+    ipShowActivities : baseUrl + "/supervisores_api/public/api/mostrarActividades",
+    ipActivity : baseUrl + "/supervisores_api/public/api/actividad",
+    ipDescripcion : baseUrl + "/supervisores_api/public/api/descripcionActividad",
+    ipChangePassword : baseUrl + "/supervisores_api/public/api/changePass",
+    ipVerify : baseUrl + "/supervisores_api/public/api/verifyPass",
+    ipImg: baseUrl + "/supervisores_api/storage/app/public/img/",
 }*/

@@ -4,7 +4,8 @@ import { Left, Body, Right, Content, List,ListItem,Text, Badge, Icon, Thumbnail,
 import {toastr} from '../../../components/Toast';
 import {View, RefreshControl} from 'react-native';
 import styles from '../../../styles/Home';
-import {api} from '../../../services/api'
+import {api} from '../../../services/api';
+import {Imagen} from '../../../components/Imagenes';
 
 let items = [];
 let user = [];
@@ -41,7 +42,8 @@ export default class Home extends Component {
       method: 'GET',
       headers: {
           'Authorization': auth,
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
       },
       body: ''
     }).then(function(response) {
@@ -88,7 +90,17 @@ export default class Home extends Component {
       }
       else
       {
-          toastr.showToast(newToken[actividades],'warning');//No se encontraron planes de trabajo para hoy
+        console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+          handler2(-1,token,[]);
+        }
+        else{
+          toastr.showToast(newToken[message],'warning');//No se encontraron planes de trabajo para hoy
+        }
       }
       //return response.json();
     }).catch(function(error){
@@ -131,7 +143,7 @@ export default class Home extends Component {
           <List>
             <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, user)}>
               <Left>
-                <Thumbnail source={{ uri: 'https://png.pngtree.com/svg/20160304/ajb_address_book_user_avatar_183015.png' }} />
+                <Thumbnail source={{ uri: Imagen.avatar }} />
                 <View style={styles.separador}></View>
               </Left>
               <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>

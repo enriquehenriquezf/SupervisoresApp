@@ -58,7 +58,8 @@ export default class ShowSucursales extends Component {
       method: 'GET',
       headers: {
           'Authorization': auth,
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
       },
       body: ''
     }).then(function(response) {
@@ -104,7 +105,17 @@ export default class ShowSucursales extends Component {
       }
       else
       {
-        toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
+        console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+          handler2(-1,token,[]);
+        }
+        else{
+          toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
+        }
       }
       //return response.json();
     }).catch(function(error){
