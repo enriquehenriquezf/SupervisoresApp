@@ -96,10 +96,11 @@ export default class Home extends Component {
         }
         else if(response.status === 401){
           toastr.showToast('Su sesión expiró','danger');
+          user = {};
           handler2(-1,token,[]);
         }
         else{
-          toastr.showToast(newToken[message],'warning');//No se encontraron planes de trabajo para hoy
+          toastr.showToast(newToken[actividades],'warning');//No se encontraron planes de trabajo para hoy
         }
       }
       //return response.json();
@@ -143,7 +144,10 @@ export default class Home extends Component {
           <List>
             <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, user)}>
               <Left>
-                <Thumbnail source={{ uri: Imagen.avatar }} />
+                <View style={{marginRight: 30}}>
+                  <Thumbnail source={{ uri: Imagen.avatar }} style={styles.perfil} />
+                  <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={styles.activo}/>
+                </View>
                 <View style={styles.separador}></View>
               </Left>
               <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
@@ -176,7 +180,7 @@ export default class Home extends Component {
                 }
                 </Left>
                 <Body style={item.borde ? styles.ConBorde : styles.SinBorde}>
-                  <Text>{item.name}</Text>
+                  <Text style={{fontSize: 16}}>{item.name}</Text>
                 </Body>
                 <Right style={item.borde ? styles.ConBorde : styles.SinBorde}>
                 {

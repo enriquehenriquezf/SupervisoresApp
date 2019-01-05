@@ -22,5 +22,20 @@ export default StyleSheet.create({
     },
     SinBorde:{
         borderBottomColor: 'rgba(255,255,255,0)'
+    },
+    perfil:{
+        position: 'absolute',
+        left: -10,
+        top: -15
+    },
+    activo:{
+        color: "#5cb85c",
+        left:30,
+        top:30
+    },
+    inactivo:{
+        color: "#d9534f",
+        left:30,
+        top:30
     }
 });

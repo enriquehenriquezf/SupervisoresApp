@@ -22,6 +22,7 @@ export default class Home extends Component {
     let newToken = null;
     items = [];
     this._OnItemPress = this._OnItemPress.bind(this);
+    this.CambiarEstado = this.CambiarEstado.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -96,10 +97,11 @@ export default class Home extends Component {
         }
         else if(response.status === 401){
           toastr.showToast('Su sesión expiró','danger');
-          handler2(-1,token,[]);
+          user = {};
+          handler2 = true;
         }
         else{
-          toastr.showToast(newToken[message],'warning');
+          toastr.showToast(newToken[actividades],'warning');
         }
       }
       //return response.json();
@@ -124,6 +126,14 @@ export default class Home extends Component {
     handler(index,token,item);
   }
 
+  /**
+   * Cambiar de estado activo a inactivo
+   */
+  CambiarEstado()
+  {
+    console.log("cambio de estado")
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar tipos de fuente
@@ -141,9 +151,12 @@ export default class Home extends Component {
         }>        
         <Card style={{borderRadius: 5}}>
           <List>
-            <ListItem thumbnail button style={{marginBottom: 5}}  onPress={() => this._OnItemPress(5,this.props.handler2, user)}>
+            <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, user)} onLongPress={() => this.CambiarEstado()}>
               <Left>
-                <Thumbnail source={{ uri: Imagen.avatar }} />
+                <View style={{marginRight: 30}}>
+                  <Thumbnail source={{ uri: Imagen.avatar }} style={styles.perfil} />
+                  <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={styles.activo}/>
+                </View>
                 <View style={styles.separador}></View>
               </Left>
               <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
@@ -176,7 +189,7 @@ export default class Home extends Component {
                 }
                 </Left>
                 <Body style={item.borde ? styles.ConBorde : styles.SinBorde}>
-                  <Text>{item.name}</Text>
+                  <Text style={{fontSize: 16}}>{item.name}</Text>
                 </Body>
                 <Right style={item.borde ? styles.ConBorde : styles.SinBorde}>
                   {
