@@ -1,11 +1,9 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title,Text, Icon, Button, Tabs, Tab, TabHeading } from 'native-base';
-import {View} from 'react-native';
 import IconStyles from '../../styles/Icons';
 import Activos from './Tabs/Activos';
 import Completados from './Tabs/Completados';
-
 
 export default class Home extends Component {
   constructor(props) {

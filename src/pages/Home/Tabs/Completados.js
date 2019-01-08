@@ -1,8 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Left, Body, Right, Title, Content, List,ListItem,Text, Badge, Icon, Thumbnail, Spinner, Card } from 'native-base';
+import { Left, Body, Right, Title, Content, List,ListItem,Text, Badge, Icon, Thumbnail, Spinner, Card, ActionSheet } from 'native-base';
 import {toastr} from '../../../components/Toast';
-import {View, RefreshControl} from 'react-native';
+import {View, RefreshControl, AsyncStorage} from 'react-native';
 import styles from '../../../styles/Home';
 import {api} from '../../../services/api';
 import {Imagen} from '../../../components/Imagenes';
@@ -10,6 +10,7 @@ import {Imagen} from '../../../components/Imagenes';
 let items = [];
 let user = [];
 let sucursalActual = null;
+let estado = 'true';
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -20,9 +21,9 @@ export default class Home extends Component {
     };
     let token = this.props.token;
     let newToken = null;
+    this._retrieveData();
     items = [];
     this._OnItemPress = this._OnItemPress.bind(this);
-    this.CambiarEstado = this.CambiarEstado.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -123,17 +124,28 @@ export default class Home extends Component {
    */
   _OnItemPress(index,handler, item)
   {
-    handler(index,token,item);
+    if(estado !== 'false' || index === 5){
+      handler(index,token,item);
+    }
+    else
+    {
+      toastr.showToast('Cambie su estado a Activo','warning');
+    }
   }
 
   /**
-   * Cambiar de estado activo a inactivo
+   * Obtener Estado del supervisor
    */
-  CambiarEstado()
-  {
-    console.log("cambio de estado")
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('ESTADO');
+      if (value !== null) {
+        estado = value;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
-
   render() {
     /***
      * Mostrar layout luego de cargar tipos de fuente
@@ -151,11 +163,15 @@ export default class Home extends Component {
         }>        
         <Card style={{borderRadius: 5}}>
           <List>
-            <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, user)} onLongPress={() => this.CambiarEstado()}>
+            <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, user)}>
               <Left>
                 <View style={{marginRight: 30}}>
                   <Thumbnail source={{ uri: Imagen.avatar }} style={styles.perfil} />
-                  <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={styles.activo}/>
+                  {estado === 'true' ?
+                      <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={styles.activo}/>
+                    :
+                      <Icon active ios='ios-remove-circle' android='md-remove-circle' style={styles.inactivo}/>
+                  }
                 </View>
                 <View style={styles.separador}></View>
               </Left>

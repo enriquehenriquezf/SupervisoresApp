@@ -11,5 +11,23 @@ export default StyleSheet.create({
     },
     back: {
         marginLeft: Platform.OS === 'ios' ? 5 : 0
+    },
+    estado:{
+        flex:1,
+        flexDirection:'row',
+        justifyContent:'flex-end',
+        alignItems:'center'
+    },
+    activo:{
+        color: "#5cb85c",
+        fontSize:20
+    },
+    inactivo:{
+        color: "#d9534f",
+        fontSize:20
+    },
+    dropdown:{
+        color: Platform.OS === 'ios' ? 'black' : 'white',
+        marginRight: 5
     }
 });

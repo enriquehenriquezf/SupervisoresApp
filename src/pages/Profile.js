@@ -1,23 +1,31 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item, Thumbnail } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item, Thumbnail, ActionSheet } from 'native-base';
 import styles from '../styles/Profile';
 import IconStyles from '../styles/Icons';
 import {toastr} from '../components/Toast';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
-import {View, BackHandler} from 'react-native';
+import {View, BackHandler, AsyncStorage, TouchableHighlight} from 'react-native';
 
+var BUTTONS = [
+  { text: "Activo", icon: "checkmark-circle", iconColor: "#5cb85c" },
+  { text: "Inactivo", icon: "remove-circle", iconColor: "#d9534f" },
+  { text: "Cerrar", icon: "close-circle", iconColor: "#fa213b" }
+];
+var CANCEL_INDEX = 2;
 let items = null;
 export default class Profile extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      showToast: false
+      showToast: false,
+      estado : true
     };
     let token = this.props.token;
     items = this.props.data;
+    this._retrieveData();
     this.ChangePass = this.ChangePass.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
@@ -83,6 +91,67 @@ export default class Profile extends Component {
       });
   }
 
+  /**
+   * Guardar estado del supervisor (Activo/Inactivo)
+   */
+  _storeData = async (estado2) => {
+    try {
+      var state = '';
+      this.setState({estado: estado2});
+      var time =  new Date().getTime().toString();
+      if(estado2){
+        state = 'true';
+        await AsyncStorage.multiSet(['ESTADO', state],['TIME_INACTIVO',time]);
+      }else{
+        state='false';
+        await AsyncStorage.multiSet(['ESTADO', state],['TIME_INACTIVO_INIT',time]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /**
+   * Obtener Estado del supervisor
+   */
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('ESTADO');
+      var state;
+      if (value !== null) {
+        if(value === 'true'){state=true}
+        else{state=false}
+        this.setState({estado: state});
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /**
+   * Cambia el estado de Activo o Inactivo
+   */
+  CambiarEstado(){
+    ActionSheet.show(
+      {
+        options: BUTTONS,
+        cancelButtonIndex: CANCEL_INDEX,
+        title: "Estado"
+      },
+      buttonIndex => {
+        var state;
+        if(buttonIndex !== 2){
+          if(buttonIndex === 0){
+            state = true;
+          }
+          else if(buttonIndex === 1){state = false;}
+          //this.setState({ estado: state });
+          this._storeData(state);            
+        }
+      }
+    );
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar los datos
@@ -96,13 +165,32 @@ export default class Profile extends Component {
         <Header style={{paddingTop: 20}}>
         <Left>
             <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
+              <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
             </Button>
         </Left>          
         <Body>
           <Title>Perfil</Title>
         </Body>
-        <Right/>
+        <Right>
+          {
+            this.state.estado === true ?
+              <TouchableHighlight onPress={() => this.CambiarEstado()}>
+                <View style={IconStyles.estado}>
+                  <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={IconStyles.activo}/>
+                  <Title style={{marginLeft:5, marginRight:5}}>Activo</Title>
+                  <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
+                </View>
+              </TouchableHighlight>
+            :
+              <TouchableHighlight onPress={() => this.CambiarEstado()}>
+                <View style={IconStyles.estado}>
+                  <Icon active ios='ios-remove-circle' android='md-remove-circle' style={IconStyles.inactivo}/>
+                  <Title style={{marginLeft:5, marginRight:5}}>Inactivo</Title>
+                  <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
+                </View>
+              </TouchableHighlight>
+          }
+        </Right>
         </Header>
           <Content>
             <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
