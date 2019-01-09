@@ -11,6 +11,7 @@ let items = [];
 let user = [];
 let sucursalActual = null;
 let tiempoInactivo=0;
+let tiempoInactivoInit=0;
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -23,6 +24,7 @@ export default class Home extends Component {
     let token = this.props.token;
     let newToken = null;
     tiempoInactivo=0;
+    tiempoInactivoInit=0;
     this._retrieveData();
     items = [];
     this._OnItemPress = this._OnItemPress.bind(this);
@@ -81,6 +83,7 @@ export default class Home extends Component {
               tiempo_actividad: element.tiempo_actividad,
               motivo_ausencia: element.motivo_ausencia,
               tiempoInactivo: tiempoInactivo,
+              tiempoInactivoInit: tiempoInactivoInit,
               latitud: 11.0041235,
               longitud: -74.8130534,
               separador: false,
@@ -146,7 +149,8 @@ export default class Home extends Component {
       if (value !== null) {
         this.setState({estado : value[0][1]});
         if(value[1][1] !== null){
-          tiempoInactivo = value[1][1] - value[2][1];
+          tiempoInactivoInit = value[2][1];
+          tiempoInactivo = value[1][1] - tiempoInactivoInit;
         }
         //console.log(tiempoInactivo);
       }

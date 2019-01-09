@@ -365,8 +365,12 @@ export default class Activity extends Component {
     try {
       const value = await AsyncStorage.getItem('TIME_AUSENTE_' + items.nombre_tabla + '_' + items.id_actividad);
       if (value !== null) {
-        var t2 = new Date().getTime().toString();
-        if((t2 - value) - items.tiempoInactivo > 180000){// más de media hora ausente     ( > 1800000 )     
+        var t2 = new Date().getTime().toString();        
+        var TiempoInact = 0;
+        if(items.tiempoInactivoInit !== 0 && items.tiempoInactivoInit > totalTimeInit){
+          TiempoInact = items.tiempoInactivo;
+        }
+        if((t2 - value) - TiempoInact > 1800000){// más de media hora ausente     ( > 1800000 )     
           ActionSheet.show(
             {
               options: BUTTONS,
