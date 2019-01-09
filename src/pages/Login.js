@@ -172,10 +172,10 @@ export default class Login extends Component {
           </Body>
           <Right />
           </Header>
-          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.8 : 1}}>
             <Content style={{ marginTop: 5}}>
               <Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/4)}} 
-                source={Imagen.unidrogas}/>{/*FIXME: Cambiar imagen */}
+                source={Imagen.unidrogas}/>
               <Form style={{paddingTop:height/4}}>
                 <Item regular style={styles.form}>
                   <Icon active ios='ios-person' android='md-person' style={styles.icon}/>

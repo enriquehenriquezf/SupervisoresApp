@@ -101,10 +101,11 @@ export default class Profile extends Component {
       var time =  new Date().getTime().toString();
       if(estado2){
         state = 'true';
-        await AsyncStorage.multiSet(['ESTADO', state],['TIME_INACTIVO',time]);
+        await AsyncStorage.multiSet([['ESTADO', state],['TIME_INACTIVO',time]]);
       }else{
         state='false';
-        await AsyncStorage.multiSet(['ESTADO', state],['TIME_INACTIVO_INIT',time]);
+        await AsyncStorage.multiSet([['ESTADO', state],['TIME_INACTIVO_INIT',time]]);
+        await AsyncStorage.removeItem('TIME_INACTIVO');
       }
     } catch (error) {
       console.log(error);
@@ -116,12 +117,14 @@ export default class Profile extends Component {
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('ESTADO');
+      const value = await AsyncStorage.multiGet(['ESTADO','TIME_INACTIVO','TIME_INACTIVO_INIT']);
       var state;
       if (value !== null) {
-        if(value === 'true'){state=true}
+        if(value[0][1] === 'true'){state=true}
         else{state=false}
         this.setState({estado: state});
+        //console.log('TIME_INACTIVO: ' + value[1][1]);
+        //console.log('TIME_INACTIVO_INIT: ' + value[2][1]);
       }
     } catch (error) {
       console.log(error);
@@ -146,7 +149,9 @@ export default class Profile extends Component {
           }
           else if(buttonIndex === 1){state = false;}
           //this.setState({ estado: state });
-          this._storeData(state);            
+          if(this.state.estado !== state){
+            this._storeData(state);
+          }   
         }
       }
     );
@@ -177,7 +182,7 @@ export default class Profile extends Component {
               <TouchableHighlight onPress={() => this.CambiarEstado()}>
                 <View style={IconStyles.estado}>
                   <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={IconStyles.activo}/>
-                  <Title style={{marginLeft:5, marginRight:5}}>Activo</Title>
+                  <Title style={IconStyles.StateTitle}>Activo</Title>
                   <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
                 </View>
               </TouchableHighlight>
@@ -185,7 +190,7 @@ export default class Profile extends Component {
               <TouchableHighlight onPress={() => this.CambiarEstado()}>
                 <View style={IconStyles.estado}>
                   <Icon active ios='ios-remove-circle' android='md-remove-circle' style={IconStyles.inactivo}/>
-                  <Title style={{marginLeft:5, marginRight:5}}>Inactivo</Title>
+                  <Title style={IconStyles.StateTitle}>Inactivo</Title>
                   <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
                 </View>
               </TouchableHighlight>

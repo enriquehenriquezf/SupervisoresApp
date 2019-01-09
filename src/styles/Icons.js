@@ -28,6 +28,12 @@ export default StyleSheet.create({
     },
     dropdown:{
         color: Platform.OS === 'ios' ? 'black' : 'white',
-        marginRight: 5
+        fontSize:20,
+        marginRight: 5,
+        marginTop: Platform.OS === 'ios' ? 0 : 6
+    },
+    StateTitle:{
+        marginLeft: Platform.OS === 'ios' ? 2 : 5,
+        marginRight:5
     }
 });

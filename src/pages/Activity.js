@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card, Input } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card, Input,ActionSheet } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity} from 'react-native';
 import Overlay from 'react-native-modal-overlay';
@@ -9,6 +9,7 @@ import IconStyles from '../styles/Icons';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
 
+var BUTTONS = ["SINIESTRO","VISITAS DE ENTIDADES PÚBLICAS","REQUERIMIENTO GERENCIAL", "AUSENCIA ADMINISTRADOR", "TRABAJO ESPECIAL"];
 let items = null;
 let info = '';
 let time = 0;
@@ -62,6 +63,7 @@ export default class Activity extends Component {
     this.Descripcion();
     this._retrieveDataInit();
     this._retrieveData();
+    this._retrieveDataAusente();
     this.setState({ loading: false });
   }
 
@@ -220,6 +222,7 @@ export default class Activity extends Component {
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let id = items.id_actividad;
     this._storeData();
+    this._storeDataAusente();
     var totalTl = new Date().getTime();
     totalTime = totalTl - totalTimeInit;
     let file1 = null;
@@ -261,7 +264,7 @@ export default class Activity extends Component {
         documento_renovado: file2,
         tiempo_actividad: time,
         tiempo_total: totalTime,
-        motivo_ausencia: 'no ausentado'
+        motivo_ausencia: items.motivo_ausencia
       })
     }).then(function(response) {
       //console.log(response);
@@ -334,6 +337,62 @@ export default class Activity extends Component {
     } catch (error) {
       console.log(error);
     }*/
+  }
+
+  /**
+   * Guardar datos del tiempo inicial de ausencia en el plan de trabajo
+   */
+  _storeDataAusente = async () => {
+    var tl = new Date().getTime();
+    try {
+      await AsyncStorage.setItem('TIME_AUSENTE_' + items.nombre_tabla + '_' + items.id_actividad, tl.toString());
+      //console.log("*TIME_AUSENTE: " + totalTimeInit);
+    } catch (error) {
+      console.log(error);
+    }
+    /* Borrar datos
+    try {
+      await AsyncStorage.removeItem('TIME_AUSENTE_' + items.nombre_tabla + '_' + items.id_actividad);
+    } catch (error) {
+      console.log(error);
+    }*/
+  }
+
+  /**
+   * Obtener datos de tiempo inicial de ausencia en el plan de trabajo
+   */
+  _retrieveDataAusente = async () => {
+    try {
+      const value = await AsyncStorage.getItem('TIME_AUSENTE_' + items.nombre_tabla + '_' + items.id_actividad);
+      if (value !== null) {
+        var t2 = new Date().getTime().toString();
+        if((t2 - value) - items.tiempoInactivo > 180000){// más de media hora ausente     ( > 1800000 )     
+          ActionSheet.show(
+            {
+              options: BUTTONS,
+              title: "Motivo de Ausencia"
+            },
+            buttonIndex => {
+              if(buttonIndex === undefined){
+                toastr.showToast('Debe seleccionar una opción','warning');
+                this.handleBackPress();
+              }
+              else{
+                if(items.motivo_ausencia === 'no ausentado'){
+                  items.motivo_ausencia = BUTTONS[buttonIndex];
+                }
+                else{
+                  items.motivo_ausencia = items.motivo_ausencia + ',' + BUTTONS[buttonIndex];
+                }
+              }
+            }
+          );
+        }
+        //console.log("TIME AUSENTE: " + totalTimeInit);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   /**

@@ -10,14 +10,14 @@ import {Imagen} from '../../../components/Imagenes';
 let items = [];
 let user = [];
 let sucursalActual = null;
-let estado = 'true';
 export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
       refreshing: false,
-      showToast: false
+      showToast: false,
+      estado:true
     };
     let token = this.props.token;
     let newToken = null;
@@ -77,6 +77,8 @@ export default class Home extends Component {
               documento_vencido: element.documento_vencido,
               documento_renovado: element.documento_renovado,
               tiempo_actividad: element.tiempo_actividad,
+              motivo_ausencia: element.motivo_ausencia,
+              tiempoInactivo: tiempoInactivo,
               latitud: 11.0041235,
               longitud: -74.8130534,
               separador: false,
@@ -124,7 +126,7 @@ export default class Home extends Component {
    */
   _OnItemPress(index,handler, item)
   {
-    if(estado !== 'false' || index === 5){
+    if(this.state.estado !== 'false' || index === 5){
       handler(index,token,item);
     }
     else
@@ -138,9 +140,13 @@ export default class Home extends Component {
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('ESTADO');
+      const value = await AsyncStorage.multiGet(['ESTADO','TIME_INACTIVO','TIME_INACTIVO_INIT']);
       if (value !== null) {
-        estado = value;
+        this.setState({estado : value[0][1]});
+        if(value[1][1] !== null){
+          tiempoInactivo = value[1][1] - value[2][1];
+        }
+        //console.log(tiempoInactivo);
       }
     } catch (error) {
       console.log(error);
@@ -167,7 +173,7 @@ export default class Home extends Component {
               <Left>
                 <View style={{marginRight: 30}}>
                   <Thumbnail source={{ uri: Imagen.avatar }} style={styles.perfil} />
-                  {estado === 'true' ?
+                  {this.state.estado === 'true' ?
                       <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={styles.activo}/>
                     :
                       <Icon active ios='ios-remove-circle' android='md-remove-circle' style={styles.inactivo}/>
