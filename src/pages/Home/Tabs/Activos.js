@@ -1,11 +1,11 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Left, Body, Right, Content, List,ListItem,Text, Badge, Icon, Thumbnail, Spinner, Card } from 'native-base';
+import { Left, Body, Right, Content, List,ListItem,Text, Badge, Icon, Spinner, Card } from 'native-base';
 import {toastr} from '../../../components/Toast';
 import {View, RefreshControl, AsyncStorage} from 'react-native';
 import styles from '../../../styles/Home';
 import {api} from '../../../services/api';
-import {Imagen} from '../../../components/Imagenes';
+import { UserInfo } from '../../../components/UserInfo';
 
 let items = [];
 let user = [];
@@ -125,22 +125,6 @@ export default class Home extends Component {
   }
 
   /**
-   * Cambiar al Layout activity al presionar el Item y enviarle los datos de ese item
-   * @param {function} handler 
-   * @param {Array} item 
-   */
-  _OnItemPress(index,handler, item)
-  {
-    if(this.state.estado !== 'false' || index === 5){
-      handler(index,token,item);
-    }
-    else
-    {
-      toastr.showToast('Cambie su estado a Activo','warning');
-    }
-  }
-
-  /**
    * Obtener Estado del supervisor
    */
   _retrieveData = async () => {
@@ -159,6 +143,22 @@ export default class Home extends Component {
     }
   }
 
+  /**
+   * Cambiar al Layout activity al presionar el Item y enviarle los datos de ese item
+   * @param {function} handler 
+   * @param {Array} item 
+   */
+  _OnItemPress(index,handler, item)
+  {
+    if(this.state.estado !== 'false' || index === 5){
+      handler(index,token,item);
+    }
+    else
+    {
+      toastr.showToast('Cambie su estado a Activo','warning');
+    }
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar tipos de fuente
@@ -174,30 +174,7 @@ export default class Home extends Component {
             colors={["#29B6F6"]}
           />
         }>
-        <Card style={{borderRadius: 5}}>
-          <List>
-            <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, user)}>
-              <Left>
-                <View style={{marginRight: 30}}>
-                  <Thumbnail source={{ uri: Imagen.avatar }} style={styles.perfil} />
-                  {this.state.estado === 'true' ?
-                      <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={styles.activo}/>
-                    :
-                      <Icon active ios='ios-remove-circle' android='md-remove-circle' style={styles.inactivo}/>
-                  }
-                </View>
-                <View style={styles.separador}></View>
-              </Left>
-              <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                <Text>{user.nombre} {user.apellido}</Text>
-                <Text note>{user.cedula}</Text>
-              </Body>
-              <Right style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                <Text note>{user.codigo}</Text>
-              </Right>
-            </ListItem>
-          </List>
-        </Card>
+        <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
         <Card style={{borderRadius: 5}}>
           <List dataArray={items}
             renderRow={(item) =>

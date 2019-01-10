@@ -134,17 +134,17 @@ export default class Activity extends Component {
     {
       this.SetChecked(3,'Muy Tarde');
     }
+    this.setState({observacion: items.observacion});
     /**
      * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
      */
-    this.setState({observacion: items.observacion});
     if(items.documento_vencido === '' || items.documento_vencido === null){//FIXME: modificar imagen no disponible
-      imgTemp1 = Imagen.noDisponible;
-      this._img1.setNativeProps({src: [{uri: imgTemp1}]});
+      //imgTemp1 = Imagen.noDisponible;
+      this._img1.setNativeProps({src: [{uri: Imagen.noDisponible}]});
     }
     if(items.documento_renovado === '' || items.documento_renovado === null){
-      imgTemp2 = Imagen.noDisponible;
-      this._img2.setNativeProps({src: [{uri: imgTemp2}]});
+      //imgTemp2 = Imagen.noDisponible;
+      this._img2.setNativeProps({src: [{uri: Imagen.noDisponible}]});
     }
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -860,14 +860,14 @@ export default class Activity extends Component {
                       <TouchableOpacity onPress={() => this.verImagen(true)}>
                         <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: imgTemp1}}></Image>
                       </TouchableOpacity>
-                      <Input placeholder='Documento Vencido' disabled defaultValue={imgTemp1} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+                      <Input placeholder='Documento Vencido' disabled defaultValue={items.documento_vencido !== null ? imgTemp1 : ''} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
                     </View>
                     <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                     <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
                       <TouchableOpacity onPress={() => this.verImagen(false)}>
                         <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: imgTemp2}}></Image>
                       </TouchableOpacity>
-                      <Input placeholder='Documento Renovado' disabled defaultValue={imgTemp2} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+                      <Input placeholder='Documento Renovado' disabled defaultValue={items.documento_renovado !== null ? imgTemp2 : ''} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
                     </View>
                     <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                   </View>
