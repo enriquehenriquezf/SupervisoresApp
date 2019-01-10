@@ -60,7 +60,8 @@ export default class Index extends Component {
       method: 'POST',
       headers: {
           'Authorization': auth,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept':'application/json'
       },      
       body: ''
     }).then(function(response) {
@@ -69,6 +70,12 @@ export default class Index extends Component {
       {
         var token2 = JSON.parse(response._bodyInit)
         console.log(token2["message"]);
+      }
+      else{
+        if(response.status === 401){
+          var token2 = JSON.parse(response._bodyInit)
+          console.log(token2["message"]);
+        }
       }
     }).catch(function(error){
       console.log(error);

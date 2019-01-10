@@ -106,7 +106,7 @@ export default class Home extends Component {
         else if(response.status === 401){
           toastr.showToast('Su sesión expiró','danger');
           user = {};
-          handler2(-1,token,[]);
+          handler2 = true;
         }
         else{
           toastr.showToast(newToken[actividades],'warning');//No se encontraron planes de trabajo para hoy
