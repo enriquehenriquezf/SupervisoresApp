@@ -190,7 +190,7 @@ export default class Activity extends Component {
     );
 
     /** buscar productos */
-    if(items.nombre_tabla === 'libro_vencimientos'){
+    if(items.nombre_tabla === 'libro_vencimientos' || items.nombre_tabla === 'kardex'){
       let bodyInit = JSON.parse(token._bodyInit);
       const auth = bodyInit.token_type + " " + bodyInit.access_token;
       let prods = [];
