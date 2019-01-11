@@ -1,8 +1,9 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form, ListItem, Radio, H2, Card, Input,ActionSheet } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, Radio, H2, Card, Input,ActionSheet } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity} from 'react-native';
+import Autocomplete from 'react-native-autocomplete-input';
 import Overlay from 'react-native-modal-overlay';
 import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
@@ -19,6 +20,7 @@ let totalTimeInit = 0;
 let imgOverlay = '';
 let imgTemp1 = '';
 let imgTemp2 = '';
+let TIEMPOAUSENCIA = 1800000;
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -34,6 +36,8 @@ export default class Activity extends Component {
       error:null,
       isVisible: false,
       isVisible2: false,
+      productos:[],
+      PRODUCTS:[],
       showToast: false
     };
     let token = this.props.token;
@@ -184,6 +188,65 @@ export default class Activity extends Component {
       },
       { enableHighAccuracy: false, timeout: 60000, maximumAge: 1000 },
     );
+
+    /** buscar productos */
+    if(items.nombre_tabla === 'libro_vencimientos'){
+      let bodyInit = JSON.parse(token._bodyInit);
+      const auth = bodyInit.token_type + " " + bodyInit.access_token;
+      let prods = [];
+      fetch(api.ipShowActivities, {
+        method: 'GET',
+        headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept':'application/json'
+        },
+        body: ''
+      }).then(function(response) {
+        //console.log(response);
+        if(response.ok === true && response.status === 200)
+        {
+          newToken = JSON.parse(response._bodyInit);
+          var actividades = "Actividades";
+          //console.log(Object.values(newToken[actividades]));
+          var SUCURSAL = null;
+          Object.values(newToken[actividades]).forEach(element => {
+            //console.log(Object.values(element));
+            var valores = Object.values(element)[0];
+            SUCURSAL = Object.keys(element)[0];       
+            var item = {
+              name: valores.nombre_actividad,
+              sucursal: SUCURSAL,
+              id_plan_trabajo: valores.id_plan_trabajo,
+              separador: false
+            };
+            //console.log(JSON.stringify(item));
+            prods.push(valores.nombre_actividad);//item
+          });
+          //console.log(prods)
+        }
+        else
+        {
+          console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else if(response.status === 401){
+            toastr.showToast('Su sesión expiró','danger');
+            handler2 = true;
+          }
+          else{
+            toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
+          }
+        }
+        //return response.json();
+      }).catch(function(error){
+        toastr.showToast('Su sesión expiró','danger');
+        handler2 = true;
+        console.log(error);
+      });
+      this.setState({productos: prods});
+    }
   }
 
   componentWillUnmount() {
@@ -370,7 +433,7 @@ export default class Activity extends Component {
         if(items.tiempoInactivoInit !== 0 && items.tiempoInactivoInit > totalTimeInit){
           TiempoInact = items.tiempoInactivo;
         }
-        if((t2 - value) - TiempoInact > 1800000){// más de media hora ausente     ( > 1800000 )     
+        if((t2 - value) - TiempoInact > TIEMPOAUSENCIA){// más de media hora ausente     ( > 1800000 )  
           ActionSheet.show(
             {
               options: BUTTONS,
@@ -474,6 +537,30 @@ export default class Activity extends Component {
     this.setState({isVisible2: true});
   }
 
+  /**
+   * Buscar Producto
+   */
+  findProduct(query) {
+    if (query === '') {
+      return [];
+    }
+
+    const { productos } = this.state;
+    return productos.filter(prod => prod.toLowerCase().search(query.toLowerCase()) >= 0);
+  }
+
+  /**
+   * Borrar Producto a la lista
+   */
+  BorrarProducto(item){
+    var array = [...this.state.PRODUCTS];
+    var index = array.indexOf(item)
+    if (index !== -1) {
+      array.splice(index, 1);
+      this.setState({PRODUCTS: array});
+    }
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar los datos
@@ -481,6 +568,10 @@ export default class Activity extends Component {
     if (this.state.loading) {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
+    
+    const { query } = this.state;
+    const prods = this.findProduct(query);
+
     return (
       <Container>
         <Header style={{paddingTop: 20}}>
@@ -1007,6 +1098,26 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
+                    <Autocomplete
+                      autoCapitalize="none"
+                      data={prods}
+                      defaultValue={query}
+                      onChangeText={text => this.setState({ query: text })}
+                      placeholder="Producto a buscar"
+                      renderItem={item => (
+                        <TouchableOpacity onPress={() => this.setState({ query: item, PRODUCTS: [...this.state.PRODUCTS, item] }) }>
+                          <Text>{item}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                    <List dataArray={this.state.PRODUCTS}
+                      renderRow={(item) =>
+                        <ListItem button onPress={() => this.BorrarProducto(item)}>
+                          <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                          <Text> {item}</Text>
+                        </ListItem>
+                      }>
+                    </List>
                   </View>
                 :
                   null

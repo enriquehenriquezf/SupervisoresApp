@@ -111,7 +111,7 @@ export default class ShowSucursales extends Component {
         }
         else if(response.status === 401){
           toastr.showToast('Su sesión expiró','danger');
-          handler2(-1,token,[]);
+          handler2 = true;
         }
         else{
           toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
