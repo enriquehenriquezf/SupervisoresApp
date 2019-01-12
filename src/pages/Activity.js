@@ -4,6 +4,7 @@ import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Butto
 import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
+import NumericInput from 'react-native-numeric-input';
 import Overlay from 'react-native-modal-overlay';
 import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
@@ -561,6 +562,19 @@ export default class Activity extends Component {
     }
   }
 
+  /**
+   * Modificar Producto a la lista
+   */
+  ModificarProducto(item,value){
+    var array = [...this.state.PRODUCTS];
+    var index = array.indexOf(item);
+    if (index !== -1) {
+      //array[index].cant = value;
+      array[index] = {...array[index], cant: value};
+      this.setState({PRODUCTS: array});
+    }
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar los datos
@@ -1105,17 +1119,20 @@ export default class Activity extends Component {
                       onChangeText={text => this.setState({ query: text })}
                       placeholder="Producto a buscar"
                       renderItem={item => (
-                        <TouchableOpacity onPress={() => this.setState({ query: item, PRODUCTS: [...this.state.PRODUCTS, item] }) }>
+                        <TouchableOpacity onPress={() => this.setState({ query: item, PRODUCTS: [...this.state.PRODUCTS, {prod:item,cant:1}] }) }>
                           <Text>{item}</Text>
                         </TouchableOpacity>
                       )}
                     />
                     <List dataArray={this.state.PRODUCTS}
                       renderRow={(item) =>
-                        <ListItem button onPress={() => this.BorrarProducto(item)}>
-                          <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                          <Text> {item}</Text>
-                        </ListItem>
+                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginRight:5}}>
+                          <ListItem button onPress={() => this.BorrarProducto(item)}>
+                            <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                            <Text> {item.prod}</Text>
+                          </ListItem>
+                          <NumericInput rounded minValue={1} maxValue={999} initValue={1} value={item.cant} onChange={value => this.ModificarProducto(item,value)} />{/*FIXME: item.value no se actualiza en el render */}
+                        </View>
                       }>
                     </List>
                   </View>
