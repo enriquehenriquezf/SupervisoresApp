@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, Radio, H2, Card, Input,ActionSheet } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, Radio, H2, Card, Input,ActionSheet, Picker, DatePicker } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
@@ -21,7 +21,7 @@ let totalTimeInit = 0;
 let imgOverlay = '';
 let imgTemp1 = '';
 let imgTemp2 = '';
-let TIEMPOAUSENCIA = 1800000;
+let TIEMPOAUSENCIA = 1800000;// más de media hora ausente     ( > 1800000 )  
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -37,8 +37,11 @@ export default class Activity extends Component {
       error:null,
       isVisible: false,
       isVisible2: false,
+      ausencia: false,
+      motivo: '',
       productos:[],
       PRODUCTS:[],
+      chosenDate: new Date(),
       showToast: false
     };
     let token = this.props.token;
@@ -50,6 +53,8 @@ export default class Activity extends Component {
     imgOverlay = '';
     imgTemp1 = api.ipImg + items.documento_vencido;
     imgTemp2 = api.ipImg + items.documento_renovado;
+    this.ModificarProducto = this.ModificarProducto.bind(this);
+    this.setDate = this.setDate.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -190,41 +195,32 @@ export default class Activity extends Component {
       { enableHighAccuracy: false, timeout: 60000, maximumAge: 1000 },
     );
 
-    /** buscar productos */
+    /** buscar productos TODO: mover dentro de findProduct */
     if(items.nombre_tabla === 'libro_vencimientos' || items.nombre_tabla === 'kardex'){
       let bodyInit = JSON.parse(token._bodyInit);
       const auth = bodyInit.token_type + " " + bodyInit.access_token;
       let prods = [];
-      fetch(api.ipShowActivities, {
-        method: 'GET',
+      fetch(api.ipBuscarProducto, {
+        method: 'POST',
         headers: {
             'Authorization': auth,
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
             'Accept':'application/json'
         },
-        body: ''
+        body: JSON.stringify({
+          producto: ''
+        })
       }).then(function(response) {
         //console.log(response);
         if(response.ok === true && response.status === 200)
         {
           newToken = JSON.parse(response._bodyInit);
-          var actividades = "Actividades";
-          //console.log(Object.values(newToken[actividades]));
-          var SUCURSAL = null;
-          Object.values(newToken[actividades]).forEach(element => {
+          //console.log(Object.values(newToken));
+          Object.values(newToken).forEach(element => {
             //console.log(Object.values(element));
-            var valores = Object.values(element)[0];
-            SUCURSAL = Object.keys(element)[0];       
-            var item = {
-              name: valores.nombre_actividad,
-              sucursal: SUCURSAL,
-              id_plan_trabajo: valores.id_plan_trabajo,
-              separador: false
-            };
-            //console.log(JSON.stringify(item));
-            prods.push(valores.nombre_actividad);//item
+            prods.push(element.nombre_comercial);//item
           });
-          //console.log(prods)
+          console.log(prods)
         }
         else
         {
@@ -237,7 +233,7 @@ export default class Activity extends Component {
             handler2 = true;
           }
           else{
-            toastr.showToast('No se encontraron planes de trabajo esta semana','warning');
+            toastr.showToast('No se encontraron productos','warning');
           }
         }
         //return response.json();
@@ -289,6 +285,7 @@ export default class Activity extends Component {
     this._storeDataAusente();
     var totalTl = new Date().getTime();
     totalTime = totalTl - totalTimeInit;
+    /** Imagenes de documentacion legal */
     let file1 = null;
     let file2 = null;
     if(this.state.archivo.hasOwnProperty('uri')){
@@ -309,6 +306,16 @@ export default class Activity extends Component {
     else{
       if(items.documento_renovado !== ''){
         file2 = imgTemp2;
+      }
+    }
+
+    /** Motivo de Ausencia */
+    if(this.state.ausencia){
+      if(items.motivo_ausencia === 'no ausentado'){
+        items.motivo_ausencia = BUTTONS[this.state.motivo];
+      }
+      else{
+        items.motivo_ausencia = items.motivo_ausencia + ',' + BUTTONS[this.state.motivo];
       }
     }
     await fetch(api.ipActivity, {
@@ -434,8 +441,8 @@ export default class Activity extends Component {
         if(items.tiempoInactivoInit !== 0 && items.tiempoInactivoInit > totalTimeInit){
           TiempoInact = items.tiempoInactivo;
         }
-        if((t2 - value) - TiempoInact > TIEMPOAUSENCIA){// más de media hora ausente     ( > 1800000 )  
-          ActionSheet.show(
+        if((t2 - value) - TiempoInact > TIEMPOAUSENCIA){
+          /*ActionSheet.show(
             {
               options: BUTTONS,
               title: "Motivo de Ausencia"
@@ -446,15 +453,19 @@ export default class Activity extends Component {
                 this.handleBackPress();
               }
               else{
-                if(items.motivo_ausencia === 'no ausentado'){
-                  items.motivo_ausencia = BUTTONS[buttonIndex];
-                }
-                else{
-                  items.motivo_ausencia = items.motivo_ausencia + ',' + BUTTONS[buttonIndex];
-                }
+                this.setState({
+                  motivo: buttonIndex,
+                  ausencia: true
+                });
+                this.forceUpdate();
               }
             }
-          );
+          );*/          
+          this.setState({
+            motivo: '0',
+            ausencia: true
+          });
+          
         }
         //console.log("TIME AUSENTE: " + totalTimeInit);
       }
@@ -542,7 +553,7 @@ export default class Activity extends Component {
    * Buscar Producto
    */
   findProduct(query) {
-    if (query === '') {
+    if (query === '' || query === undefined) {
       return [];
     }
 
@@ -551,7 +562,7 @@ export default class Activity extends Component {
   }
 
   /**
-   * Borrar Producto a la lista
+   * Borrar Producto de la lista PRODUCTS
    */
   BorrarProducto(item){
     var array = [...this.state.PRODUCTS];
@@ -563,7 +574,7 @@ export default class Activity extends Component {
   }
 
   /**
-   * Modificar Producto a la lista
+   * Modificar Producto de la lista PRODUCTS
    */
   ModificarProducto(item,value){
     var array = [...this.state.PRODUCTS];
@@ -573,6 +584,17 @@ export default class Activity extends Component {
       array[index] = {...array[index], cant: value};
       this.setState({PRODUCTS: array});
     }
+    this.forceUpdate();
+  }
+  /** Cambiar opcion de motivo de ausencia */
+  onValueChange(value) {
+    this.setState({
+      motivo: value
+    });
+  }
+  /** Cambiar fecha de vencimiento */
+  setDate(newDate) {
+    this.setState({ chosenDate: newDate });
   }
 
   render() {
@@ -1085,7 +1107,7 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'libro_vencimientos' ?
                   <View>
-                    <Text style={{margin: 10}}>Revisar libro de vencimientos: </Text>              
+                    <Text style={{margin: 10, fontWeight: 'bold'}}>Confirmar que estén separados los productos del libro de vencimientos: </Text>              
                     <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
                       <Left>
                         <Text>Completo</Text>
@@ -1112,6 +1134,7 @@ export default class Activity extends Component {
                         }
                       </Right>
                     </ListItem>
+                    <Text style={{margin: 5, fontWeight: 'bold'}}>Productos a vencer: </Text>
                     <Autocomplete
                       autoCapitalize="none"
                       data={prods}
@@ -1131,10 +1154,25 @@ export default class Activity extends Component {
                             <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
                             <Text> {item.prod}</Text>
                           </ListItem>
-                          <NumericInput rounded minValue={1} maxValue={999} initValue={1} value={item.cant} onChange={value => this.ModificarProducto(item,value)} />{/*FIXME: item.value no se actualiza en el render */}
+                          <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)} />
                         </View>
                       }>
-                    </List>
+                    </List>                    
+                    <Text style={{margin: 5, fontWeight: 'bold'}}>Fecha de Vencimiento: </Text>
+                    <DatePicker
+                      defaultDate={new Date()}
+                      minimumDate={new Date(2019, 0, 1)}
+                      locale={"es"}
+                      timeZoneOffsetInMinutes={undefined}
+                      modalTransparent={false}
+                      animationType={"fade"}
+                      androidMode={"default"}
+                      placeHolderText="Seleccionar Fecha"
+                      textStyle={{ color: "green" }}
+                      placeHolderTextStyle={{ color: "#d3d3d3" }}
+                      onDateChange={this.setDate}
+                      disabled={false}
+                      />
                   </View>
                 :
                   null
@@ -1310,6 +1348,30 @@ export default class Activity extends Component {
                   null
               }
               <Form>
+                {
+                  this.state.motivo !== '' ?
+                    <View>
+                      <Text style={{margin: 5, fontWeight: 'bold'}}>Motivo de ausencia: </Text>
+                      <Picker
+                        mode="dropdown"
+                        iosIcon={<Icon name="arrow-down" />}
+                        placeholder="Motivo de ausencia"
+                        placeholderStyle={{ color: "#bfc6ea" }}
+                        placeholderIconColor="#007aff"
+                        style={{ width: undefined }}
+                        selectedValue={this.state.motivo}
+                        onValueChange={this.onValueChange.bind(this)}
+                      >
+                        <Picker.Item label="SINIESTRO" value="0" />
+                        <Picker.Item label="VISITAS DE ENTIDADES PÚBLICAS" value="1" />
+                        <Picker.Item label="REQUERIMIENTO GERENCIAL" value="2" />
+                        <Picker.Item label="AUSENCIA ADMINISTRADOR" value="3" />
+                        <Picker.Item label="TRABAJO ESPECIAL" value="4" />
+                      </Picker>
+                    </View>
+                  :
+                    null
+                }
                 <Textarea rowSpan={2} bordered placeholder="Observaciones" defaultValue={items.observacion} style={styles.observaciones} onChangeText={(text) => this.setState({observacion: text})} />
               </Form>
             </Card>
