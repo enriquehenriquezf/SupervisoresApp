@@ -194,56 +194,6 @@ export default class Activity extends Component {
       },
       { enableHighAccuracy: false, timeout: 60000, maximumAge: 1000 },
     );
-
-    /** buscar productos TODO: mover dentro de findProduct */
-    if(items.nombre_tabla === 'libro_vencimientos' || items.nombre_tabla === 'kardex'){
-      let bodyInit = JSON.parse(token._bodyInit);
-      const auth = bodyInit.token_type + " " + bodyInit.access_token;
-      let prods = [];
-      fetch(api.ipBuscarProducto, {
-        method: 'POST',
-        headers: {
-            'Authorization': auth,
-            'Content-Type': 'application/json',
-            'Accept':'application/json'
-        },
-        body: JSON.stringify({
-          producto: ''
-        })
-      }).then(function(response) {
-        //console.log(response);
-        if(response.ok === true && response.status === 200)
-        {
-          newToken = JSON.parse(response._bodyInit);
-          //console.log(Object.values(newToken));
-          Object.values(newToken).forEach(element => {
-            //console.log(Object.values(element));
-            prods.push(element.nombre_comercial);//item
-          });
-          console.log(prods)
-        }
-        else
-        {
-          console.log(response);
-          if(response.status === 500){
-            toastr.showToast('Error con el servidor','danger');
-          }
-          else if(response.status === 401){
-            toastr.showToast('Su sesión expiró','danger');
-            handler2 = true;
-          }
-          else{
-            toastr.showToast('No se encontraron productos','warning');
-          }
-        }
-        //return response.json();
-      }).catch(function(error){
-        toastr.showToast('Su sesión expiró','danger');
-        handler2 = true;
-        console.log(error);
-      });
-      this.setState({productos: prods});
-    }
   }
 
   componentWillUnmount() {
@@ -549,6 +499,59 @@ export default class Activity extends Component {
     this.setState({isVisible2: true});
   }
 
+  /** buscar productos */
+  BuscarProducto(query){    
+    if(items.nombre_tabla === 'libro_vencimientos' || items.nombre_tabla === 'kardex'){
+      let bodyInit = JSON.parse(token._bodyInit);
+      const auth = bodyInit.token_type + " " + bodyInit.access_token;
+      let prods = [];
+      var that = this;
+      fetch(api.ipBuscarProducto, {
+        method: 'POST',
+        headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/json',
+            'Accept':'application/json'
+        },
+        body: JSON.stringify({
+          nombre_producto: query.toLowerCase()
+        })
+      }).then(function(response) {
+        //console.log(response);
+        if(response.ok === true && response.status === 200)
+        {
+          newToken = JSON.parse(response._bodyInit);
+          //console.log(Object.values(newToken));
+          Object.values(newToken.productos['data']).forEach(element => {
+            //console.log(Object.values(element));
+            prods.push(element.nombre_comercial);//item
+          });
+          //console.log(prods)
+          that.setState({productos: prods, query: query});
+        }
+        else
+        {
+          console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else if(response.status === 401){
+            toastr.showToast('Su sesión expiró','danger');
+            handler2 = true;
+          }
+          else{
+            toastr.showToast('No se encontraron productos','warning');
+          }
+        }
+        //return response.json();
+      }).catch(function(error){
+        toastr.showToast('Su sesión expiró','danger');
+        handler2 = true;
+        console.log(error);
+      });
+    }
+  }
+
   /**
    * Buscar Producto
    */
@@ -556,9 +559,8 @@ export default class Activity extends Component {
     if (query === '' || query === undefined) {
       return [];
     }
-
-    const { productos } = this.state;
-    return productos.filter(prod => prod.toLowerCase().search(query.toLowerCase()) >= 0);
+    //console.log(this.state.productos);
+    return this.state.productos.filter(prod => prod.toLowerCase().search(query.toLowerCase()) >= 0);
   }
 
   /**
@@ -580,11 +582,11 @@ export default class Activity extends Component {
     var array = [...this.state.PRODUCTS];
     var index = array.indexOf(item);
     if (index !== -1) {
-      //array[index].cant = value;
       array[index] = {...array[index], cant: value};
+      //console.log(array);
       this.setState({PRODUCTS: array});
+      this.forceUpdate();
     }
-    this.forceUpdate();
   }
   /** Cambiar opcion de motivo de ausencia */
   onValueChange(value) {
@@ -1139,22 +1141,26 @@ export default class Activity extends Component {
                       autoCapitalize="none"
                       data={prods}
                       defaultValue={query}
-                      onChangeText={text => this.setState({ query: text })}
+                      onChangeText={text => this.BuscarProducto(text)}
                       placeholder="Producto a buscar"
                       renderItem={item => (
-                        <TouchableOpacity onPress={() => this.setState({ query: item, PRODUCTS: [...this.state.PRODUCTS, {prod:item,cant:1}] }) }>
-                          <Text>{item}</Text>
+                        <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {prod:item,cant:1}] }) }>
+                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item}</Text>
                         </TouchableOpacity>
                       )}
                     />
                     <List dataArray={this.state.PRODUCTS}
                       renderRow={(item) =>
-                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginRight:5}}>
-                          <ListItem button onPress={() => this.BorrarProducto(item)}>
-                            <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                            <Text> {item.prod}</Text>
-                          </ListItem>
-                          <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)} />
+                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                          <View style={{flex:2, justifyContent:'flex-start'}}>
+                            <ListItem button onPress={() => this.BorrarProducto(item)}>
+                              <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                              <Text style={{marginLeft:3}}>{item.prod}</Text>
+                            </ListItem>
+                          </View>
+                          <View style={{flex:1, justifyContent:'center'}}>
+                            <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                          </View>
                         </View>
                       }>
                     </List>                    
