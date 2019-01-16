@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, Radio, H2, Card, Input,ActionSheet, Picker, DatePicker } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, H2, Card, Input,ActionSheet, Picker, DatePicker } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
@@ -10,6 +10,7 @@ import styles from '../styles/Activity';
 import IconStyles from '../styles/Icons';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
+import { RadioButton } from '../components/RadioButton';
 
 var BUTTONS = ["SINIESTRO","VISITAS DE ENTIDADES PÚBLICAS","REQUERIMIENTO GERENCIAL", "AUSENCIA ADMINISTRADOR", "TRABAJO ESPECIAL"];
 let items = null;
@@ -53,6 +54,7 @@ export default class Activity extends Component {
     imgOverlay = '';
     imgTemp1 = api.ipImg + items.documento_vencido;
     imgTemp2 = api.ipImg + items.documento_renovado;
+    this.SetChecked = this.SetChecked.bind(this);
     this.ModificarProducto = this.ModificarProducto.bind(this);
     this.setDate = this.setDate.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
@@ -143,6 +145,38 @@ export default class Activity extends Component {
     else if(items.calificacion_pv === 'Muy Tarde')
     {
       this.SetChecked(3,'Muy Tarde');
+    }
+    else if(items.calificacion_pv === 'Completo')
+    {
+      this.SetChecked(1,'Completo');
+    }
+    else if(items.calificacion_pv === 'Al día')
+    {
+      this.SetChecked(1,'Al día');
+    }
+    else if(items.calificacion_pv === 'Pendiente')
+    {
+      this.SetChecked(2,'Pendiente');
+    }
+    else if(items.calificacion_pv === 'Excelentes')
+    {
+      this.SetChecked(1,'Excelentes');
+    }
+    else if(items.calificacion_pv === 'Buenas')
+    {
+      this.SetChecked(2,'Buenas');
+    }
+    else if(items.calificacion_pv === 'Regulares')
+    {
+      this.SetChecked(3,'Regulares');
+    }
+    else if(items.calificacion_pv === 'Malas')
+    {
+      this.SetChecked(4,'Malas');
+    }
+    else if(items.calificacion_pv === 'Pesimas')
+    {
+      this.SetChecked(5,'Pesimas');
     }
     this.setState({observacion: items.observacion});
     /**
@@ -500,60 +534,109 @@ export default class Activity extends Component {
   }
 
   /** buscar productos */
-  BuscarProducto(query){    
-    if(items.nombre_tabla === 'libro_vencimientos' || items.nombre_tabla === 'kardex'){
-      let bodyInit = JSON.parse(token._bodyInit);
-      const auth = bodyInit.token_type + " " + bodyInit.access_token;
-      let prods = [];
-      var that = this;
-      fetch(api.ipBuscarProducto, {
-        method: 'POST',
-        headers: {
-            'Authorization': auth,
-            'Content-Type': 'application/json',
-            'Accept':'application/json'
-        },
-        body: JSON.stringify({
-          nombre_producto: query.toLowerCase()
-        })
-      }).then(function(response) {
-        //console.log(response);
-        if(response.ok === true && response.status === 200)
-        {
-          newToken = JSON.parse(response._bodyInit);
-          //console.log(Object.values(newToken));
-          Object.values(newToken.productos['data']).forEach(element => {
-            //console.log(Object.values(element));
-            prods.push(element.nombre_comercial);//item
-          });
-          //console.log(prods)
-          that.setState({productos: prods, query: query});
+  BuscarProducto(query){
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    let prods = [];
+    var that = this;
+    fetch(api.ipBuscarProducto, {
+      method: 'POST',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/json',
+          'Accept':'application/json'
+      },
+      body: JSON.stringify({
+        nombre_producto: query.toLowerCase()
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true && response.status === 200)
+      {
+        newToken = JSON.parse(response._bodyInit);
+        //console.log(Object.values(newToken));
+        Object.values(newToken.productos['data']).forEach(element => {
+          //console.log(Object.values(element));
+          prods.push(element.nombre_comercial);
+        });
+        //console.log(prods)
+        that.setState({productos: prods, query: query});
+      }
+      else
+      {
+        console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
         }
-        else
-        {
-          console.log(response);
-          if(response.status === 500){
-            toastr.showToast('Error con el servidor','danger');
-          }
-          else if(response.status === 401){
-            toastr.showToast('Su sesión expiró','danger');
-            handler2 = true;
-          }
-          else{
-            toastr.showToast('No se encontraron productos','warning');
-          }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+          handler2 = true;
         }
-        //return response.json();
-      }).catch(function(error){
-        toastr.showToast('Su sesión expiró','danger');
-        handler2 = true;
-        console.log(error);
-      });
-    }
+        else{
+          toastr.showToast('No se encontraron productos','warning');
+        }
+      }
+      //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2 = true;
+      console.log(error);
+    });
+  }
+
+  /** buscar Laboratorios */
+  BuscarLaboratorio(query){
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    let labs = [];
+    var that = this;
+    fetch(api.ipBuscarLaboratorio, {
+      method: 'POST',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/json',
+          'Accept':'application/json'
+      },
+      body: JSON.stringify({
+        laboratorio: query.toLowerCase()
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true && response.status === 200)
+      {
+        newToken = JSON.parse(response._bodyInit);
+        console.log(Object.values(newToken));
+        Object.values(newToken.laboratorio['data']).forEach(element => {
+          //console.log(Object.values(element));
+          //labs.push(element.nombre_comercial);
+        });
+        //console.log(labs)
+        //that.setState({laboratorios: labs, query: query});
+      }
+      else
+      {
+        console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+          handler2 = true;
+        }
+        else{
+          toastr.showToast('No se encontraron Laboratorios','warning');
+        }
+      }
+      //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2 = true;
+      console.log(error);
+    });
   }
 
   /**
-   * Buscar Producto
+   * Buscar y Filtrar Productos
    */
   findProduct(query) {
     if (query === '' || query === undefined) {
@@ -634,46 +717,10 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'apertura' ?
                   <View>
-                    <Text style={{margin: 10}}>Hora de apertura: </Text>                       
-                    <ListItem button onPress={() => this.SetChecked(1,'Puntual')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Puntual</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Puntual')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Puntual')} />
-                        }
-                      </Right>
-                    </ListItem>       
-                    <ListItem button onPress={() => this.SetChecked(2,'Tarde')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Tarde</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Tarde')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Tarde')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(3,'Muy Tarde')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Muy Tarde</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 3 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(3,'Muy Tarde')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(3,'Muy Tarde')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Hora de apertura: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Puntual'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Tarde'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={3} value={'Muy Tarde'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -681,33 +728,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'kardex' ?
                   <View>
-                    <Text style={{margin: 10}}>Elaboración: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Elaboración: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -715,72 +738,12 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'condiciones_locativas' ?
                   <View>
-                    <Text style={{margin: 10}}>Condiciones: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Excelentes')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Excelentes</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Excelentes')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Excelentes')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Buenas')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Buenas</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Buenas')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Buenas')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(3,'Regulares')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Regulares</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 3 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(3,'Regulares')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(3,'Regulares')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(4,'Malas')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Malas</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 4 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(4,'Malas')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(4,'Malas')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(5,'Pesimas')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pesimas</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 5 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(5,'Pesimas')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(5,'Pesimas')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Condiciones: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Excelentes'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Buenas'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={3} value={'Regulares'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={4} value={'Malas'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={5} value={'Pesimas'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -788,33 +751,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'convenio_exhibicion' ?
                   <View>
-                    <Text style={{margin: 10}}>Verificar permanencia de las exhibiciones: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Verificar permanencia de las exhibiciones: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -822,33 +761,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'libros_faltantes' ?
                   <View>
-                    <Text style={{margin: 10}}>Verificar libros faltantes a la fecha: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Al día')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Al día</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Al día')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Al día')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Verificar libros faltantes a la fecha: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Al día'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -856,33 +771,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'ingreso_sucursal' ?
                   <View>
-                    <Text style={{margin: 10}}>Reporte de ingreso: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Al día')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Al día</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Al día')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Al día')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Reporte de ingreso: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Al día'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -890,33 +781,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'formulas_despacho' ?
                   <View>
-                    <Text style={{margin: 10}}>Reporte de ingreso: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Reporte de ingreso: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -924,33 +791,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'captura_cliente' ?
                   <View>
-                    <Text style={{margin: 10}}>Captación de clientes: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Captación de clientes: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -958,33 +801,10 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'documentacion_legal' ?
                   <View>
-                    <Text style={{margin: 10}}>Verificar Documentación legal: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Verificar Documentación legal: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+
                     <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
                       <TouchableOpacity onPress={() => this.verImagen(true)}>
                         <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: imgTemp1}}></Image>
@@ -1006,33 +826,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'evaluacion_pedidos' ?
                   <View>
-                    <Text style={{margin: 10}}>Pedidos realizados vs Remision: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Pedidos realizados vs Remision: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     <Input placeholder="Número revisión"></Input>
                   </View>
                 :
@@ -1041,33 +837,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'excesos' ?
                   <View>
-                    <Text style={{margin: 10}}>Revisar pedidos y excesos: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Revisar pedidos y excesos: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -1075,33 +847,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'libro_agendaclientes' ?
                   <View>
-                    <Text style={{margin: 10}}>Revisar agenda de clientes: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Revisar agenda de clientes: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -1109,33 +857,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'libro_vencimientos' ?
                   <View>
-                    <Text style={{margin: 10, fontWeight: 'bold'}}>Confirmar que estén separados los productos del libro de vencimientos: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10, fontWeight: 'bold'}}>Confirmar que estén separados los productos del libro de vencimientos: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     <Text style={{margin: 5, fontWeight: 'bold'}}>Productos a vencer: </Text>
                     <Autocomplete
                       autoCapitalize="none"
@@ -1186,33 +910,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'papeleria_consignaciones' ?
                   <View>
-                    <Text style={{margin: 10}}>Verificar la papelería: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Verificar la papelería: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -1220,33 +920,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'presupuesto_pedido' ?
                   <View>
-                    <Text style={{margin: 10}}>Revisar metodología utilizada para revisar el pedido: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Revisar metodología utilizada para revisar el pedido: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -1254,33 +930,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'remisiones' ?
                   <View>
-                    <Text style={{margin: 10}}>Revisar remisiones grabadas a la fecha: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Revisar remisiones grabadas a la fecha: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -1288,33 +940,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'revision_completa_inventario' ?
                   <View>
-                    <Text style={{margin: 10}}>Revision completa de los inventarios: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Revision completa de los inventarios: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null
@@ -1322,33 +950,9 @@ export default class Activity extends Component {
               {
                 items.nombre_tabla === 'seguimiento_vendedores' ?
                   <View>
-                    <Text style={{margin: 10}}>Revisión del desempeño de cada vendedor: </Text>              
-                    <ListItem button onPress={() => this.SetChecked(1,'Completo')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Completo</Text>
-                      </Left>
-                      <Right>
-                        {
-                          this.state.checked === 1 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(1,'Completo')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(1,'Completo')} />
-                        }
-                      </Right>
-                    </ListItem>
-                    <ListItem button onPress={() => this.SetChecked(2,'Pendiente')} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                      <Left>
-                        <Text>Pendiente</Text>
-                      </Left>
-                      <Right>                    
-                        {
-                          this.state.checked === 2 ?                        
-                            <Radio selected={true} onPress={() => this.SetChecked(2,'Pendiente')}/>
-                          :
-                            <Radio selected={false} onPress={() => this.SetChecked(2,'Pendiente')} />
-                        }
-                      </Right>
-                    </ListItem>
+                    <Text style={{margin: 10}}>Revisión del desempeño de cada vendedor: </Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                   </View>
                 :
                   null

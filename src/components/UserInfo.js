@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Left, Body, Right, List,ListItem,Text, Icon, Thumbnail, Card } from 'native-base';
-import {toastr} from './Toast';
 import {View} from 'react-native';
 import styles from '../styles/Home';
 import {Imagen} from './Imagenes';
