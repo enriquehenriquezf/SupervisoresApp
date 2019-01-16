@@ -42,6 +42,7 @@ export default class Activity extends Component {
       motivo: '',
       productos:[],
       PRODUCTS:[],
+      laboratorios:[],
       chosenDate: new Date(),
       showToast: false
     };
@@ -178,7 +179,14 @@ export default class Activity extends Component {
     {
       this.SetChecked(5,'Pesimas');
     }
-    this.setState({observacion: items.observacion});
+    var array = []
+    if(items.productos !== null && items.productos !== undefined){
+      //console.log(JSON.parse(items.productos));
+      JSON.parse(items.productos).forEach(element =>{
+        array.push(element);
+      });
+    }
+    this.setState({observacion: items.observacion,PRODUCTS: array});
     /**
      * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
      */
@@ -317,6 +325,7 @@ export default class Activity extends Component {
         observaciones: this.state.observacion,        
         documento_vencido: file1,
         documento_renovado: file2,
+        productos: JSON.stringify(this.state.PRODUCTS),
         tiempo_actividad: time,
         tiempo_total: totalTime,
         motivo_ausencia: items.motivo_ausencia
@@ -554,10 +563,10 @@ export default class Activity extends Component {
       if(response.ok === true && response.status === 200)
       {
         newToken = JSON.parse(response._bodyInit);
-        //console.log(Object.values(newToken));
+        //console.log(newToken);
         Object.values(newToken.productos['data']).forEach(element => {
-          //console.log(Object.values(element));
-          prods.push(element.nombre_comercial);
+          //console.log(element);
+          prods.push({nombre_comercial:element.nombre_comercial, laboratorio_id: element.laboratorio_id, codigo: element.codigo});
         });
         //console.log(prods)
         that.setState({productos: prods, query: query});
@@ -605,13 +614,13 @@ export default class Activity extends Component {
       if(response.ok === true && response.status === 200)
       {
         newToken = JSON.parse(response._bodyInit);
-        console.log(Object.values(newToken));
-        Object.values(newToken.laboratorio['data']).forEach(element => {
+        //console.log(newToken);
+        Object.values(newToken.laboratorios['data']).forEach(element => {
           //console.log(Object.values(element));
-          //labs.push(element.nombre_comercial);
+          labs.push({nombre: element.nombre, dk: element.dk});
         });
         //console.log(labs)
-        //that.setState({laboratorios: labs, query: query});
+        that.setState({laboratorios: labs, query2: query});
       }
       else
       {
@@ -643,7 +652,7 @@ export default class Activity extends Component {
       return [];
     }
     //console.log(this.state.productos);
-    return this.state.productos.filter(prod => prod.toLowerCase().search(query.toLowerCase()) >= 0);
+    return this.state.productos.filter(prod => prod.nombre_comercial.toLowerCase().search(query.toLowerCase()) >= 0);
   }
 
   /**
@@ -678,8 +687,15 @@ export default class Activity extends Component {
     });
   }
   /** Cambiar fecha de vencimiento */
-  setDate(newDate) {
-    this.setState({ chosenDate: newDate });
+  setDate(newDate,item) {
+    var array = [...this.state.PRODUCTS];
+    var index = array.indexOf(item);
+    if (index !== -1) {
+      array[index] = {...array[index], fecha_vencimiento: newDate};
+      //console.log(array);
+      this.setState({chosenDate: newDate, PRODUCTS: array});
+      this.forceUpdate();
+    }
   }
 
   render() {
@@ -690,8 +706,9 @@ export default class Activity extends Component {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     
-    const { query } = this.state;
+    const { query, query2 } = this.state;
     const prods = this.findProduct(query);
+    const labs = this.state.laboratorios;
 
     return (
       <Container>
@@ -731,6 +748,47 @@ export default class Activity extends Component {
                     <Text style={{margin: 10}}>Elaboración: </Text>
                     <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                    <Text style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: </Text>
+                    <Autocomplete
+                      autoCapitalize="none"
+                      data={labs}
+                      defaultValue={query2}
+                      onChangeText={text => this.BuscarLaboratorio(text)}
+                      placeholder="Laboratorio a buscar"
+                      renderItem={item => (
+                        <TouchableOpacity onPress={() => this.setState({ query2: item.nombre }) }>
+                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                    <Text style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
+                    <Autocomplete
+                      autoCapitalize="none"
+                      data={prods}
+                      defaultValue={query}
+                      onChangeText={text => this.BuscarProducto(text)}
+                      placeholder="Producto a buscar"
+                      renderItem={item => (
+                        <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
+                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                    <List dataArray={this.state.PRODUCTS}
+                      renderRow={(item) =>
+                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                          <View style={{flex:2, justifyContent:'flex-start'}}>
+                            <ListItem button onPress={() => this.BorrarProducto(item)}>
+                              <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                              <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
+                            </ListItem>
+                          </View>
+                          <View style={{flex:1, justifyContent:'center'}}>
+                            <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                          </View>
+                        </View>
+                      }>
+                    </List>
                   </View>
                 :
                   null
@@ -764,6 +822,35 @@ export default class Activity extends Component {
                     <Text style={{margin: 10}}>Verificar libros faltantes a la fecha: </Text>
                     <RadioButton SetChecked={this.SetChecked} i={1} value={'Al día'} checked={this.state.checked}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                    <Text style={{margin: 5, fontWeight: 'bold'}}>Productos a vencer: </Text>
+                    <Autocomplete
+                      autoCapitalize="none"
+                      data={prods}
+                      defaultValue={query}
+                      onChangeText={text => this.BuscarProducto(text)}
+                      placeholder="Producto a buscar"
+                      renderItem={item => (
+                        <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
+                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                    <List dataArray={this.state.PRODUCTS}
+                      renderRow={(item) =>
+                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                          <View style={{flex:2, justifyContent:'flex-start'}}>
+                            <ListItem button onPress={() => this.BorrarProducto(item)}>
+                              <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                              <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
+                            </ListItem>
+                          </View>
+                          <View style={{flex:1, justifyContent:'center'}}>
+                            <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                          </View>
+                        </View>
+                      }>
+                    </List>                  
+                    <Input placeholder="Número Consecutivo"></Input>
                   </View>
                 :
                   null
@@ -868,41 +955,49 @@ export default class Activity extends Component {
                       onChangeText={text => this.BuscarProducto(text)}
                       placeholder="Producto a buscar"
                       renderItem={item => (
-                        <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {prod:item,cant:1}] }) }>
-                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item}</Text>
+                        <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,fecha_vencimiento:new Date(),codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
+                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
                         </TouchableOpacity>
                       )}
                     />
                     <List dataArray={this.state.PRODUCTS}
                       renderRow={(item) =>
-                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
-                          <View style={{flex:2, justifyContent:'flex-start'}}>
-                            <ListItem button onPress={() => this.BorrarProducto(item)}>
-                              <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                              <Text style={{marginLeft:3}}>{item.prod}</Text>
-                            </ListItem>
+                        <View>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:2, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => this.BorrarProducto(item)} style={{borderBottomWidth:0}}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                            <View style={{flex:1, justifyContent:'center'}}>
+                              <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                            </View>
                           </View>
-                          <View style={{flex:1, justifyContent:'center'}}>
-                            <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', borderBottomWidth:1}}>
+                            <View style={{flex:5, justifyContent:'flex-start'}}>
+                              <Text style={{marginLeft: 5, fontWeight: 'bold'}}>Fecha de Vencimiento: </Text>
+                            </View>
+                            <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
+                              <DatePicker
+                                defaultDate={new Date(item.fecha_vencimiento)}
+                                minimumDate={new Date(2019, 0, 1)}
+                                locale={"es"}
+                                timeZoneOffsetInMinutes={undefined}
+                                modalTransparent={false}
+                                animationType={"fade"}
+                                androidMode={"default"}
+                                placeHolderText={new Date(item.fecha_vencimiento).toJSON().substr(0,10) === new Date().toJSON().substr(0,10) ? "Seleccionar Fecha" : undefined}
+                                textStyle={{ color: "green" }}
+                                placeHolderTextStyle={{ color: "#d3d3d3" }}
+                                onDateChange={newDate => this.setDate(newDate,item)}
+                                disabled={false}
+                            />
+                            </View>
                           </View>
                         </View>
                       }>
-                    </List>                    
-                    <Text style={{margin: 5, fontWeight: 'bold'}}>Fecha de Vencimiento: </Text>
-                    <DatePicker
-                      defaultDate={new Date()}
-                      minimumDate={new Date(2019, 0, 1)}
-                      locale={"es"}
-                      timeZoneOffsetInMinutes={undefined}
-                      modalTransparent={false}
-                      animationType={"fade"}
-                      androidMode={"default"}
-                      placeHolderText="Seleccionar Fecha"
-                      textStyle={{ color: "green" }}
-                      placeHolderTextStyle={{ color: "#d3d3d3" }}
-                      onDateChange={this.setDate}
-                      disabled={false}
-                      />
+                    </List>
                   </View>
                 :
                   null
