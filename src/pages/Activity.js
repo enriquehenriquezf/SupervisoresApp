@@ -40,9 +40,11 @@ export default class Activity extends Component {
       isVisible2: false,
       ausencia: false,
       motivo: '',
+      numero_consecutivo:'',
       productos:[],
       PRODUCTS:[],
       laboratorios:[],
+      LABORATORIES:[],
       chosenDate: new Date(),
       showToast: false
     };
@@ -179,14 +181,21 @@ export default class Activity extends Component {
     {
       this.SetChecked(5,'Pesimas');
     }
-    var array = []
+    var array = [];
+    var array2 = [];
     if(items.productos !== null && items.productos !== undefined){
       //console.log(JSON.parse(items.productos));
       JSON.parse(items.productos).forEach(element =>{
         array.push(element);
       });
     }
-    this.setState({observacion: items.observacion,PRODUCTS: array});
+    if((items.laboratorios_asignados !== undefined && items.laboratorios_asignados !== null && items.laboratorios_asignados !== "") && (items.laboratorios_realizados === undefined || items.laboratorios_realizados === null || items.laboratorios_realizados === "")){
+      //console.log(JSON.parse(items.laboratorios_asignados));
+      JSON.parse(items.laboratorios_asignados).forEach(element =>{
+        array2.push(element);
+      });
+    }
+    this.setState({observacion: items.observacion,PRODUCTS: array,LABORATORIES: array2});
     /**
      * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
      */
@@ -326,6 +335,7 @@ export default class Activity extends Component {
         documento_vencido: file1,
         documento_renovado: file2,
         productos: JSON.stringify(this.state.PRODUCTS),
+        numero_consecutivo:this.state.numero_consecutivo,
         tiempo_actividad: time,
         tiempo_total: totalTime,
         motivo_ausencia: items.motivo_ausencia
@@ -543,7 +553,7 @@ export default class Activity extends Component {
   }
 
   /** buscar productos */
-  BuscarProducto(query){
+  BuscarProducto(query, lab){
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let prods = [];
@@ -556,7 +566,8 @@ export default class Activity extends Component {
           'Accept':'application/json'
       },
       body: JSON.stringify({
-        nombre_producto: query.toLowerCase()
+        nombre_producto: query.toLowerCase(),
+        laboratorio: lab
       })
     }).then(function(response) {
       //console.log(response);
@@ -583,6 +594,7 @@ export default class Activity extends Component {
         }
         else{
           toastr.showToast('No se encontraron productos','warning');
+          that.setState({productos: prods, query: query});
         }
       }
       //return response.json();
@@ -748,7 +760,48 @@ export default class Activity extends Component {
                     <Text style={{margin: 10}}>Elaboración: </Text>
                     <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
-                    <Text style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: </Text>
+                    {
+                      this.state.LABORATORIES.map((data,i) => {
+                        // FIXME: cambiarlo a un LIST
+                        return(
+                          <View key={Math.floor(Math.random() * 1000) + 1}>
+                            <Text style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: {data.nombre}</Text>
+                            <Text style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
+                            <Autocomplete
+                              key={Math.floor(Math.random() * 1000) + 1}
+                              autoCapitalize="none"
+                              data={prods}
+                              defaultValue={this.state.LABORATORIES[i].dk === data.dk ? query : ''}
+                              onChangeText={text => this.BuscarProducto(text,data.dk)}
+                              placeholder="Producto a buscar"
+                              renderItem={item => 
+                                (
+                                  <TouchableOpacity key={Math.floor(Math.random() * 1000) + 1} onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
+                                    <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
+                                  </TouchableOpacity>
+                                )
+                              }
+                            />
+                            <List key={Math.floor(Math.random() * 1000) + 1} dataArray={this.state.PRODUCTS}
+                              renderRow={(item) =>
+                                <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                                  <View style={{flex:2, justifyContent:'flex-start'}}>
+                                    <ListItem button onPress={() => this.BorrarProducto(item)}>
+                                      <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                      <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
+                                    </ListItem>
+                                  </View>
+                                  <View style={{flex:1, justifyContent:'center'}}>
+                                    <NumericInput rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                                  </View>
+                                </View>
+                              }>
+                            </List>
+                          </View>
+                        )
+                      })
+                    }
+                    {/*<Text style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: </Text>
                     <Autocomplete
                       autoCapitalize="none"
                       data={labs}
@@ -766,7 +819,7 @@ export default class Activity extends Component {
                       autoCapitalize="none"
                       data={prods}
                       defaultValue={query}
-                      onChangeText={text => this.BuscarProducto(text)}
+                      onChangeText={text => this.BuscarProducto(text,'')}
                       placeholder="Producto a buscar"
                       renderItem={item => (
                         <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
@@ -784,11 +837,11 @@ export default class Activity extends Component {
                             </ListItem>
                           </View>
                           <View style={{flex:1, justifyContent:'center'}}>
-                            <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                            <NumericInput rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
                           </View>
                         </View>
                       }>
-                    </List>
+                    </List>*/}
                   </View>
                 :
                   null
@@ -827,7 +880,7 @@ export default class Activity extends Component {
                       autoCapitalize="none"
                       data={prods}
                       defaultValue={query}
-                      onChangeText={text => this.BuscarProducto(text)}
+                      onChangeText={text => this.BuscarProducto(text,'')}
                       placeholder="Producto a buscar"
                       renderItem={item => (
                         <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
@@ -850,7 +903,7 @@ export default class Activity extends Component {
                         </View>
                       }>
                     </List>                  
-                    <Input placeholder="Número Consecutivo"></Input>
+                    <Input placeholder="Número Consecutivo" onChangeText={text => this.setState({numero_consecutivo: text})}></Input>
                   </View>
                 :
                   null
@@ -952,7 +1005,7 @@ export default class Activity extends Component {
                       autoCapitalize="none"
                       data={prods}
                       defaultValue={query}
-                      onChangeText={text => this.BuscarProducto(text)}
+                      onChangeText={text => this.BuscarProducto(text,'')}
                       placeholder="Producto a buscar"
                       renderItem={item => (
                         <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,fecha_vencimiento:new Date(),codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
