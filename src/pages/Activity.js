@@ -44,6 +44,7 @@ export default class Activity extends Component {
       productos:[],
       productos2:[],
       PRODUCTS:[],
+      PRODUCTS2:[],
       laboratorios:[],
       LABORATORIES:[],
       chosenDate: new Date(),
@@ -195,11 +196,11 @@ export default class Activity extends Component {
     if((items.laboratorios_asignados !== undefined && items.laboratorios_asignados !== null && items.laboratorios_asignados !== "") && (items.laboratorios_realizados === undefined || items.laboratorios_realizados === null || items.laboratorios_realizados === "")){
       //console.log(JSON.parse(items.laboratorios_asignados));
       JSON.parse(items.laboratorios_asignados).forEach((element,index) =>{
-        array2.push(element);
+        array2.push({dk:element.dk, nombre: element.nombre, prods: []});
         array3.push({index:index})
       });
     }
-    this.setState({observacion: items.observacion,PRODUCTS: array,LABORATORIES: array2, productos2: array3});
+    this.setState({observacion: items.observacion,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
     /**
      * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
      */
@@ -340,6 +341,7 @@ export default class Activity extends Component {
         documento_renovado: file2,
         productos: JSON.stringify(this.state.PRODUCTS),
         numero_consecutivo:this.state.numero_consecutivo,
+        laboratorios_realizados: JSON.stringify(this.state.PRODUCTS2),
         tiempo_actividad: time,
         tiempo_total: totalTime,
         motivo_ausencia: items.motivo_ausencia
@@ -683,27 +685,40 @@ export default class Activity extends Component {
   /**
    * Borrar Producto de la lista PRODUCTS
    */
-  BorrarProducto(item){
+  BorrarProducto(item,index2){
     var array = [...this.state.PRODUCTS];
     var index = array.indexOf(item)
+    
+    var array2 = [...this.state.PRODUCTS2];
+    var index3 = array2[index2].prods.indexOf(item)
     if (index !== -1) {
       array.splice(index, 1);
-      this.setState({PRODUCTS: array});
     }
+    if (index3 !== -1) {
+      array2[index2].prods.splice(index3,1);
+    }
+    this.setState({PRODUCTS: array, PRODUCTS2:array2});
   }
 
   /**
    * Modificar Producto de la lista PRODUCTS
    */
-  ModificarProducto(item,value){
+  ModificarProducto(item,value,index2){
     var array = [...this.state.PRODUCTS];
     var index = array.indexOf(item);
+    
+    var array2 = [...this.state.PRODUCTS2];
+    var index3 = array2[index2].prods.indexOf(item);
+
     if (index !== -1) {
       array[index] = {...array[index], cant: value};
       //console.log(array);
-      this.setState({PRODUCTS: array});
-      this.forceUpdate();
     }
+    if (index3 !== -1) {
+      array2[index2].prods[index3] = {...array2[index2].prods[index3], cant: value};
+    }
+    this.setState({PRODUCTS: array, PRODUCTS2: array2});
+    this.forceUpdate();
   }
   /** Cambiar opcion de motivo de ausencia */
   onValueChange(value) {
@@ -777,8 +792,8 @@ export default class Activity extends Component {
                       extraData={this.state}
                       renderItem={({item,index}) =>
                           <View key={Math.floor(Math.random() * 1000) + 1}>
-                            <Text style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: {item.nombre}</Text>
-                            <Text style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: {console.log(this.state.productos2)} </Text>
+                            <Text key={Math.floor(Math.random() * 1000) + 1} style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: {item.nombre}</Text>
+                            <Text key={Math.floor(Math.random() * 1000) + 1} style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
                             <Autocomplete
                               autoCapitalize="none"
                               data={this.state.productos2[index].index === index ? this.state.productos2[index].prods : []}
@@ -787,23 +802,23 @@ export default class Activity extends Component {
                               placeholder="Producto a buscar"
                               renderItem={item => 
                                 (
-                                  <TouchableOpacity key={Math.floor(Math.random() * 1000) + 1} onPress={() => {let {query2} = this.state; query2[index] = ''; this.setState({ query2 , PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) } }>
+                                  <TouchableOpacity key={Math.floor(Math.random() * 1000) + 1} onPress={() => {let {query2,PRODUCTS2} = this.state; query2[index] = ''; var prods = PRODUCTS2[index].prods; prods.push({nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}); PRODUCTS2[index] = {...PRODUCTS2[index], prods: prods }; this.setState({ query2 , PRODUCTS2 }) } }>
                                     <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
                                   </TouchableOpacity>
                                 )
                               }
                             />
-                            <List key={Math.floor(Math.random() * 1000) + 1} dataArray={this.state.PRODUCTS}
+                            <List key={Math.floor(Math.random() * 1000) + 1} dataArray={this.state.PRODUCTS2[index].prods}
                               renderRow={(item) =>
                                 <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
                                   <View style={{flex:2, justifyContent:'flex-start'}}>
-                                    <ListItem button onPress={() => this.BorrarProducto(item)}>
+                                    <ListItem button onPress={() => this.BorrarProducto(item,index)}>
                                       <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
                                       <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
                                     </ListItem>
                                   </View>
                                   <View style={{flex:1, justifyContent:'center'}}>
-                                    <NumericInput rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                                    <NumericInput rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value,index)}/>
                                   </View>
                                 </View>
                               }>
