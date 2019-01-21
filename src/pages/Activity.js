@@ -196,7 +196,7 @@ export default class Activity extends Component {
     if((items.laboratorios_asignados !== undefined && items.laboratorios_asignados !== null && items.laboratorios_asignados !== "") && (items.laboratorios_realizados === undefined || items.laboratorios_realizados === null || items.laboratorios_realizados === "")){
       //console.log(JSON.parse(items.laboratorios_asignados));
       JSON.parse(items.laboratorios_asignados).forEach((element,index) =>{
-        array2.push({dk:element.dk, nombre: element.nombre, prods: []});
+        array2.push({dk:element.dk, nombre: element.nombre, prods: element.prods});
         array3.push({index:index});
       });
     }
@@ -851,90 +851,6 @@ export default class Activity extends Component {
                         </TouchableOpacity>
                       )}
                     />
-                    {/*
-                      this.state.LABORATORIES.map((data,i) => {
-                        // FIXME: cambiarlo a un LIST
-                        return(
-                          <View key={Math.floor(Math.random() * 1000) + 1}>
-                            <Text style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: {data.nombre}</Text>
-                            <Text style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
-                            <Autocomplete
-                              key={Math.floor(Math.random() * 1000) + 1}
-                              autoCapitalize="none"
-                              data={prods}
-                              defaultValue={this.state.LABORATORIES[i].dk === data.dk ? query : ''}
-                              onChangeText={text => this.BuscarProducto(text,data.dk)}
-                              placeholder="Producto a buscar"
-                              renderItem={item => 
-                                (
-                                  <TouchableOpacity key={Math.floor(Math.random() * 1000) + 1} onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
-                                    <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
-                                  </TouchableOpacity>
-                                )
-                              }
-                            />
-                            <List key={Math.floor(Math.random() * 1000) + 1} dataArray={this.state.PRODUCTS}
-                              renderRow={(item) =>
-                                <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
-                                  <View style={{flex:2, justifyContent:'flex-start'}}>
-                                    <ListItem button onPress={() => this.BorrarProducto(item)}>
-                                      <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                                      <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
-                                    </ListItem>
-                                  </View>
-                                  <View style={{flex:1, justifyContent:'center'}}>
-                                    <NumericInput rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
-                                  </View>
-                                </View>
-                              }>
-                            </List>
-                          </View>
-                        )
-                      })
-                    */}
-
-
-                    {/*<Text style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: </Text>
-                    <Autocomplete
-                      autoCapitalize="none"
-                      data={labs}
-                      defaultValue={query2}
-                      onChangeText={text => this.BuscarLaboratorio(text)}
-                      placeholder="Laboratorio a buscar"
-                      renderItem={item => (
-                        <TouchableOpacity onPress={() => this.setState({ query2: item.nombre }) }>
-                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre}</Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                    <Text style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
-                    <Autocomplete
-                      autoCapitalize="none"
-                      data={prods}
-                      defaultValue={query}
-                      onChangeText={text => this.BuscarProducto(text,'')}
-                      placeholder="Producto a buscar"
-                      renderItem={item => (
-                        <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
-                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                    <List dataArray={this.state.PRODUCTS}
-                      renderRow={(item) =>
-                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
-                          <View style={{flex:2, justifyContent:'flex-start'}}>
-                            <ListItem button onPress={() => this.BorrarProducto(item)}>
-                              <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                              <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
-                            </ListItem>
-                          </View>
-                          <View style={{flex:1, justifyContent:'center'}}>
-                            <NumericInput rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
-                          </View>
-                        </View>
-                      }>
-                    </List>*/}
                   </View>
                 :
                   null

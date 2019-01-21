@@ -19,4 +19,6 @@ export const api = {
  ipImg: baseUrl + "/supervisores_api/storage/app/public/img/",
  ipBuscarProducto: baseUrl + "/supervisores_api/public/api/searchProducts",
  ipBuscarLaboratorio: baseUrl + "/supervisores_api/public/api/searchLaboratories",
+ ipListarDocumentacion: baseUrl + "/supervisores_api/public/api/listarDocumentacion",
+ ipTerminarDocumento: baseUrl + "/supervisores_api/public/api/terminarDocumento",
 }
