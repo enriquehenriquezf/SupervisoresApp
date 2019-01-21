@@ -197,7 +197,14 @@ export default class Activity extends Component {
       //console.log(JSON.parse(items.laboratorios_asignados));
       JSON.parse(items.laboratorios_asignados).forEach((element,index) =>{
         array2.push({dk:element.dk, nombre: element.nombre, prods: []});
-        array3.push({index:index})
+        array3.push({index:index});
+      });
+    }
+    else if(items.laboratorios_realizados !== undefined && items.laboratorios_realizados !== null && items.laboratorios_realizados !== ""){
+      //console.log(JSON.parse(items.laboratorios_asignados));
+      JSON.parse(items.laboratorios_realizados).forEach((element,index) =>{
+        array2.push({dk:element.dk, nombre: element.nombre, prods: element.prods, nuevo: element.nuevo});
+        array3.push({index:index});
       });
     }
     this.setState({observacion: items.observacion,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
@@ -606,8 +613,8 @@ export default class Activity extends Component {
           }
           else{
             toastr.showToast('No se encontraron productos','warning');
-            productos2.push({index: index, prods:prods});
-            that.setState({productos: prods, query: query, query2, productos2});
+            array[index] = {...array[index], prods: prods};
+            that.setState({productos: prods, query: query, query2, productos2:array});
           }
         }
         //return response.json();
@@ -617,7 +624,7 @@ export default class Activity extends Component {
         console.log(error);
       });
     }
-    else{productos2.push({index: index, prods:prods}); this.setState({productos: prods, query: query, query2,productos2});}
+    else{array[index] = {...array[index], prods: prods}; this.setState({productos: prods, query: query, query2,productos2:array});}
   }
 
   /** buscar Laboratorios */
@@ -626,49 +633,52 @@ export default class Activity extends Component {
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let labs = [];
     var that = this;
-    fetch(api.ipBuscarLaboratorio, {
-      method: 'POST',
-      headers: {
-          'Authorization': auth,
-          'Content-Type': 'application/json',
-          'Accept':'application/json'
-      },
-      body: JSON.stringify({
-        laboratorio: query.toLowerCase()
-      })
-    }).then(function(response) {
-      //console.log(response);
-      if(response.ok === true && response.status === 200)
-      {
-        newToken = JSON.parse(response._bodyInit);
-        //console.log(newToken);
-        Object.values(newToken.laboratorios['data']).forEach(element => {
-          //console.log(Object.values(element));
-          labs.push({nombre: element.nombre, dk: element.dk});
-        });
-        //console.log(labs)
-        that.setState({laboratorios: labs, query2: query});
-      }
-      else
-      {
-        console.log(response);
-        if(response.status === 500){
-          toastr.showToast('Error con el servidor','danger');
+    if(query !== ''){
+      fetch(api.ipBuscarLaboratorio, {
+        method: 'POST',
+        headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/json',
+            'Accept':'application/json'
+        },
+        body: JSON.stringify({
+          laboratorio: query.toLowerCase()
+        })
+      }).then(function(response) {
+        //console.log(response);
+        if(response.ok === true && response.status === 200)
+        {
+          newToken = JSON.parse(response._bodyInit);
+          //console.log(newToken);
+          Object.values(newToken.laboratorios['data']).forEach(element => {
+            //console.log(Object.values(element));
+            labs.push({nombre: element.nombre, dk: element.dk});
+          });
+          //console.log(labs)
+          that.setState({laboratorios: labs,query3:query});
         }
-        else if(response.status === 401){
-          toastr.showToast('Su sesión expiró','danger');
-          handler2 = true;
+        else
+        {
+          console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else if(response.status === 401){
+            toastr.showToast('Su sesión expiró','danger');
+            handler2 = true;
+          }
+          else{
+            toastr.showToast('No se encontraron Laboratorios','warning');
+            that.setState({laboratorios: labs,query3:query});
+          }
         }
-        else{
-          toastr.showToast('No se encontraron Laboratorios','warning');
-        }
-      }
-      //return response.json();
-    }).catch(function(error){
-      toastr.showToast('Su sesión expiró','danger');
-      handler2 = true;
-      console.log(error);
-    });
+        //return response.json();
+      }).catch(function(error){
+        toastr.showToast('Su sesión expiró','danger');
+        handler2 = true;
+        console.log(error);
+      });
+    }else{this.setState({laboratorios: labs,query3:query});}
   }
 
   /**
@@ -746,7 +756,7 @@ export default class Activity extends Component {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     
-    const { query } = this.state;
+    const { query,query3 } = this.state;
     const prods = this.findProduct(query);
     const labs = this.state.laboratorios;
 
@@ -790,19 +800,21 @@ export default class Activity extends Component {
                     <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     <FlatList data={this.state.LABORATORIES}
                       extraData={this.state}
+                      keyExtractor={(item, index) => index.toString()}
                       renderItem={({item,index}) =>
                           <View key={Math.floor(Math.random() * 1000) + 1}>
-                            <Text key={Math.floor(Math.random() * 1000) + 1} style={{margin: 5, fontWeight: 'bold'}}>Laboratorio: {item.nombre}</Text>
-                            <Text key={Math.floor(Math.random() * 1000) + 1} style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
+
+                            <Text style={{margin: 5, fontWeight: 'bold'}}>{item.nuevo ?<Icon onPress={() => {var array = [...this.state.LABORATORIES]; var array2 = [...this.state.productos2]; array.splice(index,1); array2.splice(index,1); this.setState({LABORATORIES: array, PRODUCTS2: array, productos2:array2});}} ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>:null} Laboratorio: {item.nombre}</Text>
+                            <Text style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
                             <Autocomplete
                               autoCapitalize="none"
-                              data={this.state.productos2[index].index === index ? this.state.productos2[index].prods : []}
+                              data={this.state.productos2[index].prods}
                               defaultValue={this.state.query2[index]}
-                              onChangeText={text => this.BuscarProducto(text,item.dk,index)}
+                              onEndEditing={text => this.BuscarProducto(text.nativeEvent.text,item.dk,index)}
                               placeholder="Producto a buscar"
                               renderItem={item => 
                                 (
-                                  <TouchableOpacity key={Math.floor(Math.random() * 1000) + 1} onPress={() => {let {query2,PRODUCTS2} = this.state; query2[index] = ''; var prods = PRODUCTS2[index].prods; prods.push({nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}); PRODUCTS2[index] = {...PRODUCTS2[index], prods: prods }; this.setState({ query2 , PRODUCTS2 }) } }>
+                                  <TouchableOpacity onPress={() => {let {query2,PRODUCTS2,productos2} = this.state; query2[index] = ''; productos2[index].prods = []; var prods = PRODUCTS2[index].prods; prods.push({nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}); PRODUCTS2[index] = {...PRODUCTS2[index], prods: prods }; this.setState({ query2 , PRODUCTS2, productos2 }) } }>
                                     <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
                                   </TouchableOpacity>
                                 )
@@ -826,6 +838,19 @@ export default class Activity extends Component {
                           </View>
                       }>
                     </FlatList>
+                    <Text style={{margin: 5, fontWeight: 'bold'}}>Agregar Laboratorio: </Text>
+                    <Autocomplete
+                      autoCapitalize="none"
+                      data={labs}
+                      defaultValue={query3}
+                      onChangeText={text => this.BuscarLaboratorio(text)}
+                      placeholder="Laboratorio a buscar"
+                      renderItem={item => (
+                        <TouchableOpacity onPress={() => {var array = [...this.state.PRODUCTS2]; var array2 = [...this.state.productos2]; array.push({dk:item.dk, nombre:item.nombre,prods:[],nuevo:true}); array2.push({index: array2.length,prods:[]}); this.setState({ query3: '', laboratorios:[], PRODUCTS2:array, LABORATORIES:array,productos2:array2 })} }>
+                          <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}><Icon ios='ios-add-circle-outline' android="md-add-circle-outline" style={{color: '#5cb85c', fontSize: 20}}></Icon> {item.nombre}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
                     {/*
                       this.state.LABORATORIES.map((data,i) => {
                         // FIXME: cambiarlo a un LIST
