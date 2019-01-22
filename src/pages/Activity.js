@@ -33,11 +33,13 @@ export default class Activity extends Component {
       checked: 1 ,
       calificacion_pv: 'Puntual',
       observacion: '',
+      observacion2: '',
       latitude: null,
       longitude: null,
       error:null,
       isVisible: false,
       isVisible2: false,
+      isVisibleActividad: false,
       ausencia: false,
       motivo: '',
       numero_consecutivo:'',
@@ -184,6 +186,14 @@ export default class Activity extends Component {
     {
       this.SetChecked(5,'Pesimas');
     }
+    /*else if(items.calificacion_pv === 'Si')
+    {
+      this.SetChecked(1,'Si');
+    }
+    else if(items.calificacion_pv === 'No')
+    {
+      this.SetChecked(2,'No');
+    }*/
     var array = [];
     var array2 = [];
     var array3 = [];
@@ -207,7 +217,7 @@ export default class Activity extends Component {
         array3.push({index:index});
       });
     }
-    this.setState({observacion: items.observacion,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
     /**
      * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
      */
@@ -912,7 +922,7 @@ export default class Activity extends Component {
                         </View>
                       }>
                     </List>                  
-                    <Input placeholder="Número Consecutivo" onChangeText={text => this.setState({numero_consecutivo: text})}></Input>
+                    <Input placeholder="Número Consecutivo" defaultValue={this.state.numero_consecutivo} onChangeText={text => this.setState({numero_consecutivo: text})}></Input>
                   </View>
                 :
                   null
@@ -955,19 +965,10 @@ export default class Activity extends Component {
                     <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
 
                     <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
-                      <TouchableOpacity onPress={() => this.verImagen(true)}>
-                        <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: imgTemp1}}></Image>
-                      </TouchableOpacity>
-                      <Input placeholder='Documento Vencido' disabled defaultValue={items.documento_vencido !== null ? imgTemp1 : ''} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+                      
                     </View>
-                    <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
-                    <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
-                      <TouchableOpacity onPress={() => this.verImagen(false)}>
-                        <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: imgTemp2}}></Image>
-                      </TouchableOpacity>
-                      <Input placeholder='Documento Renovado' disabled defaultValue={items.documento_renovado !== null ? imgTemp2 : ''} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
-                    </View>
-                    <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                    <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.setState({isVisibleActividad:true})}><Icon ios="ios-search" android="md-search"></Icon><Text>Modificar Datos</Text></Button>
+                    
                   </View>
                 :
                   null
@@ -1159,6 +1160,38 @@ export default class Activity extends Component {
           childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
         >
           <Text style={{color:'white', textAlign:'justify'}}>{info}</Text>
+        </Overlay>
+        <Overlay
+          visible={this.state.isVisibleActividad}
+          animationType="zoomIn"
+          onClose={() => this.setState({isVisibleActividad: false})}
+          containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+          childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+        >
+          <View>
+            <Text style={{margin: 10}}>Titulo: </Text>
+            <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked}></RadioButton>
+            <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked}></RadioButton>
+            <Text style={{color:'black', textAlign:'justify'}}>Documento Vencido</Text>
+            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
+              <TouchableOpacity onPress={() => this.verImagen(true)}>
+                <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: imgTemp1}}></Image>
+              </TouchableOpacity>
+              <Input placeholder='Documento Vencido' disabled defaultValue={items.documento_vencido !== null ? imgTemp1 : ''} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+            </View>
+            <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
+              <TouchableOpacity onPress={() => this.verImagen(false)}>
+                <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: imgTemp2}}></Image>
+              </TouchableOpacity>
+              <Input placeholder='Documento Renovado' disabled defaultValue={items.documento_renovado !== null ? imgTemp2 : ''} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+            </View>
+            <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+            <Form>
+              <Textarea rowSpan={2} bordered placeholder="Observaciones" defaultValue={items.observacion} style={styles.observaciones} onChangeText={(text) => this.setState({observacion2: text})} />
+            </Form>
+            <Button success regular block style={styles.boton} onPress={() => console.log("finish him")}><Text> Actualizar </Text></Button>
+          </View>
         </Overlay>
         <Overlay
           visible={this.state.isVisible2}

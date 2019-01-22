@@ -83,6 +83,7 @@ export default class Home extends Component {
               productos: element.productos,
               laboratorios_asignados: element.laboratorios_asignados,
               laboratorios_realizados: element.laboratorios_realizados,
+              numero_consecutivo: element.numero_consecutivo,
               tiempo_actividad: element.tiempo_actividad,
               motivo_ausencia: element.motivo_ausencia,
               tiempoInactivo: tiempoInactivo,
