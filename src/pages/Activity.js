@@ -22,7 +22,9 @@ let totalTimeInit = 0;
 let imgOverlay = '';
 let imgTemp1 = '';
 let imgTemp2 = '';
-let TIEMPOAUSENCIA = 1800000;// más de media hora ausente     ( > 1800000 )  
+let TIEMPOAUSENCIA = 1800000;// más de media hora ausente     ( > 1800000 ) 
+let items2 = [];
+let Lista = null;
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -42,6 +44,9 @@ export default class Activity extends Component {
       isVisibleActividad: false,
       ausencia: false,
       motivo: '',
+      selected:'0',
+      imgVencido:'',
+      imgRenovado:'',
       numero_consecutivo:'',
       productos:[],
       productos2:[],
@@ -51,17 +56,17 @@ export default class Activity extends Component {
       LABORATORIES:[],
       chosenDate: new Date(),
       query2:[],
+      lista:null,
+      documentos:{},
       showToast: false
     };
     let token = this.props.token;
     items = this.props.data;
     time = 0;
     totalTime = 0;
-    timeInit = new Date().getTime();
     totalTimeInit = new Date().getTime();
+    timeInit = new Date().getTime();
     imgOverlay = '';
-    imgTemp1 = api.ipImg + items.documento_vencido;
-    imgTemp2 = api.ipImg + items.documento_renovado;
     this.SetChecked = this.SetChecked.bind(this);
     this.ModificarProducto = this.ModificarProducto.bind(this);
     this.setDate = this.setDate.bind(this);
@@ -81,6 +86,7 @@ export default class Activity extends Component {
     }
     navigator.geolocation.clearWatch(this.watchId);
     this.Descripcion();
+    this.ListarDocumentacion();
     this._retrieveDataInit();
     this._retrieveData();
     this._retrieveDataAusente();
@@ -108,6 +114,145 @@ export default class Activity extends Component {
         var token2 = JSON.parse(response._bodyInit)
         //console.log(token2["message"]);
         info = token2["message"].descripcion;
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+  /**
+   * Obtener la lista de documentación legal a realizar
+   */
+  ListarDocumentacion = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var that = this;
+    await fetch(api.ipListarDocumentacion, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_actividad: items.id_actividad
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        var token2 = JSON.parse(response._bodyInit);
+        //console.log(token2["message"]);
+        //info = token2["message"].descripcion;
+        Object.values(token2).forEach(element => {
+          var item = {
+            id: element.id,
+            id_documento: element.id_documento,
+            documento: element.documento
+          }
+          items2.push(item);
+        });
+        /**
+         * items de la lista de documentos
+         */
+        Lista = items2.map((data,index) => {
+          return(
+            <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.documento} value={index} />              
+          )
+        })
+        that.setState({lista:Lista});
+      }
+      else{        
+        console.log(response);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+  /**
+   * Obtener datos del documento a realizar
+   */
+  AccederDocumento = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var that = this;
+    await fetch(api.ipAccederDocumento, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id:items2[this.state.selected].id,
+        id_actividad: items.id_actividad,
+        id_documento:items2[this.state.selected].id_documento
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        var token2 = JSON.parse(response._bodyInit);
+        //console.log(token2["message"]);
+        //info = token2["message"].descripcion;
+        var item = {
+          id: token2.id,
+          id_documento: token2.id_documento,
+          documento: token2.documento,
+          estado_documento: token2.estado_documento,
+          documento_vencido: token2.documento_vencido,
+          documento_renovado: token2.documento_renovado,
+          observaciones: token2.observaciones
+        }
+        imgTemp1 = api.ipImg + item.documento_vencido;
+        imgTemp2 = api.ipImg + item.documento_renovado;
+        that.setState({documentos: item, isVisibleActividad:true, imgVencido: imgTemp1, imgRenovado: imgTemp2});
+      }
+      else{        
+        console.log(response);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+  /**
+   * Obtener datos del documento
+   */
+  UpdateData = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    await fetch(api.ipTerminarDocumento, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_actividad: items.id_actividad,
+        id_documento: this.state.documentos.id_documento,
+        estado_documento: this.state.documentos.estado_documento,
+        documento_vencido: this.state.documentos.documento_vencido,
+        documento_renovado: this.state.documentos.documento_renovado,
+        observaciones: this.state.documentos.observaciones,
+        nombre_sucursal:items.sucursal,
+        nombre_documento:this.state.documentos.documento
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        var token2 = JSON.parse(response._bodyInit);
+        console.log(token2);
+        //info = token2["message"].descripcion;
+      }
+      else{        
+        console.log(response);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
@@ -217,18 +362,20 @@ export default class Activity extends Component {
         array3.push({index:index});
       });
     }
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
+
     /**
      * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
      */
     if(items.documento_vencido === '' || items.documento_vencido === null){//FIXME: modificar imagen no disponible
-      //imgTemp1 = Imagen.noDisponible;
-      this._img1.setNativeProps({src: [{uri: Imagen.noDisponible}]});
+      //imgTemp1 = Imagen.noDisponible; // state imgVencido
+      this._Vencido.setNativeProps({src: [{uri: Imagen.noDisponible}]});
     }
     if(items.documento_renovado === '' || items.documento_renovado === null){
-      //imgTemp2 = Imagen.noDisponible;
+      //imgTemp2 = Imagen.noDisponible; // state imgRenovado
       this._img2.setNativeProps({src: [{uri: Imagen.noDisponible}]});
     }
+
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
      * @example rango: a una distancia de 5000*10^-7 grados de latitud y longitud
@@ -238,13 +385,8 @@ export default class Activity extends Component {
     var RANGO = 0.0005000
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
-        console.log("Pos:");
-        console.log(position);
-        /*this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          error: null,
-        });*/
+        //console.log("Pos:");
+        //console.log(position);
         lat = position.coords.latitude;
         long = position.coords.longitude;
         if((lat >= items.latitud-RANGO && lat <= items.latitud+RANGO) && (long >= items.longitud-RANGO && long <= items.longitud+RANGO))
@@ -290,8 +432,15 @@ export default class Activity extends Component {
    * @param {String} calificacion_pv texto de calificacion del punto de venta
    */
   SetChecked(i,calificacion_pv)
-  {    
-    this.setState({ checked: i, calificacion_pv: calificacion_pv });
+  {
+    if(calificacion_pv === 'Si' || calificacion_pv === 'No'){
+      var docs = this.state.documentos;
+      docs.estado_documento = calificacion_pv;
+      this.setState({ checked: i, documentos: docs });
+    }
+    else{
+      this.setState({ checked: i, calificacion_pv: calificacion_pv });
+    }
   }
 
   /**
@@ -317,8 +466,8 @@ export default class Activity extends Component {
       });
     }
     else{
-      if(items.documento_vencido !== ''){
-        file1 = imgTemp1;
+      if(this.state.documentos.documento_vencido !== ''){
+        file1 = this.state.imgVencido;
       }
     }
     if(this.state.archivo2.hasOwnProperty('uri')){
@@ -327,8 +476,8 @@ export default class Activity extends Component {
       });
     }
     else{
-      if(items.documento_renovado !== ''){
-        file2 = imgTemp2;
+      if(this.state.documentos.documento_renovado !== ''){
+        file2 = this.state.imgRenovado;
       }
     }
 
@@ -550,11 +699,11 @@ export default class Activity extends Component {
         if(vencido){
           imgTemp1 = attachment.uri;
           this._img1.setNativeProps({src: [{uri: imgTemp1}]});
-          this.setState({archivo: attachment});
+          this.setState({archivo: attachment, imgVencido: imgTemp1});
         }else{
           imgTemp2 = attachment.uri;
           this._img2.setNativeProps({src: [{uri: imgTemp2}]});//'data:image/png;base64,' + imgsource
-          this.setState({archivo2: attachment});
+          this.setState({archivo2: attachment, imgRenovado: imgTemp2});
         }
       }
     }
@@ -569,9 +718,9 @@ export default class Activity extends Component {
    */
   verImagen(vencido){
     if(vencido){
-      imgOverlay = imgTemp1;
+      imgOverlay = this.state.imgVencido;
     }
-    else{imgOverlay = imgTemp2;}
+    else{imgOverlay = this.state.imgRenovado;}
     this.setState({isVisible2: true});
   }
 
@@ -964,11 +1113,16 @@ export default class Activity extends Component {
                     <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
 
-                    <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
-                      
-                    </View>
-                    <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.setState({isVisibleActividad:true})}><Icon ios="ios-search" android="md-search"></Icon><Text>Modificar Datos</Text></Button>
-                    
+                      {/* TODO: obtener lista y obtener datos al abrir overlay */}
+                      <Picker
+                        note
+                        mode="dropdown"
+                        selectedValue={this.state.selected}
+                        onValueChange={value => this.setState({selected:value})}
+                      >                      
+                        {this.state.lista}
+                      </Picker>
+                      <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.AccederDocumento() }><Icon ios="ios-arrow-dropup-circle" android="md-arrow-dropup-circle"></Icon><Text>Modificar Datos</Text></Button>                    
                   </View>
                 :
                   null
@@ -1169,28 +1323,28 @@ export default class Activity extends Component {
           childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
         >
           <View>
-            <Text style={{margin: 10}}>Titulo: </Text>
+            <Text style={{margin: 10}}>{this.state.isVisibleActividad ? this.state.documentos.documento : null}</Text>
             <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked}></RadioButton>
             <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked}></RadioButton>
             <Text style={{color:'black', textAlign:'justify'}}>Documento Vencido</Text>
             <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
               <TouchableOpacity onPress={() => this.verImagen(true)}>
-                <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: imgTemp1}}></Image>
+                <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgVencido}}></Image>
               </TouchableOpacity>
-              <Input placeholder='Documento Vencido' disabled defaultValue={items.documento_vencido !== null ? imgTemp1 : ''} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+              <Input placeholder='Documento Vencido' disabled defaultValue={this.state.isVisibleActividad ? (this.state.documentos.documento_vencido !== null ? this.state.imgVencido : '') : null} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
             </View>
             <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
             <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
               <TouchableOpacity onPress={() => this.verImagen(false)}>
-                <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: imgTemp2}}></Image>
+                <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgRenovado}}></Image>
               </TouchableOpacity>
-              <Input placeholder='Documento Renovado' disabled defaultValue={items.documento_renovado !== null ? imgTemp2 : ''} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+              <Input placeholder='Documento Renovado' disabled defaultValue={this.state.isVisibleActividad ? (this.state.documentos.documento_renovado !== null ? this.state.imgRenovado : '') : null} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
             </View>
             <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
             <Form>
-              <Textarea rowSpan={2} bordered placeholder="Observaciones" defaultValue={items.observacion} style={styles.observaciones} onChangeText={(text) => this.setState({observacion2: text})} />
+              <Textarea rowSpan={2} bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad ? this.state.documentos.observaciones : null} style={styles.observaciones} onChangeText={(text) => this.setState({observacion2: text})} />
             </Form>
-            <Button success regular block style={styles.boton} onPress={() => console.log("finish him")}><Text> Actualizar </Text></Button>
+            <Button success regular block style={styles.boton} onPress={() => this.UpdateData()}><Text> Actualizar </Text></Button>
           </View>
         </Overlay>
         <Overlay

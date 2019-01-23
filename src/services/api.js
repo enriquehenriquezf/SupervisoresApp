@@ -20,5 +20,6 @@ export const api = {
  ipBuscarProducto: baseUrl + "/supervisores_api/public/api/searchProducts",
  ipBuscarLaboratorio: baseUrl + "/supervisores_api/public/api/searchLaboratories",
  ipListarDocumentacion: baseUrl + "/supervisores_api/public/api/listarDocumentacion",
+ ipAccederDocumento: baseUrl + "/supervisores_api/public/api/accederDocumento",
  ipTerminarDocumento: baseUrl + "/supervisores_api/public/api/terminarDocumento",
 }
