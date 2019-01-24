@@ -33,6 +33,7 @@ export default class Activity extends Component {
       archivo2: {},
       loading: true,
       checked: 1 ,
+      checked2: 1 ,
       calificacion_pv: 'Puntual',
       observacion: '',
       observacion2: '',
@@ -149,7 +150,8 @@ export default class Activity extends Component {
           var item = {
             id: element.id,
             id_documento: element.id_documento,
-            documento: element.documento
+            documento: element.documento,
+            estado_documento: element.estado_documento
           }
           items2.push(item);
         });
@@ -158,7 +160,10 @@ export default class Activity extends Component {
          */
         Lista = items2.map((data,index) => {
           return(
-            <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.documento} value={index} />              
+            (data.estado_documento !== '' && data.estado_documento !== null) ?
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={'*' + data.documento} value={index} />
+            :
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.documento} value={index} />
           )
         })
         that.setState({lista:Lista});
@@ -179,6 +184,7 @@ export default class Activity extends Component {
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     var that = this;
+    var noDisponible = Imagen.noDisponible;
     await fetch(api.ipAccederDocumento, {
       method: 'POST',
       headers: {
@@ -207,9 +213,30 @@ export default class Activity extends Component {
           documento_renovado: token2.documento_renovado,
           observaciones: token2.observaciones
         }
-        imgTemp1 = api.ipImg + item.documento_vencido;
-        imgTemp2 = api.ipImg + item.documento_renovado;
-        that.setState({documentos: item, isVisibleActividad:true, imgVencido: imgTemp1, imgRenovado: imgTemp2});
+        /**
+         * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
+         */
+        if(item.documento_vencido === '' || item.documento_vencido === null){//FIXME: modificar imagen no disponible
+          imgTemp1 = noDisponible;
+        }
+        else{
+          imgTemp1 = api.ipImg + item.documento_vencido;
+        }
+        if(item.documento_renovado === '' || item.documento_renovado === null){
+          imgTemp2 = noDisponible;
+        }
+        else{
+          imgTemp2 = api.ipImg + item.documento_renovado;
+        }
+        that.setState({documentos: item, isVisibleActividad:true, imgVencido: imgTemp1, imgRenovado: imgTemp2,observacion2:item.observaciones, archivo:{}, archivo2:{}});
+        if(item.estado_documento === 'Si' || item.estado_documento === '' || item.estado_documento === null)
+        {
+          that.SetChecked(1,'Si');
+        }
+        else if(item.estado_documento === 'No')
+        {
+          that.SetChecked(2,'No');
+        }
       }
       else{        
         console.log(response);
@@ -221,11 +248,35 @@ export default class Activity extends Component {
   }
 
   /**
-   * Obtener datos del documento
+   * Actualizar datos del documento
    */
   UpdateData = async() => {
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    /** Imagenes de documentacion legal */
+    let file1 = '';
+    let file2 = '';
+    let that = this;
+    if(this.state.archivo.hasOwnProperty('uri')){
+      await Expo.FileSystem.readAsStringAsync(this.state.archivo.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+        file1 = response;
+      });
+    }
+    else{
+      if(this.state.documentos.documento_vencido !== '' && this.state.documentos.documento_vencido !== null){
+        file1 = this.state.imgVencido;
+      }
+    }
+    if(this.state.archivo2.hasOwnProperty('uri')){
+      await Expo.FileSystem.readAsStringAsync(this.state.archivo2.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+        file2 = response;
+      });
+    }
+    else{
+      if(this.state.documentos.documento_renovado !== '' && this.state.documentos.documento_renovado !== null){
+        file2 = this.state.imgRenovado;
+      }
+    }
     await fetch(api.ipTerminarDocumento, {
       method: 'POST',
       headers: {
@@ -237,10 +288,10 @@ export default class Activity extends Component {
         id_actividad: items.id_actividad,
         id_documento: this.state.documentos.id_documento,
         estado_documento: this.state.documentos.estado_documento,
-        documento_vencido: this.state.documentos.documento_vencido,
-        documento_renovado: this.state.documentos.documento_renovado,
-        observaciones: this.state.documentos.observaciones,
-        nombre_sucursal:items.sucursal,
+        documento_vencido: file1,
+        documento_renovado: file2,
+        observaciones: this.state.observacion2,
+        nombre_sucursal:items.cod_sucursal,
         nombre_documento:this.state.documentos.documento
       })
     }).then(function(response) {
@@ -248,8 +299,8 @@ export default class Activity extends Component {
       if(response.ok === true)
       {
         var token2 = JSON.parse(response._bodyInit);
-        console.log(token2);
-        //info = token2["message"].descripcion;
+        that.setState({isVisibleActividad:false});
+        toastr.showToast(token2["message"],'success');
       }
       else{        
         console.log(response);
@@ -331,14 +382,6 @@ export default class Activity extends Component {
     {
       this.SetChecked(5,'Pesimas');
     }
-    /*else if(items.calificacion_pv === 'Si')
-    {
-      this.SetChecked(1,'Si');
-    }
-    else if(items.calificacion_pv === 'No')
-    {
-      this.SetChecked(2,'No');
-    }*/
     var array = [];
     var array2 = [];
     var array3 = [];
@@ -361,18 +404,6 @@ export default class Activity extends Component {
         array2.push({dk:element.dk, nombre: element.nombre, prods: element.prods, nuevo: element.nuevo});
         array3.push({index:index});
       });
-    }
-
-    /**
-     * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
-     */
-    if(items.documento_vencido === '' || items.documento_vencido === null){//FIXME: modificar imagen no disponible
-      //imgTemp1 = Imagen.noDisponible; // state imgVencido
-      this._Vencido.setNativeProps({src: [{uri: Imagen.noDisponible}]});
-    }
-    if(items.documento_renovado === '' || items.documento_renovado === null){
-      //imgTemp2 = Imagen.noDisponible; // state imgRenovado
-      this._img2.setNativeProps({src: [{uri: Imagen.noDisponible}]});
     }
 
     this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
@@ -436,7 +467,7 @@ export default class Activity extends Component {
     if(calificacion_pv === 'Si' || calificacion_pv === 'No'){
       var docs = this.state.documentos;
       docs.estado_documento = calificacion_pv;
-      this.setState({ checked: i, documentos: docs });
+      this.setState({ checked2: i, documentos: docs });
     }
     else{
       this.setState({ checked: i, calificacion_pv: calificacion_pv });
@@ -457,29 +488,6 @@ export default class Activity extends Component {
     this._storeDataAusente();
     var totalTl = new Date().getTime();
     totalTime = totalTl - totalTimeInit;
-    /** Imagenes de documentacion legal */
-    let file1 = null;
-    let file2 = null;
-    if(this.state.archivo.hasOwnProperty('uri')){
-      await Expo.FileSystem.readAsStringAsync(this.state.archivo.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
-        file1 = response;
-      });
-    }
-    else{
-      if(this.state.documentos.documento_vencido !== ''){
-        file1 = this.state.imgVencido;
-      }
-    }
-    if(this.state.archivo2.hasOwnProperty('uri')){
-      await Expo.FileSystem.readAsStringAsync(this.state.archivo2.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
-        file2 = response;
-      });
-    }
-    else{
-      if(this.state.documentos.documento_renovado !== ''){
-        file2 = this.state.imgRenovado;
-      }
-    }
 
     /** Motivo de Ausencia */
     if(this.state.ausencia){
@@ -502,9 +510,7 @@ export default class Activity extends Component {
         nombre_tabla: items.nombre_tabla,
         id_plan_trabajo: items.id_plan_trabajo, 
         id_actividad: id,
-        observaciones: this.state.observacion,        
-        documento_vencido: file1,
-        documento_renovado: file2,
+        observaciones: this.state.observacion,
         productos: JSON.stringify(this.state.PRODUCTS),
         numero_consecutivo:this.state.numero_consecutivo,
         laboratorios_realizados: JSON.stringify(this.state.PRODUCTS2),
@@ -1113,7 +1119,6 @@ export default class Activity extends Component {
                     <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
 
-                      {/* TODO: obtener lista y obtener datos al abrir overlay */}
                       <Picker
                         note
                         mode="dropdown"
@@ -1323,26 +1328,25 @@ export default class Activity extends Component {
           childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
         >
           <View>
-            <Text style={{margin: 10}}>{this.state.isVisibleActividad ? this.state.documentos.documento : null}</Text>
-            <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked}></RadioButton>
-            <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked}></RadioButton>
+            <Text style={{margin: 5}}>{this.state.isVisibleActividad ? this.state.documentos.documento : ''}</Text>
+            <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
+            <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
             <Text style={{color:'black', textAlign:'justify'}}>Documento Vencido</Text>
-            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
+            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
               <TouchableOpacity onPress={() => this.verImagen(true)}>
                 <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgVencido}}></Image>
               </TouchableOpacity>
-              <Input placeholder='Documento Vencido' disabled defaultValue={this.state.isVisibleActividad ? (this.state.documentos.documento_vencido !== null ? this.state.imgVencido : '') : null} value={this.state.archivo.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+              <Button iconLeft regular block info style={[styles.boton,{marginLeft:20,marginRight:20}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
             </View>
-            <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
-            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginBottom: 10, marginTop: 10}}>
+            <Text style={{color:'black', textAlign:'justify'}}>Documento Renovado</Text>
+            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginTop: 10}}>
               <TouchableOpacity onPress={() => this.verImagen(false)}>
                 <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgRenovado}}></Image>
               </TouchableOpacity>
-              <Input placeholder='Documento Renovado' disabled defaultValue={this.state.isVisibleActividad ? (this.state.documentos.documento_renovado !== null ? this.state.imgRenovado : '') : null} value={this.state.archivo2.uri} style={{marginLeft:20, textDecorationLine:'underline'}}></Input>
+              <Button iconLeft regular block info style={[styles.boton,{marginLeft:20,marginRight:20}]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
             </View>
-            <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
             <Form>
-              <Textarea rowSpan={2} bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad ? this.state.documentos.observaciones : null} style={styles.observaciones} onChangeText={(text) => this.setState({observacion2: text})} />
+              <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
             </Form>
             <Button success regular block style={styles.boton} onPress={() => this.UpdateData()}><Text> Actualizar </Text></Button>
           </View>

@@ -70,6 +70,7 @@ export default class Home extends Component {
             var item = {
               name: keys[i].split('-')[0],
               sucursal: element.nombre_sucursal,
+              cod_sucursal: element.cod_sucursal,
               prioridad: element.id_prioridad,
               estado: element.estado,
               id_plan_trabajo: element.id_plan_trabajo,
