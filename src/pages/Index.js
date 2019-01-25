@@ -10,6 +10,7 @@ import ChangePass from './ChangePass';
 import ShowSucursales from './ShowSucursales';
 import ShowActivities from './ShowActivities';
 import {api} from '../services/api'
+import { Imagen } from '../components/Imagenes';
 
 export default class Index extends Component {
   constructor(props) {
@@ -43,10 +44,27 @@ export default class Index extends Component {
    * Cargar tipos de fuentes antes de mostrar el layout.
    */
   async componentWillMount() {
-    await Expo.Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
+    try{
+      await Expo.Font.loadAsync({
+        Roboto: require("native-base/Fonts/Roboto.ttf"),
+        Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
+        BebasNeueBold: require('../../assets/Fonts/BebasNeueBold.ttf'),
+        BebasKai: require('../../assets/Fonts/BebasKai.ttf'),
+      });
+      await Expo.Asset.loadAsync([
+        Imagen.unidrogas,
+        Imagen.user,
+        Imagen.pass,
+        Imagen.back,
+        Imagen.phone,
+        Imagen.mail,
+        Imagen.code,
+        Imagen.find,
+        Imagen.check,
+        Imagen.uncheck,
+        Imagen.profileBorder
+      ]);
+    }catch(error){console.log(error)}
     this.setState({ loading: false });
   }
 

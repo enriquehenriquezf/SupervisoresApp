@@ -4,12 +4,18 @@ import Index from './src/pages/Index';
 
 export default class App extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
-  render() { 
-    Preload.images();
+  async componentDidMount(){
+    try{
+      Preload.images();
+    }
+    catch(error){console.log(error)}
+  }
+
+  render() {
     return (
       <Index/>
     );

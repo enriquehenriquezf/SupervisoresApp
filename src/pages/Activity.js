@@ -160,10 +160,10 @@ export default class Activity extends Component {
          */
         Lista = items2.map((data,index) => {
           return(
-            (data.estado_documento !== '' && data.estado_documento !== null) ?
-              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={'*' + data.documento} value={index} />
+            (data.estado_documento === 'Si' || data.estado_documento === 'No') ?
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.documento} value={index} color={'#5cb85c'} />
             :
-              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.documento} value={index} />
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.documento} value={index} color={'#000000'} />
           )
         })
         that.setState({lista:Lista});
@@ -1123,6 +1123,8 @@ export default class Activity extends Component {
                         note
                         mode="dropdown"
                         selectedValue={this.state.selected}
+                        itemStyle={{height:60}}
+                        itemTextStyle={{textTransform:'lowercase'}}
                         onValueChange={value => this.setState({selected:value})}
                       >                      
                         {this.state.lista}

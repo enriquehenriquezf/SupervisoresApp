@@ -17,6 +17,7 @@ export const api = {
  ipChangePassword : baseUrl + "/supervisores_api/public/api/changePass",
  ipVerify : baseUrl + "/supervisores_api/public/api/verifyPass",
  ipImg: baseUrl + "/supervisores_api/storage/app/public/img/",
+ ipIcons: baseUrl + "/supervisores_api/storage/app/public/icons/",
  ipBuscarProducto: baseUrl + "/supervisores_api/public/api/searchProducts",
  ipBuscarLaboratorio: baseUrl + "/supervisores_api/public/api/searchLaboratories",
  ipListarDocumentacion: baseUrl + "/supervisores_api/public/api/listarDocumentacion",

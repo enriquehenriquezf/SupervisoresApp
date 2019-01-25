@@ -6,6 +6,7 @@ import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image } 
 import styles from '../styles/Login';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
+import { COLOR } from '../components/Colores';
 
 let fail = 0;
 let swChange = false;
@@ -164,45 +165,36 @@ export default class Login extends Component {
     var height = Dimensions.get('window').height;
     return (
       <Container>
-        <Expo.LinearGradient colors={['#29B6F6','#039BE5']} style={{ flex: 1}} start={[0.5,0.01]} end={[0.5,0.99]}>{/* ['#8baaaa', '#ae8b9c'] ['#37ecba', '#72afd3'] ['#2af598','#009efd'] ['#00CDAC','#02AAB0'] ['#5A288E','#02AAB0'] ['#29B6F6','#039BE5']*/}
-          <Header transparent style={{paddingTop: 20}}>
-          <Left/>          
-          <Body>
-            <H1 style={{color: '#FFF'}}>Inicio</H1>
-          </Body>
-          <Right />
-          </Header>
-          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.8 : 1}}>
-            <Content style={{ marginTop: 5}}>
-              <Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/4)}} 
-                source={Imagen.unidrogas}/>
+        <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.8 : 1}}>
+          <Content style={{ marginTop: 35}}>
+            <View>
+              <Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/5)}} source={Imagen.unidrogas}/>
               <Form style={{paddingTop:height/4}}>
                 <Item regular style={styles.form}>
-                  <Icon active ios='ios-person' android='md-person' style={styles.icon}/>
-                  <Input placeholder='Correo' placeholderTextColor='#f0f0f0' defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={styles.input}/>
+                  {/*<Icon active ios='ios-person' android='md-person' style={styles.icon}/>*/}
+                  <Image style={styles.icon} source={Imagen.user}/>
+                  <Input placeholder='Correo' placeholderTextColor={COLOR.gris} defaultValue={this.state.email} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={styles.input}/>
                 </Item>
                 <Item regular style={styles.form}>
-                  <Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>
-                  <Input placeholder='Contraseña' placeholderTextColor='#f0f0f0' defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.input}/>
+                  {/*<Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>*/}
+                  <Image style={styles.icon} source={Imagen.pass}/>
+                  <Input placeholder='Contraseña' placeholderTextColor={COLOR.gris} defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.input}/>
                 </Item>
-                <ListItem underlayColor='#29B6F6' style={styles.checkbox2} button onPress={() => this.setState({checked: !this.state.checked})}>
-                  <CheckBox color='#5cb85c' checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
+                
+                {fail >= 1 && <Text style={styles.forgotPass} onPress={() => this.ChangePass(this.props.handler2)}>Olvidaste tu contraseña?</Text>}              
+                <Button block onPress={() => this._OnLogin(this.props.handler)} style={styles.boton2}>
+                  <Text style={styles.text}>Ingresar</Text>
+                </Button>
+                <ListItem underlayColor={COLOR.azul} style={styles.checkbox2} button onPress={() => this.setState({checked: !this.state.checked})}>
+                  <CheckBox color={COLOR.azul} checked={this.state.checked} onPress={() => this.setState({checked: !this.state.checked})}/>
                   <Body>
-                    <Text style={{color:'white'}}>Recordar Credenciales</Text>
+                    <Text style={styles.checkbox}>Recordar Credenciales</Text>
                   </Body>
-                </ListItem>
-                {fail >= 1 && <Text style={styles.forgotPass} onPress={() => this.ChangePass(this.props.handler2)}>Olvidaste tu contraseña?</Text>}
-                <Item regular style={styles.boton}>
-                  <Body>
-                    <Button success regular block onPress={() => this._OnLogin(this.props.handler)} style={styles.boton2}>
-                      <Text style={styles.text}>Iniciar Sesión</Text>
-                    </Button> 
-                  </Body>
-                </Item>          
+                </ListItem>        
               </Form>
-            </Content>
-          </KeyboardAvoidingView>
-        </Expo.LinearGradient>
+            </View>
+          </Content>
+        </KeyboardAvoidingView>
       </Container>
     );
   }

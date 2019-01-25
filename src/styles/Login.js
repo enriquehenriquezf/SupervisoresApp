@@ -1,8 +1,9 @@
 import { StyleSheet } from 'react-native';
+import { COLOR } from '../components/Colores';
 export default StyleSheet.create({
     form: {
         backgroundColor: 'rgba(255,255,255,0.1)',
-        borderColor: '#FFF',//rgba(255,255,255,0)
+        borderColor: COLOR.azulTransparente,//rgba(255,255,255,0)
         borderBottomWidth: 2,
         borderLeftWidth: 2,
         borderRightWidth: 2,
@@ -23,42 +24,50 @@ export default StyleSheet.create({
         marginTop: 10
     },
     boton2: {
+        backgroundColor: COLOR.verdeTransparente,
         borderColor: 'rgba(255,255,255,0)',
+        elevation:0,
+        borderWidth:0,
         borderRadius: 10,
-        height: 40
+        height: 40,
+        marginLeft: 50,
+        marginRight: 50,
+        marginTop: 10
     },
     input:{
-        color: 'white',
-        borderLeftWidth: 1,
-        borderLeftColor: '#FFF',
-        height: 37
+        color: COLOR.azul,
+        borderLeftWidth: 2,
+        borderLeftColor: COLOR.azulTransparente,
+        height: 37,
+        fontFamily:'BebasKai'
     },
     icon:{
-        color: 'white',
-        width: 36
+        width: 36,
+        height:36
     },
     text:{
-        fontSize: 16
+        fontSize: 20,
+        fontFamily:'BebasNeueBold'
     },
     checkbox:{
-        backgroundColor: 'rgba(255,255,255,0)',
-        borderColor: 'rgba(255,255,255,0)', 
-        marginTop: -10
+        color:COLOR.azul,
+        fontFamily:'BebasNeueBold'
     },
     checkbox2:{
         backgroundColor: 'rgba(255,255,255,0)',
         borderColor: 'rgba(255,255,255,0)',
-        marginLeft: 50,
+        marginLeft: 80,
         marginRight: 20,
         paddingTop:-5,
         paddingBottom:-5,
-        marginBottom:5
+        marginTop:10,
     },
     forgotPass: {
-        color: 'white',
+        color: COLOR.azul,
         marginLeft: 'auto',
         marginRight: 'auto',
         textDecorationLine: 'underline',
+        fontFamily:'BebasNeueBold',
         marginBottom:2
     }
 });
