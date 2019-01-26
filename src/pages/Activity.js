@@ -1,8 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, H2, Card, Input,ActionSheet, Picker, DatePicker } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, H2, Card, Input, Picker, DatePicker } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity,FlatList} from 'react-native';
+import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity,FlatList, ScrollView} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
 import NumericInput from 'react-native-numeric-input';
 import Overlay from 'react-native-modal-overlay';
@@ -1123,7 +1123,7 @@ export default class Activity extends Component {
                         note
                         mode="dropdown"
                         selectedValue={this.state.selected}
-                        itemStyle={{height:60}}
+                        itemStyle={{height:60,fontSize:10}}
                         itemTextStyle={{textTransform:'lowercase'}}
                         onValueChange={value => this.setState({selected:value})}
                       >                      
@@ -1330,27 +1330,37 @@ export default class Activity extends Component {
           childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
         >
           <View>
-            <Text style={{margin: 5}}>{this.state.isVisibleActividad ? this.state.documentos.documento : ''}</Text>
-            <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
-            <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
-            <Text style={{color:'black', textAlign:'justify'}}>Documento Vencido</Text>
-            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
-              <TouchableOpacity onPress={() => this.verImagen(true)}>
-                <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgVencido}}></Image>
-              </TouchableOpacity>
-              <Button iconLeft regular block info style={[styles.boton,{marginLeft:20,marginRight:20}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
-            </View>
-            <Text style={{color:'black', textAlign:'justify'}}>Documento Renovado</Text>
-            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', marginTop: 10}}>
-              <TouchableOpacity onPress={() => this.verImagen(false)}>
-                <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgRenovado}}></Image>
-              </TouchableOpacity>
-              <Button iconLeft regular block info style={[styles.boton,{marginLeft:20,marginRight:20}]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
-            </View>
-            <Form>
-              <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
-            </Form>
-            <Button success regular block style={styles.boton} onPress={() => this.UpdateData()}><Text> Actualizar </Text></Button>
+            <ScrollView>
+              <Text style={{margin: 5}}>{this.state.isVisibleActividad ? this.state.documentos.documento : ''}</Text>
+              <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
+              <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
+              <Text style={{color:'black', textAlign:'justify'}}>Documento Vencido</Text>
+              <ListItem thumbnail style={{marginLeft:0}}>
+                <Left>
+                  <TouchableOpacity onPress={() => this.verImagen(true)}>
+                    <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgVencido}}></Image>
+                  </TouchableOpacity>
+                </Left>
+                <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                  <Button iconLeft regular block info style={[styles.boton,{marginLeft:0,marginRight:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                </Body>
+              </ListItem>
+              <Text style={{color:'black', textAlign:'justify'}}>Documento Renovado</Text>
+              <ListItem thumbnail style={{marginLeft:0}}>
+                <Left>
+                  <TouchableOpacity onPress={() => this.verImagen(false)}>
+                    <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgRenovado}}></Image>
+                  </TouchableOpacity>
+                </Left>
+                <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                  <Button iconLeft regular block info style={[styles.boton,{marginLeft:0,marginRight:0}]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                </Body>
+              </ListItem>
+              <Form>
+                <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
+              </Form>
+              <Button success regular block style={styles.boton} onPress={() => this.UpdateData()}><Text> Actualizar </Text></Button>
+            </ScrollView>
           </View>
         </Overlay>
         <Overlay
