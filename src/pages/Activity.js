@@ -87,7 +87,7 @@ export default class Activity extends Component {
     }
     navigator.geolocation.clearWatch(this.watchId);
     this.Descripcion();
-    this.ListarDocumentacion();
+    this.ListarDocumentacion();//TODO: validar q solo lo haga en documentacion legal y condiciones locativas, además de hacer la api de condiciones
     this._retrieveDataInit();
     this._retrieveData();
     this._retrieveDataAusente();
@@ -1029,6 +1029,18 @@ export default class Activity extends Component {
                     <RadioButton SetChecked={this.SetChecked} i={3} value={'Regulares'} checked={this.state.checked}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={4} value={'Malas'} checked={this.state.checked}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={5} value={'Pesimas'} checked={this.state.checked}></RadioButton>
+                    
+                    <Picker
+                        note
+                        mode="dropdown"
+                        selectedValue={this.state.selected}
+                        itemStyle={{height:60,fontSize:10}}
+                        itemTextStyle={{textTransform:'lowercase'}}
+                        onValueChange={value => this.setState({selected:value})}
+                      >                      
+                        {this.state.lista}
+                      </Picker>
+                      <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.AccederDocumento() }><Icon ios="ios-arrow-dropup-circle" android="md-arrow-dropup-circle"></Icon><Text>Modificar Datos</Text></Button>
                   </View>
                 :
                   null

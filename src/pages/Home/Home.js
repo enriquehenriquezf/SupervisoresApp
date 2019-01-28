@@ -1,9 +1,11 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title,Text, Icon, Button, Tabs, Tab, TabHeading } from 'native-base';
+import { Container, Header, Left, Body, Right, Text, Icon, Button, Tabs, Tab, TabHeading } from 'native-base';
+import { View } from 'react-native';
 import IconStyles from '../../styles/Icons';
 import Activos from './Tabs/Activos';
 import Completados from './Tabs/Completados';
+import { COLOR } from '../../components/Colores';
 
 export default class Home extends Component {
   constructor(props) {
@@ -19,10 +21,10 @@ export default class Home extends Component {
   render() {
     return (
       <Container>     
-          <Header hasTabs style={{paddingTop: 20, elevation:0}}>
+          <Header hasTabs style={{paddingTop: 40, elevation:0, borderBottomRightRadius:100, backgroundColor:COLOR.azul}}>
             <Left/>          
             <Body>
-              <Title>Actividades</Title>
+              {/*<Title>Actividades</Title>*/}
             </Body>
             <Right>
                 <Button transparent onPress={() => this.props.handler2(3,token,[])}>
@@ -33,11 +35,12 @@ export default class Home extends Component {
                 </Button>
             </Right>
           </Header>
+          <Text>Aqui va el perfil</Text>
         <Tabs tabContainerStyle={{elevation:0}}>
-          <Tab style={{backgroundColor: '#f4f4f4'}} heading={ <TabHeading><Text>Activos</Text></TabHeading>}>{/* #E1F5FE */}
+          <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Activos</Text></View></TabHeading>}>
             <Activos handler2={this.props.handler2} token={token} data={this.props.data}/>
           </Tab>
-          <Tab style={{backgroundColor: '#f4f4f4'}} heading={ <TabHeading  ><Text>Completados</Text></TabHeading>}>
+          <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Completados</Text></View></TabHeading>}>
             <Completados handler2={this.props.handler2} token={token} data={this.props.data}/>
           </Tab>
         </Tabs>

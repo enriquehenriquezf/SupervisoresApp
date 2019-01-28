@@ -166,7 +166,7 @@ export default class Login extends Component {
     return (
       <Container>
         <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.8 : 1}}>
-          <Content style={{ marginTop: 35}}>
+          <Content style={{ marginTop: 50}}>
             <View>
               <Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/5)}} source={Imagen.unidrogas}/>
               <Form style={{paddingTop:height/4}}>

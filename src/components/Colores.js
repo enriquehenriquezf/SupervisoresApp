@@ -7,4 +7,6 @@ export const COLOR = {
  verde: '#7EB700',
  verdeTransparente: 'rgba(126,183,0,0.65)',
  gris: '#8f8f8f',
+ rojo: '#F53F3F',
+ amarillo: '#EBC908'
 }

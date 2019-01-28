@@ -6,6 +6,7 @@ import {View, RefreshControl, AsyncStorage} from 'react-native';
 import styles from '../../../styles/Home';
 import {api} from '../../../services/api';
 import { UserInfo } from '../../../components/UserInfo';
+import { COLOR } from '../../../components/Colores';
 
 let items = [];
 let user = [];
@@ -78,7 +79,6 @@ export default class Home extends Component {
               observacion: element.observacion,
               id_actividad: element.id,
               nombre_tabla: element.nombre_tabla,
-              estado: element.estado,
               documento_vencido: element.documento_vencido,
               documento_renovado: element.documento_renovado,
               productos: element.productos,
@@ -91,15 +91,13 @@ export default class Home extends Component {
               tiempoInactivoInit: tiempoInactivoInit,
               latitud: 11.0041235,
               longitud: -74.8130534,
-              separador: false,
-              borde: true
+              separador: false
             };
-            if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true});}
-            if(sucursalActual !== element.nombre_sucursal){items[j].borde = false; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true}); j = j + 1; sucursalActual = element.nombre_sucursal}                                    
+            if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:true});}
+            if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}); j = j + 1; sucursalActual = element.nombre_sucursal}                                    
             items.push(item);
             i = i + 1;       j = j + 1;   
           });
-          items[j].borde = false;
           //console.log(items)
       }
       else
@@ -175,47 +173,44 @@ export default class Home extends Component {
           <RefreshControl
             refreshing={this.state.refreshing}
             onRefresh={() => this.getPlanesDeTrabajo()}
-            colors={["#5cb85c"]}
+            colors={[COLOR.verde]}
           />
         }>
         <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
-        <Card style={{borderRadius: 5}}>
-          <List dataArray={items}
-            renderRow={(item) =>
-            item.separador === true ?
-              <Expo.LinearGradient colors={['#5cb85c','#43A047']} style={{ flex: 1, borderRadius: 5}} start={[0.5,0.01]} end={[0.5,1]}>
-                <ListItem button underlayColor='#5cb85c' itemDivider style={{backgroundColor: "rgba(255,255,255,0)"}}  onPress={() => toastr.showToast(item.direccion,'info')}>
-                  <Text style={{color: '#FFF'}}>{item.sucursal}</Text>
-                </ListItem>
-              </Expo.LinearGradient>
-            :
-              <ListItem icon button underlayColor='#C8E6C9' onPress={() => this._OnItemPress(2,this.props.handler2, item)}>
-                <Left>
-                {
-                  (item.estado === "activo" || item.estado === "Activo") && <Icon active ios='ios-time' android='md-time' style={{color: "#5cb85c"}} />
-                }
-                {
-                  (item.estado === "terminado" || item.estado === "completo") && <Icon active ios='ios-checkmark' android='md-checkmark' style={{color: "#5cb85c"}} />
-                }
-                </Left>
-                <Body style={item.borde ? styles.ConBorde : styles.SinBorde}>
-                  <Text style={{fontSize: 16}}>{item.name}</Text>
-                </Body>
-                <Right style={item.borde ? styles.ConBorde : styles.SinBorde}>
-                  {
-                    item.prioridad === 3 && <Badge><Text>urgente</Text></Badge>
-                  }
-                  {                  
-                    item.prioridad === 2 && <Badge warning><Text>media</Text></Badge>
-                  }
-                  {                  
-                    item.prioridad === 1 && <Badge info><Text>normal</Text></Badge>
-                  }
-                </Right>
+        <List dataArray={items}
+          renderRow={(item) =>
+          item.separador === true ?
+            <View>
+              {item.first === true ?
+                  null
+                :
+                  <View style={styles.separadorSucursales}></View>
+              }
+              <ListItem button underlayColor={COLOR.azulTransparente} itemDivider style={styles.ConBorde} onPress={() => toastr.showToast(item.direccion,'info')} >
+                <Text style={styles.sucursalText}>{item.sucursal}</Text>
               </ListItem>
-            }>
-          </List>
-        </Card>
+            </View>
+          :
+            <ListItem button underlayColor={COLOR.azulTransparente} onPress={() => this._OnItemPress(2,this.props.handler2, item)} style={styles.SinBorde}>
+              <Left >
+                <View style={styles.ActividadBackground}>
+                  <Text style={styles.ActividadText}>{item.name}</Text>
+                </View>
+              </Left>
+              <Right>
+              {
+                item.prioridad === 3 && <View style={[styles.prioridad,{backgroundColor:COLOR.rojo}]}><Text style={styles.ActividadText}>urgente</Text></View>
+              }
+              {                  
+                item.prioridad === 2 && <View style={[styles.prioridad,{backgroundColor:COLOR.amarillo}]}><Text style={styles.ActividadText}>media</Text></View>
+              }
+              {                  
+                item.prioridad === 1 && <View style={[styles.prioridad,{backgroundColor:COLOR.verde}]}><Text style={styles.ActividadText}>normal</Text></View>
+              }
+              </Right>
+            </ListItem>
+          }>
+        </List>
       </Content>
     );
   }

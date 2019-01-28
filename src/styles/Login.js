@@ -32,7 +32,7 @@ export default StyleSheet.create({
         height: 40,
         marginLeft: 50,
         marginRight: 50,
-        marginTop: 10
+        marginTop: 15
     },
     input:{
         color: COLOR.azul,
@@ -60,7 +60,7 @@ export default StyleSheet.create({
         marginRight: 20,
         paddingTop:-5,
         paddingBottom:-5,
-        marginTop:10,
+        marginTop:15,
     },
     forgotPass: {
         color: COLOR.azul,
@@ -68,6 +68,7 @@ export default StyleSheet.create({
         marginRight: 'auto',
         textDecorationLine: 'underline',
         fontFamily:'BebasNeueBold',
-        marginBottom:2
+        marginBottom:2,
+        marginTop:5
     }
 });
