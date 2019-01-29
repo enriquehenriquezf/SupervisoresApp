@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import {Platform} from 'react-native';
 export default StyleSheet.create({
     header: {
-        fontSize: 20,
+        fontSize: 40,
         color: Platform.OS === 'ios' ? 'black' : 'white'
     },
     help: {

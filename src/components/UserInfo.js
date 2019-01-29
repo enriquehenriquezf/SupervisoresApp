@@ -27,7 +27,7 @@ export class UserInfo extends Component {
                     <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, this.props.user)}>
                     <Left>
                         <View style={{marginRight: 30}}>
-                        <Thumbnail source={{ uri: Imagen.avatar }} style={styles.perfil} />{/* this.props.user.foto */}
+                        <Thumbnail source={{ uri: this.props.user.foto }} style={styles.perfil} />{/* Imagen.avatar */}
                         {/*<Thumbnail source={Imagen.profileBorder} style={styles.perfil}/>*/}
                         {this.props.estado === 'true' ?
                             <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={styles.activo}/>

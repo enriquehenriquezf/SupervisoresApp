@@ -9,6 +9,7 @@ var baseUrl ='http://192.168.1.4';// Servidor Privada
 export const api = {
  ipLogin : baseUrl + "/supervisores_api/public/api/login",
  ipLogout : baseUrl + "/supervisores_api/public/api/logout",
+ ipProfileUser : baseUrl + "/supervisores_api/public/api/profileUser",
  ipHome : baseUrl + "/supervisores_api/public/api/homeSupervisor",
  ipHomeCompletados : baseUrl + "/supervisores_api/public/api/actividades_completas",
  ipShowActivities : baseUrl + "/supervisores_api/public/api/mostrarActividades",
@@ -23,4 +24,7 @@ export const api = {
  ipListarDocumentacion: baseUrl + "/supervisores_api/public/api/listarDocumentacion",
  ipAccederDocumento: baseUrl + "/supervisores_api/public/api/accederDocumento",
  ipTerminarDocumento: baseUrl + "/supervisores_api/public/api/terminarDocumento",
+ ipListarCondiciones: baseUrl + "/supervisores_api/public/api/listarCondicionesLocativas",
+ ipAccederCondicion: baseUrl + "/supervisores_api/public/api/accederCondicion",
+ ipTerminarCondicion: baseUrl + "/supervisores_api/public/api/terminarCondicionesLocativas",
 }

@@ -5,11 +5,9 @@ import {toastr} from '../../../components/Toast';
 import {View, RefreshControl, AsyncStorage} from 'react-native';
 import styles from '../../../styles/Home';
 import {api} from '../../../services/api';
-import { UserInfo } from '../../../components/UserInfo';
 import { COLOR } from '../../../components/Colores';
 
 let items = [];
-let user = [];
 let sucursalActual = null;
 let tiempoInactivo=0;
 let tiempoInactivoInit=0;
@@ -19,8 +17,7 @@ export default class Home extends Component {
     this.state = {
       loading: true,
       refreshing: false,
-      showToast: false,
-      estado:true
+      showToast: false
     };
     let token = this.props.token;
     let newToken = null;
@@ -57,9 +54,6 @@ export default class Home extends Component {
       //console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var actividades = "Actividades";
-      var datos_usuario = "datos_usuario";
-      //console.log(newToken[datos_usuario]);
-      user = newToken[datos_usuario];
       if(response.ok === true && response.status === 200)
       {
           //console.log(Object.values(newToken[actividades]));
@@ -108,7 +102,6 @@ export default class Home extends Component {
         }
         else if(response.status === 401){
           toastr.showToast('Su sesión expiró','danger');
-          user = {};
           handler2 = true;
         }
         else{
@@ -134,7 +127,7 @@ export default class Home extends Component {
    */
   _OnItemPress(index,handler, item)
   {
-    if(this.state.estado !== 'false' || index === 5){
+    if(this.props.estado !== 'false' || index === 5){
       handler(index,token,item);
     }
     else
@@ -144,16 +137,15 @@ export default class Home extends Component {
   }
 
   /**
-   * Obtener Estado del supervisor
+   * Obtener el tiempo inactivo
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.multiGet(['ESTADO','TIME_INACTIVO','TIME_INACTIVO_INIT']);
+      const value = await AsyncStorage.multiGet(['TIME_INACTIVO','TIME_INACTIVO_INIT']);
       if (value !== null) {
-        this.setState({estado : value[0][1]});
-        if(value[1][1] !== null){
-          tiempoInactivoInit = value[2][1];
-          tiempoInactivo = value[1][1] - tiempoInactivoInit;
+        if(value[0][1] !== null){
+          tiempoInactivoInit = value[1][1];
+          tiempoInactivo = value[0][1] - tiempoInactivoInit;
         }
         //console.log(tiempoInactivo);
       }
@@ -161,6 +153,7 @@ export default class Home extends Component {
       console.log(error);
     }
   }
+
   render() {
     /***
      * Mostrar layout luego de cargar tipos de fuente
@@ -176,7 +169,6 @@ export default class Home extends Component {
             colors={[COLOR.verde]}
           />
         }>
-        <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
         <List dataArray={items}
           renderRow={(item) =>
           item.separador === true ?

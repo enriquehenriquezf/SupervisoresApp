@@ -43,6 +43,7 @@ export default class Activity extends Component {
       isVisible: false,
       isVisible2: false,
       isVisibleActividad: false,
+      isVisibleActividad2: false,
       ausencia: false,
       motivo: '',
       selected:'0',
@@ -68,6 +69,7 @@ export default class Activity extends Component {
     totalTimeInit = new Date().getTime();
     timeInit = new Date().getTime();
     imgOverlay = '';
+    items2 = [];
     this.SetChecked = this.SetChecked.bind(this);
     this.ModificarProducto = this.ModificarProducto.bind(this);
     this.setDate = this.setDate.bind(this);
@@ -87,7 +89,8 @@ export default class Activity extends Component {
     }
     navigator.geolocation.clearWatch(this.watchId);
     this.Descripcion();
-    this.ListarDocumentacion();//TODO: validar q solo lo haga en documentacion legal y condiciones locativas, además de hacer la api de condiciones
+    if(items.nombre_tabla === 'documentacion_legal'){this.ListarDocumentacion();}
+    else if(items.nombre_tabla === 'condiciones_locativas'){this.ListarCondiciones();}
     this._retrieveDataInit();
     this._retrieveData();
     this._retrieveDataAusente();
@@ -177,6 +180,7 @@ export default class Activity extends Component {
     });
   }
 
+  
   /**
    * Obtener datos del documento a realizar
    */
@@ -216,7 +220,7 @@ export default class Activity extends Component {
         /**
          * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
          */
-        if(item.documento_vencido === '' || item.documento_vencido === null){//FIXME: modificar imagen no disponible
+        if(item.documento_vencido === '' || item.documento_vencido === null){
           imgTemp1 = noDisponible;
         }
         else{
@@ -246,7 +250,7 @@ export default class Activity extends Component {
       console.log(error);
     });
   }
-
+  
   /**
    * Actualizar datos del documento
    */
@@ -300,6 +304,176 @@ export default class Activity extends Component {
       {
         var token2 = JSON.parse(response._bodyInit);
         that.setState({isVisibleActividad:false});
+        toastr.showToast(token2["message"],'success');
+      }
+      else{        
+        console.log(response);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+  
+  /**
+   * Obtener la lista de Condiciones Locativas a realizar
+   */
+  ListarCondiciones = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var that = this;
+    await fetch(api.ipListarCondiciones, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_actividad: items.id_actividad
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        var token2 = JSON.parse(response._bodyInit);
+        Object.values(token2).forEach(element => {
+          var item = {
+            id: element.id,
+            id_condicion: element.id_condicion,
+            condicion: element.condicion_locativa,
+            estado_condicion: element.estado_condicion
+          }
+          items2.push(item);
+        });
+        /**
+         * items de la lista de condiciones
+         */
+        Lista = items2.map((data,index) => {
+          return(
+            (data.estado_condicion === 'Si' || data.estado_condicion === 'No') ?
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.condicion} value={index} color={'#5cb85c'} />
+            :
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.condicion} value={index} color={'#000000'} />
+          )
+        })
+        that.setState({lista:Lista});
+      }
+      else{        
+        console.log(response);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+  /**
+   * Obtener datos de la condicion a realizar
+   */
+  AccederCondicion = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var that = this;
+    var noDisponible = Imagen.noDisponible;
+    await fetch(api.ipAccederCondicion, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id:items2[this.state.selected].id,
+        id_actividad: items.id_actividad,
+        id_condicion:items2[this.state.selected].id_condicion
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        var token2 = JSON.parse(response._bodyInit);
+        //console.log(token2["message"]);
+        //info = token2["message"].descripcion;
+        var item = {
+          id: token2.id,
+          id_condicion: token2.id_condicion,
+          condicion: token2.condicion_locativa,
+          estado_condicion: token2.estado_condicion,
+          foto_condicion: token2.foto_condicion,
+          observaciones: token2.observaciones
+        }
+        /**
+         * Cambiar image Source por imagen no disponible si no se encuentra la url en la db
+         */
+        if(item.foto_condicion === '' || item.foto_condicion === null){
+          imgTemp1 = noDisponible;
+        }
+        else{
+          imgTemp1 = api.ipImg + item.foto_condicion;
+        }
+        that.setState({documentos: item, isVisibleActividad2:true, imgVencido: imgTemp1, observacion2:item.observaciones, archivo:{}});
+        if(item.estado_condicion === 'Si' || item.estado_condicion === '' || item.estado_condicion === null)
+        {
+          that.SetChecked(1,'Si');
+        }
+        else if(item.estado_condicion === 'No')
+        {
+          that.SetChecked(2,'No');
+        }
+      }
+      else{        
+        console.log(response);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+  /**
+   * Actualizar datos de la condicion locativa
+   */
+  UpdateDataCondicion = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    /** Imagenes de condiciones locativas */
+    let file1 = '';
+    let that = this;
+    if(this.state.archivo.hasOwnProperty('uri')){
+      await Expo.FileSystem.readAsStringAsync(this.state.archivo.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+        file1 = response;
+      });
+    }
+    else{
+      if(this.state.documentos.foto_condicion !== '' && this.state.documentos.foto_condicion !== null){
+        file1 = this.state.imgVencido;
+      }
+    }
+    await fetch(api.ipTerminarCondicion, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_actividad: items.id_actividad,
+        id_condicion: this.state.documentos.id_condicion,
+        estado_condicion: this.state.documentos.estado_condicion,
+        foto_condicion: file1,
+        observaciones: this.state.observacion2,
+        nombre_sucursal:items.cod_sucursal,
+        nombre_condicion:this.state.documentos.condicion
+      })
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        //var conds = that.state.lista;
+        //conds[that.state.selected].props.color = '#5cb85c'
+        var token2 = JSON.parse(response._bodyInit);
+        that.setState({isVisibleActividad2:false});
         toastr.showToast(token2["message"],'success');
       }
       else{        
@@ -467,6 +641,7 @@ export default class Activity extends Component {
     if(calificacion_pv === 'Si' || calificacion_pv === 'No'){
       var docs = this.state.documentos;
       docs.estado_documento = calificacion_pv;
+      docs.estado_condicion = calificacion_pv;
       this.setState({ checked2: i, documentos: docs });
     }
     else{
@@ -863,9 +1038,12 @@ export default class Activity extends Component {
   BorrarProducto(item,index2){
     var array = [...this.state.PRODUCTS];
     var index = array.indexOf(item)
-    
+
     var array2 = [...this.state.PRODUCTS2];
-    var index3 = array2[index2].prods.indexOf(item)
+    var index3 = -1;
+    if(index2 !== undefined){
+      index3 = array2[index2].prods.indexOf(item)
+    }
     if (index !== -1) {
       array.splice(index, 1);
     }
@@ -881,10 +1059,12 @@ export default class Activity extends Component {
   ModificarProducto(item,value,index2){
     var array = [...this.state.PRODUCTS];
     var index = array.indexOf(item);
-    
-    var array2 = [...this.state.PRODUCTS2];
-    var index3 = array2[index2].prods.indexOf(item);
 
+    var array2 = [...this.state.PRODUCTS2];
+    var index3 = -1;
+    if(index2 !== undefined){  
+      index3 = array2[index2].prods.indexOf(item);
+    }
     if (index !== -1) {
       array[index] = {...array[index], cant: value};
       //console.log(array);
@@ -1034,13 +1214,13 @@ export default class Activity extends Component {
                         note
                         mode="dropdown"
                         selectedValue={this.state.selected}
-                        itemStyle={{height:60,fontSize:10}}
+                        itemStyle={{height:100,fontSize:10}}
                         itemTextStyle={{textTransform:'lowercase'}}
                         onValueChange={value => this.setState({selected:value})}
                       >                      
                         {this.state.lista}
-                      </Picker>
-                      <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.AccederDocumento() }><Icon ios="ios-arrow-dropup-circle" android="md-arrow-dropup-circle"></Icon><Text>Modificar Datos</Text></Button>
+                    </Picker>
+                    <Button iconLeft regular block info style={[styles.boton]} onPress={() => this.AccederCondicion() }><Icon ios="ios-arrow-dropup-circle" android="md-arrow-dropup-circle"></Icon><Text>Modificar Datos</Text></Button>
                   </View>
                 :
                   null
@@ -1375,6 +1555,38 @@ export default class Activity extends Component {
             </ScrollView>
           </View>
         </Overlay>
+
+        <Overlay
+          visible={this.state.isVisibleActividad2}
+          animationType="zoomIn"
+          onClose={() => this.setState({isVisibleActividad2: false})}
+          containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+          childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+        >
+          <View>
+            <ScrollView>
+              <Text style={{margin: 5}}>{this.state.isVisibleActividad2 ? this.state.documentos.condicion : ''}</Text>
+              <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
+              <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
+              <Text style={{color:'black', textAlign:'justify'}}>Foto de la condicion locativa</Text>
+              <ListItem thumbnail style={{marginLeft:0}}>
+                <Left>
+                  <TouchableOpacity onPress={() => this.verImagen(true)}>
+                    <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgVencido}}></Image>
+                  </TouchableOpacity>
+                </Left>
+                <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                  <Button iconLeft regular block info style={[styles.boton,{marginLeft:0,marginRight:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                </Body>
+              </ListItem>
+              <Form>
+                <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad2 ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
+              </Form>
+              <Button success regular block style={styles.boton} onPress={() => this.UpdateDataCondicion()}><Text> Actualizar </Text></Button>
+            </ScrollView>
+          </View>
+        </Overlay>
+
         <Overlay
           visible={this.state.isVisible2}
           closeOnTouchOutside 
