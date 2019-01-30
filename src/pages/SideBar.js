@@ -16,7 +16,7 @@ export default class SideBar extends React.Component {
       <Container>
         <Content>
             <View style={{width:"100%", height:600, paddingLeft:20, paddingRight:20}}>
-                <View style={{backgroundColor:COLOR.azul, width:"100%", borderBottomRightRadius:100, height:78, marginLeft:-20}}></View>
+                <View style={{backgroundColor:COLOR.azul, width:"115%", borderBottomRightRadius:100, height:78, marginLeft:-20}}></View>
 
                 <View style={{width:"100%", height:"25%", flexDirection:'row', justifyContent:'space-between', marginTop:20}}>
                     <View style={{backgroundColor:'#00645C', width:"53%", height:"100%", borderRadius:10}}><TouchableOpacity style={{flex:1}} onPress={() => console.log("actividades")}></TouchableOpacity></View>

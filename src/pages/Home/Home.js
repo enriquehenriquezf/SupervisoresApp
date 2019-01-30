@@ -100,7 +100,8 @@ export default class Home extends Component {
         onClose={() => this.drawer._root.close()} 
         initializeOpen={false}
         openDrawerOffset={0}
-        panOpenMask={.5}>
+        panOpenMask={.5}
+        styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}>
         <Container>     
             <Header hasTabs style={{paddingTop: 50, paddingBottom:30, height:"10%", elevation:0, borderBottomRightRadius:100, backgroundColor:COLOR.azul}}>
               <Left>
