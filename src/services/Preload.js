@@ -7,6 +7,15 @@ export const Preload = {
     Image.prefetch('https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585');    
     Image.prefetch(Imagen.noDisponible);  
     Imagen.unidrogas;
+    //TODO: icono de home
+    Imagen.actividad,
+    Imagen.perfil,
+    Imagen.agenda,
+    Imagen.activo,
+    Imagen.inactivo,
+    Imagen.reportes,
+    Imagen.servicioTecnico,
+    Imagen.cerrarSesion,
     Imagen.user;
     Imagen.pass;
     Imagen.back;

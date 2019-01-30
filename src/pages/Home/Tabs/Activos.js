@@ -64,6 +64,7 @@ export default class Home extends Component {
             //console.log(JSON.stringify(element));
             var item = {
               name: keys[i].split('-')[0],
+              titulo: element.titulo,
               sucursal: element.nombre_sucursal,
               cod_sucursal: element.cod_sucursal,
               prioridad: element.id_prioridad,
@@ -87,6 +88,7 @@ export default class Home extends Component {
               longitud: -74.8130534,
               separador: false
             };
+            if(item.titulo !== undefined){item.name = item.titulo;}
             if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:true});}
             if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}); j = j + 1; sucursalActual = element.nombre_sucursal}
             items.push(item);

@@ -5,6 +5,15 @@ export const Imagen = {
     avatar2: 'https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585',
     noDisponible: api.ipIcons + 'icono-supp-01.png',
     unidrogas: require('../../assets/unidrogas.png'),
+    //TODO: icono de home
+    actividad: require('../../assets/Icons/icono-sup-02.png'),
+    perfil: require('../../assets/Icons/icono-suppp-01.png'),//FIXME: cambiar
+    agenda: require('../../assets/Icons/icono-sup-04.png'),
+    activo: require('../../assets/Icons/icono-sup-06.png'),
+    inactivo: require('../../assets/Icons/icono-sup-07.png'),
+    reportes: require('../../assets/Icons/icono-sup-03.png'),
+    servicioTecnico: require('../../assets/Icons/icono-sup-03.png'),//FIXME: cambiar
+    cerrarSesion: require('../../assets/Icons/icono-sup-05.png'),
     user: require('../../assets/Icons/icono-suppp-01.png'),
     pass: require('../../assets/Icons/icono-suppp-03.png'),
     back: require('../../assets/Icons/icono-supp-02.png'),

@@ -21,6 +21,7 @@ export default class Home extends Component {
       estado: true
     };
     let token = this.props.token;
+    this._retrieveData = this._retrieveData.bind(this);
     this._retrieveData();
     console.ignoredYellowBox = ['Require cycle:'];
   }
@@ -96,11 +97,12 @@ export default class Home extends Component {
     return (
       <Drawer
         ref={(ref) => { this.drawer = ref; }}
-        content={<SideBar handler={this.props.handler} handler2={this.props.handler2} handler3={this.props.handler3} token={token} data={this.props.data} indexArray={this.props.indexArray} estado={this.state.estado} user={user}/>}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2} handler3={this.props.handler3} token={token} data={this.props.data} indexArray={this.props.indexArray} user={user} _retrieveData={this._retrieveData} drawer={this.drawer}/>}
         onClose={() => this.drawer._root.close()} 
         initializeOpen={false}
         openDrawerOffset={0}
-        panOpenMask={.5}
+        panOpenMask={.05}
+        panCloseMask={.02}
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}>
         <Container>     
             <Header hasTabs style={{paddingTop: 50, paddingBottom:30, height:"10%", elevation:0, borderBottomRightRadius:100, backgroundColor:COLOR.azul}}>
@@ -112,14 +114,6 @@ export default class Home extends Component {
               <Body>
                 {/*<Title>Actividades</Title>*/}
               </Body>
-              {/*<Right>
-                  <Button transparent onPress={() => this.props.handler2(3,token,[])}>
-                      <Icon ios="ios-calendar" android="md-calendar" style={IconStyles.header}></Icon>
-                  </Button>
-                  <Button transparent onPress={() => this.props.handler2(-1,token,[])}>
-                      <Icon ios="ios-log-out" android="md-log-out" style={IconStyles.header}></Icon>
-                  </Button>
-              </Right>*/}
             </Header>
           <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
           <Tabs tabContainerStyle={{elevation:0}}>
