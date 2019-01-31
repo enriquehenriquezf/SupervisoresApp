@@ -16,9 +16,9 @@ export class RadioButton extends Component {
                 <Right>                    
                 {
                     this.props.checked === this.props.i ?                        
-                        <Radio color='white' selected={true} onPress={() => this.props.SetChecked(this.props.i,this.props.value)}/>
+                        <Radio color='white' selectedColor='white' selected={true} onPress={() => this.props.SetChecked(this.props.i,this.props.value)}/>
                     :
-                        <Radio color='white' selected={false} onPress={() => this.props.SetChecked(this.props.i,this.props.value)}/>
+                        <Radio color='white' selectedColor='white' selected={false} onPress={() => this.props.SetChecked(this.props.i,this.props.value)}/>
                 }
                 </Right>
             </ListItem>
