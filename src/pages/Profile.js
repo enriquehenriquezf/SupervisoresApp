@@ -1,19 +1,20 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item, Thumbnail, ActionSheet } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item, Thumbnail, Drawer } from 'native-base';
 import styles from '../styles/Profile';
 import IconStyles from '../styles/Icons';
 import {toastr} from '../components/Toast';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
-import {View, BackHandler, AsyncStorage, TouchableHighlight} from 'react-native';
+import {View, BackHandler, Image} from 'react-native';
+import SideBar from './SideBar';
 
-var BUTTONS = [
+/*var BUTTONS = [
   { text: "Activo", icon: "checkmark-circle", iconColor: "#5cb85c" },
   { text: "Inactivo", icon: "remove-circle", iconColor: "#d9534f" },
   { text: "Cerrar", icon: "close-circle", iconColor: "#fa213b" }
 ];
-var CANCEL_INDEX = 2;
+var CANCEL_INDEX = 2;*/
 let items = null;
 export default class Profile extends Component {
   constructor(props) {
@@ -25,14 +26,17 @@ export default class Profile extends Component {
     };
     let token = this.props.token;
     items = this.props.data;
-    this._retrieveData();
+    //this._retrieveData();
     this.ChangePass = this.ChangePass.bind(this);
+    this.closeDrawer = this.closeDrawer.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
   async componentWillMount() {
     //console.log(items);
-    this.setState({ loading: false });
+    if(items.length === 0){this.getProfile()}
+    else{this.setState({ loading: false });}
+    
   }
 
   componentDidMount()
@@ -53,6 +57,57 @@ export default class Profile extends Component {
   handleBackPress = () => {
     this.props.handler2(1,token,[]);
     return true;
+  }
+
+  /**
+   * Obtener los datos del usuario
+   */
+  async getProfile()
+  {
+    let handler2 = false;
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    await fetch(api.ipProfileUser, {
+      method: 'GET',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
+      },
+      body: ''
+    }).then(function(response) {
+      //console.log(response);
+      newToken = JSON.parse(response._bodyInit);
+      //console.log(newToken);
+      if(response.ok === true && response.status === 200)
+      {
+        items = newToken;
+      }
+      else
+      {
+        console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+          items = {};
+          handler2 = true;
+        }
+        else{
+          //toastr.showToast(newToken[actividades],'warning');
+        }
+      }
+      //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2 = true;
+      console.log(error);
+    });
+    if(!handler2){
+      this.setState({ loading: false });
+    }
+    else{this.props.handler2(-1,token,[]);}
   }
 
   /**
@@ -94,7 +149,7 @@ export default class Profile extends Component {
   /**
    * Guardar estado del supervisor (Activo/Inactivo)
    */
-  _storeData = async (estado2) => {
+  /*_storeData = async (estado2) => {
     try {
       var state = '';
       this.setState({estado: estado2});
@@ -110,12 +165,12 @@ export default class Profile extends Component {
     } catch (error) {
       console.log(error);
     }
-  }
+  }*/
 
   /**
    * Obtener Estado del supervisor
    */
-  _retrieveData = async () => {
+  /*_retrieveData = async () => {
     try {
       const value = await AsyncStorage.multiGet(['ESTADO','TIME_INACTIVO','TIME_INACTIVO_INIT']);
       var state;
@@ -134,7 +189,7 @@ export default class Profile extends Component {
   /**
    * Cambia el estado de Activo o Inactivo
    */
-  CambiarEstado(){
+  /*CambiarEstado(){
     ActionSheet.show(
       {
         options: BUTTONS,
@@ -155,6 +210,13 @@ export default class Profile extends Component {
         }
       }
     );
+  }*/
+
+  /**
+   * cerrar SideBar
+   */
+  closeDrawer(){
+    this.drawer._root.close();
   }
 
   render() {
@@ -165,71 +227,80 @@ export default class Profile extends Component {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     return (
-      <Container>
-        <Expo.LinearGradient colors={['#0277BD','#FFF', '#FFF']} style={{ flex: 1}} start={[0.5,0.01]} end={[0.5,0.99]}>
-        <Header style={{paddingTop: 20}}>
-        <Left>
-            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
-              <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
-            </Button>
-        </Left>          
-        <Body>
-          <Title>Perfil</Title>
-        </Body>
-        <Right>
-          {
-            this.state.estado === true ?
-              <TouchableHighlight onPress={() => this.CambiarEstado()}>
-                <View style={IconStyles.estado}>
-                  <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={IconStyles.activo}/>
-                  <Title style={IconStyles.StateTitle}>Activo</Title>
-                  <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
-                </View>
-              </TouchableHighlight>
-            :
-              <TouchableHighlight onPress={() => this.CambiarEstado()}>
-                <View style={IconStyles.estado}>
-                  <Icon active ios='ios-remove-circle' android='md-remove-circle' style={IconStyles.inactivo}/>
-                  <Title style={IconStyles.StateTitle}>Inactivo</Title>
-                  <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
-                </View>
-              </TouchableHighlight>
-          }
-        </Right>
-        </Header>
-          <Content>
-            <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
-                <Thumbnail large
-                source={{uri: Imagen.avatar2}}
-                style={{marginLeft:'auto', marginRight:'auto', borderWidth:4, borderColor:'#FFF', width: 160, height: 160, borderRadius:80}}
-                />
-                <H2 style={{margin: 5, marginLeft:'auto', marginRight:'auto'}}>{items.nombre} {items.apellido}</H2>
-                <Item style={{borderBottomColor: '#039BE5'}}>
-                    <Icon ios="ios-card" android="md-card" style={{color: '#039BE5'}}></Icon>
-                    <Text style={styles.text}>cedula: </Text>
-                    <Text>{items.cedula}</Text>
-                </Item>
-                <Item style={{borderBottomColor: '#039BE5'}}>
-                    <Icon ios="ios-code" android="md-code" style={{color: '#039BE5'}}></Icon>
-                    <Text style={styles.text}>codigo: </Text>
-                    <Text>{items.codigo}</Text>
-                </Item>
-                <Item style={{borderBottomColor: '#039BE5'}}>
-                    <Icon ios="ios-mail" android="md-mail" style={{color: '#039BE5'}}></Icon>
-                    <Text style={styles.text}>correo: </Text>
-                    <Text>{items.correo}</Text>
-                </Item>
-                <Item style={{borderBottomColor: '#039BE5'}}>
-                    <Icon ios="ios-phone-portrait" android="md-phone-portrait" style={{color: '#039BE5', marginLeft:5}}></Icon>
-                    <Text style={styles.text}>  tels:     </Text>
-                    <Text>{items.telefono}</Text>
-                </Item>
-                <Button info regular block style={styles.boton} onPress={() => this.ChangePass(this.props.handler2)}><Text> Cambiar Contraseña </Text></Button>
-                <Button danger regular block style={styles.boton} onPress={() => this.props.handler2(-1,token,[])}><Text> Cerrar Sesión </Text></Button>
-            </View>
-          </Content>
-          </Expo.LinearGradient>
-      </Container>
+      <Drawer
+        ref={(ref) => { this.drawer = ref; }}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={5} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        onClose={() => this.drawer._root.close()} 
+        initializeOpen={false}
+        openDrawerOffset={0}
+        panOpenMask={.05}
+        panCloseMask={.02}
+        styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
+        >
+        <Container>
+          <Header hasTabs style={IconStyles.navbar}>
+            <Left>
+              <Button transparent onPress={() => this.drawer._root.open()}>
+                <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+              </Button>
+              {/*<Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
+                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
+              </Button>*/}
+            </Left>       
+            <Body>
+              {/*<Title>Perfil</Title>*/}
+            </Body>
+            <Right>
+              {/*
+                this.state.estado === true ?
+                  <TouchableHighlight onPress={() => this.CambiarEstado()}>
+                    <View style={IconStyles.estado}>
+                      <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={IconStyles.activo}/>
+                      <Title style={IconStyles.StateTitle}>Activo</Title>
+                      <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
+                    </View>
+                  </TouchableHighlight>
+                :
+                  <TouchableHighlight onPress={() => this.CambiarEstado()}>
+                    <View style={IconStyles.estado}>
+                      <Icon active ios='ios-remove-circle' android='md-remove-circle' style={IconStyles.inactivo}/>
+                      <Title style={IconStyles.StateTitle}>Inactivo</Title>
+                      <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
+                    </View>
+                  </TouchableHighlight>
+              */}
+            </Right>
+          </Header>
+            <Content>
+              <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
+                  {/* <Thumbnail square large source={Imagen.profileBorder} style={{width:160, height:160}}/> */}
+                  <Thumbnail large
+                  source={{uri: items.foto}}
+                  style={styles.foto}
+                  />
+                  <H2 style={styles.textH2}>{items.nombre} {items.apellido}</H2>
+                  <Item style={styles.item}>
+                      {/* <Icon ios="ios-card" android="md-card" style={{color: '#039BE5'}}></Icon> */}
+                      <Image source={Imagen.user} style={styles.icono}></Image>
+                      <Text style={styles.text}>{items.cedula}</Text>
+                  </Item>
+                  <Item style={styles.item}>
+                      <Image source={Imagen.code} style={styles.icono}></Image>
+                      <Text style={styles.text}>{items.codigo}</Text>
+                  </Item>
+                  <Item style={styles.item}>
+                      <Image source={Imagen.mail} style={styles.icono}></Image>
+                      <Text style={styles.text}>{items.correo}</Text>
+                  </Item>
+                  <Item style={styles.item}>
+                      <Image source={Imagen.phone} style={styles.icono}></Image>
+                      <Text style={styles.text}>{items.telefono}</Text>
+                  </Item>
+                  <Button info regular block style={styles.boton} onPress={() => this.ChangePass(this.props.handler2)}><Text style={styles.textoBoton}> Cambiar Contraseña </Text></Button>
+              </View>
+            </Content>
+        </Container>
+      </Drawer>
     );
   }
 }

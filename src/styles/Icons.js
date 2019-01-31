@@ -1,6 +1,19 @@
 import { StyleSheet } from 'react-native';
 import {Platform} from 'react-native';
+import { COLOR } from '../components/Colores';
 export default StyleSheet.create({
+    navbar:{
+        paddingTop: 50,
+        paddingBottom:30,
+        height:"10%",
+        elevation:0,
+        borderBottomRightRadius:100,
+        backgroundColor:COLOR.azul
+    },
+    menu: {
+        fontSize: 40,
+        color: 'white'
+    },
     header: {
         fontSize: 40,
         color: Platform.OS === 'ios' ? 'black' : 'white'

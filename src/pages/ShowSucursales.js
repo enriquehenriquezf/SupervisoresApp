@@ -1,10 +1,12 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Icon, Button, Spinner, Card } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Icon, Button, Spinner, Card, Drawer } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View, BackHandler} from 'react-native';
 import IconStyles from '../styles/Icons';
-import {api} from '../services/api'
+import {api} from '../services/api';
+import SideBar from './SideBar';
+import { COLOR } from '../components/Colores';
 
 let items = [];
 let sucursalActual = null;
@@ -22,6 +24,7 @@ export default class ShowSucursales extends Component {
     items = [];
     dataArray = [];
     contenido = [];
+    this.closeDrawer = this.closeDrawer.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -129,6 +132,13 @@ export default class ShowSucursales extends Component {
     else{this.props.handler2(-1,token,[]);}
   }
 
+  /**
+   * cerrar SideBar
+   */
+  closeDrawer(){
+    this.drawer._root.close();
+  }
+
   render() {
     /***
      * Mostrar layout luego de cargar las sucursales con planes de trabajo
@@ -137,39 +147,48 @@ export default class ShowSucursales extends Component {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     return (
-      <Container>
-        <Header style={{paddingTop: 20}}>
-        <Left>
-            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
-            </Button>
-        </Left>          
-        <Body>
-          <Title>Actividades</Title>
-        </Body>
-        <Right>
-            <Button transparent onPress={() => this.props.handler2(-1,token,[])}>
-                <Icon ios="ios-log-out" android="md-log-out" style={IconStyles.header}></Icon>
-            </Button>
-        </Right>
-        </Header>
-        <Content>
-          <Card style={{borderRadius:5}}>
-            <List dataArray={items}
-              renderRow={(item) =>
-              item.index !== items.length-1 ?
-                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)} style={{borderBottomColor: "#29B6F6", borderBottomWidth:1.5}}>
-                  <Text>{item.sucursal}</Text>
-                </ListItem>
+      <Drawer
+        ref={(ref) => { this.drawer = ref; }}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={3} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        onClose={() => this.drawer._root.close()} 
+        initializeOpen={false}
+        openDrawerOffset={0}
+        panOpenMask={.05}
+        panCloseMask={.02}
+        styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
+        >
+        <Container>
+          <Header hasTabs style={IconStyles.navbar}>
+            <Left>
+              <Button transparent onPress={() => this.drawer._root.open()}>
+                <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+              </Button>
+            </Left>           
+            <Body>
+              {/* <Title>Actividades</Title> */}
+            </Body>
+            <Right>
+            </Right>
+          </Header>
+          <Content>
+            {
+              dataArray.length > 0 ?
+                  <List dataArray={items}
+                    style={{marginTop:30, marginLeft:20, marginRight:20}}
+                    renderRow={(item) =>
+                      <Card style={{borderRadius:10, backgroundColor:COLOR.azul, borderColor:COLOR.azul, borderWidth:2}}>
+                        <ListItem button onPress={() => this.props.handler2(4,token,dataArray[item.index])} style={{borderBottomColor:'rgba(255,255,255,0)'}}>
+                          <Text style={{fontFamily:'BebasNeueBold', color:'white', fontSize:28}}>{item.sucursal}</Text>
+                        </ListItem>
+                      </Card>
+                    }>
+                  </List>
               :
-                <ListItem button onPress={() => this.props.handler3(4,token,dataArray,item.index)} style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                  <Text>{item.sucursal}</Text>
-                </ListItem>
-              }>
-            </List>
-          </Card>
-        </Content>
-      </Container>
+                null
+            }
+          </Content>
+        </Container>
+      </Drawer>
     );
   }
 }

@@ -1,11 +1,14 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item, Input } from 'native-base';
-import styles from '../styles/Login';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, H2, Item, Input,Drawer, Thumbnail } from 'native-base';
+import styles from '../styles/Profile';
 import IconStyles from '../styles/Icons';
 import {toastr} from '../components/Toast';
 import {api} from '../services/api'
-import {View, BackHandler} from 'react-native';
+import {View, BackHandler,Image, KeyboardAvoidingView} from 'react-native';
+import { Imagen } from '../components/Imagenes';
+import { COLOR } from '../components/Colores';
+import SideBar from './SideBar';
 
 let items = null;
 export default class ChangePass extends Component {
@@ -22,6 +25,7 @@ export default class ChangePass extends Component {
     let token = this.props.token;
     items = this.props.data;
     this.changePass = this.changePass.bind(this);
+    this.closeDrawer = this.closeDrawer.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -70,7 +74,7 @@ export default class ChangePass extends Component {
         },
         body: JSON.stringify({email: items.correo,password: this.state.pass, codigo: this.state.code})
       }).then(function(response) {
-        console.log(response);
+        //console.log(response);
         if(response.ok === true)
         {
           toastr.showToast(JSON.parse(response._bodyInit),'success');
@@ -87,6 +91,9 @@ export default class ChangePass extends Component {
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }
+          else if(response.status === 400){
+            toastr.showToast(JSON.parse(response._bodyInit),'warning');
+          }
           else{
             toastr.showToast('Credenciales incorrectas','danger');
           }
@@ -95,7 +102,14 @@ export default class ChangePass extends Component {
       }).catch(function(error){
         console.log(error);
       });
-    }else{toastr.showToast('Contraseñas no coinciden','danger');}
+    }else{toastr.showToast('Contraseñas no coinciden','warning');}
+  }
+
+  /**
+   * cerrar SideBar
+   */
+  closeDrawer(){
+    this.drawer._root.close();
   }
 
   render() {
@@ -106,47 +120,60 @@ export default class ChangePass extends Component {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
     return (
-      <Container>
-        <Expo.LinearGradient colors={['#0277BD','#0277BD', '#FFF']} style={{ flex: 1}} start={[0.5,0.01]} end={[0.5,0.99]}>
-        <Header style={{paddingTop: 20}}>
-        <Left>
-            <Button transparent style={IconStyles.back} onPress={() => this.handleBackPress()}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
-            </Button>
-        </Left>          
-        <Body>
-          <Title>Cambiar Contraseña</Title>
-        </Body>
-        <Right/>
-        </Header>
-          <Content>
-            <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
-              <H2 style={{margin: 5, marginLeft:'auto', marginRight:'auto'}}>{items.nombre} {items.apellido}</H2>
-            </View>
-            <Item regular style={styles.form}>
-              <Icon active ios='ios-person' android='md-person' style={styles.icon}/>
-              <Input placeholder='Correo' placeholderTextColor='#f0f0f0' defaultValue={items.correo} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={styles.input}/>
-            </Item>
-            <Item regular style={styles.form}>
-              <Icon active ios='ios-code' android='md-code'  style={styles.icon}/>
-              <Input placeholder='Codigo' placeholderTextColor='#f0f0f0' defaultValue={this.state.code} onChangeText={(text) => this.setState({code: text})} autoCapitalize='none'  style={styles.input}/>
-            </Item>
-            <Item regular style={styles.form}>
-              <Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>
-              <Input placeholder='Contraseña' placeholderTextColor='#f0f0f0' defaultValue={this.state.pass} secureTextEntry={true}  onChangeText={(text) => this.setState({pass: text})} autoCapitalize='none'  style={styles.input}/>
-            </Item>
-            <Item regular style={styles.form}>
-              <Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>
-              <Input placeholder='Confirmar Contraseña' placeholderTextColor='#f0f0f0' defaultValue={this.state.verifyPass} secureTextEntry={true}  onChangeText={(text) => this.setState({verifyPass: text})} autoCapitalize='none'  style={styles.input}/>
-            </Item>
-            <Item regular style={styles.boton}>
-              <Body>
-                <Button success regular block style={styles.boton2} onPress={() => this.changePass(this.props.handler2)}><Text style={styles.text}> Cambiar Contraseña </Text></Button>
-              </Body>
-            </Item>
-          </Content>
-          </Expo.LinearGradient>
-      </Container>
+      <Drawer
+        ref={(ref) => { this.drawer = ref; }}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={-1} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        onClose={() => this.drawer._root.close()} 
+        initializeOpen={false}
+        openDrawerOffset={0}
+        panOpenMask={.05}
+        panCloseMask={.02}
+        styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
+        >
+        <Container>
+          <Header hasTabs style={IconStyles.navbar}>
+            <Left>
+              <Button transparent onPress={() => this.drawer._root.open()}>
+                <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+              </Button>
+            </Left>       
+            <Body>
+              {/*<Title>Cambiar Contraseña</Title>*/}
+            </Body>
+            <Right>
+            </Right>
+          </Header>
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: 1}}>
+            <Content>
+              <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
+                  {/* <Thumbnail square large source={Imagen.profileBorder} style={{width:160, height:160}}/> */}
+                  <Thumbnail large
+                  source={{uri: items.foto}}
+                  style={styles.foto}
+                  />
+                  <H2 style={styles.textH2}>{items.nombre} {items.apellido}</H2>
+                  <Item style={styles.item}>
+                      <Image source={Imagen.mail} style={styles.icono}></Image>
+                      <Input placeholder='Correo' placeholderTextColor={COLOR.gris} defaultValue={items.correo} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={styles.input}/>
+                  </Item>
+                  <Item style={styles.item}>
+                      <Image source={Imagen.code} style={styles.icono}></Image>
+                      <Input placeholder='Codigo' placeholderTextColor={COLOR.gris} defaultValue={this.state.code} onChangeText={(text) => this.setState({code: text})} autoCapitalize='none' keyboardType='number-pad'  style={styles.input}/>
+                  </Item>
+                  <Item style={styles.item}>
+                      <Image source={Imagen.pass} style={styles.icono}></Image>
+                      <Input placeholder='Contraseña' placeholderTextColor={COLOR.gris} defaultValue={this.state.pass} secureTextEntry={true}  onChangeText={(text) => this.setState({pass: text})} autoCapitalize='none'  style={styles.input}/>
+                  </Item>
+                  <Item style={styles.item}>
+                      <Image source={Imagen.pass} style={styles.icono}></Image>
+                      <Input placeholder='Confirmar Contraseña' placeholderTextColor={COLOR.gris} defaultValue={this.state.verifyPass} secureTextEntry={true}  onChangeText={(text) => this.setState({verifyPass: text})} autoCapitalize='none'  style={styles.input}/>
+                  </Item>
+                  <Button info regular block style={styles.boton2} onPress={() => this.changePass(this.props.handler2)}><Text style={styles.textoBoton}> Cambiar Contraseña </Text></Button>
+              </View>
+            </Content>
+          </KeyboardAvoidingView>
+        </Container>
+      </Drawer>
     );
   }
 }

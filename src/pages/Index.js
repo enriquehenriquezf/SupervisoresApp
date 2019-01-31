@@ -25,7 +25,6 @@ export default class Index extends Component {
     }
     this.handler = this.handler.bind(this);
     this.handler2 = this.handler2.bind(this);
-    this.handler3 = this.handler3.bind(this);
     this._OnLogout = this._OnLogout.bind(this);
     console.ignoredYellowBox = ['Setting a timer', 'Require cycle:'];
     console.ignoredYellowBox = ['Require cycle:'];
@@ -114,17 +113,6 @@ export default class Index extends Component {
    * @param {int} index valor del layout al cual se quiere acceder
    * @param token token obtenido de otro layout
    * @param {Array} data datos del plan de trabajo seleccionado
-   * @param {int} i indice del array
-   */
-  handler3(index,token,data,i) {
-    this.setState({token: token, data: data, indexArray:i})
-    this.switchScreen(index);
-  }
-  /***
-   * Obtiene el token y un valor de un layout para cargar otro layout
-   * @param {int} index valor del layout al cual se quiere acceder
-   * @param token token obtenido de otro layout
-   * @param {Array} data datos del plan de trabajo seleccionado
    */
   handler2(index,token,data) {
     this.setState({token: token, data: data})
@@ -180,7 +168,7 @@ export default class Index extends Component {
     return (
       <Root>
         <AppComponent 
-        handler={this.handler} handler2={this.handler2} handler3={this.handler3} 
+        handler={this.handler} handler2={this.handler2}
         token={this.state.token} 
         data={this.state.data} 
         indexArray={this.state.indexArray} 

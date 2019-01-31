@@ -1,12 +1,13 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content,Text, Icon, Button, Spinner, Card } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content,Text, Icon, Button, Spinner, Card, Drawer } from 'native-base';
 import {View, BackHandler} from 'react-native';
 import IconStyles from '../styles/Icons';
-import {api} from '../services/api'
+import SideBar from './SideBar';
+import { COLOR } from '../components/Colores';
 
 let dataArray = [];
-let indexArray = 0;
+//let indexArray = 0;
 let items = [];
 let SUCURSAL = 'Sucursal';
 export default class ShowActivities extends Component {
@@ -19,7 +20,8 @@ export default class ShowActivities extends Component {
     let newToken = null;
     items = [];
     dataArray = this.props.data;
-    indexArray = this.props.indexArray;
+    //indexArray = this.props.indexArray;
+    this.closeDrawer = this.closeDrawer.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -53,7 +55,8 @@ export default class ShowActivities extends Component {
     var i = 0;
     var j = 0;
     var content = [];
-    dataArray[indexArray].forEach(element => {
+    //console.log(dataArray);
+    dataArray.forEach(element => {
       //console.log(element);
       if(i === 0){
         nombreActual = element.title;
@@ -76,6 +79,13 @@ export default class ShowActivities extends Component {
     this.setState({ loading: false });
   }
 
+  /**
+   * cerrar SideBar
+   */
+  closeDrawer(){
+    this.drawer._root.close();
+  }
+
   render() { 
     /***
      * Mostrar layout luego de cargar los datos
@@ -86,51 +96,59 @@ export default class ShowActivities extends Component {
     /**
      * mostrar las fechas de una actividad dentro de un solo componente
      */
-    const activities = items.map((data) => {
+    const activities = items.map((data,index) => {
       return(
-        <Card key={Math.floor(Math.random() * 1000) + 1} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0}}>
-          <Text style={{color: "#039BE5", fontSize:20}}> {data.title}</Text>
+        <Card key={index} style={{borderRadius:10,backgroundColor:COLOR.azul, borderColor:COLOR.azul, borderWidth:1, marginTop:25, marginLeft:20, marginRight:20}}>
+          <Text style={{color:'white', fontSize:24, fontFamily:'BebasNeueBold', textAlign:'center'}}> {data.title}</Text>
           {
-            data.content.map((data2) => {
-              return(             
-                <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderRadius: 5}}>
-                  <Text> Fecha inicio: {data2.fecha_inicio}</Text>
-                  <Text> Fecha fin: {data2.fecha_fin}</Text>
-                </Card>
+            data.content.map((data2,index2) => {
+              return(
+                index2 !== data.content.length-1?
+                  <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,marginTop:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0}}>
+                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha inicio: {data2.fecha_inicio}</Text>
+                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha fin: {data2.fecha_fin}</Text>
+                  </Card>
+                :
+                  <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
+                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha inicio: {data2.fecha_inicio}</Text>
+                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha fin: {data2.fecha_fin}</Text>
+                  </Card>
               )
             })
-          }
-          {
-            data.index !== items.length-1 ? 
-              <View style={{backgroundColor:'#039BE5', marginLeft:10, marginRight:10, marginTop:10, height:1.5,
-              elevation:2, shadowOpacity:0.2, shadowColor:'#039BE5' }} />
-            :
-              null
           }
         </Card>
       )
     })
     return (
-      <Container>
-        <Header style={{paddingTop: 20}}>
-        <Left>
-            <Button transparent style={IconStyles.back} onPress={() => this.props.handler2(3,token,[])}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
-            </Button>
-        </Left>          
-        <Body>
-          <Title>{SUCURSAL.substring(0,1) + SUCURSAL.substring(1,SUCURSAL.length).toLowerCase()}</Title>
-        </Body>
-        <Right>
-            <Button transparent onPress={() => this.props.handler2(-1,token,[])}>
-                <Icon ios="ios-log-out" android="md-log-out" style={IconStyles.header}></Icon>
-            </Button>
-        </Right>
-        </Header>
-        <Content>          
-          {activities}
-        </Content>
-      </Container>
+      <Drawer
+        ref={(ref) => { this.drawer = ref; }}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={-1} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        onClose={() => this.drawer._root.close()} 
+        initializeOpen={false}
+        openDrawerOffset={0}
+        panOpenMask={.05}
+        panCloseMask={.02}
+        styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
+        >
+        <Container>
+          <Header hasTabs style={IconStyles.navbar}>
+            <Left>
+              <Button transparent onPress={() => this.drawer._root.open()}>
+                <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+              </Button>
+            </Left>             
+            <Body>
+              {/* <Title>{SUCURSAL.substring(0,1) + SUCURSAL.substring(1,SUCURSAL.length).toLowerCase()}</Title> */}
+            </Body>
+            <Right>
+            </Right>
+          </Header>
+          <Content>
+            <Text style={{fontFamily:'BebasNeueBold',color: COLOR.azul,fontSize: 28, marginLeft:20, marginTop:10}}>{SUCURSAL}</Text>
+            {activities}
+          </Content>
+        </Container>
+      </Drawer>
     );
   }
 }

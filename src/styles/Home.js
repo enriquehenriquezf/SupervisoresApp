@@ -20,10 +20,10 @@ export default StyleSheet.create({
     },
     separadorSucursales:{
         flex:1,
-        height:.6,
-        backgroundColor:'#afafaf88',
+        height:1,
+        backgroundColor:'#afafaf44',
         marginTop: 40,
-        elevation:5,
+        elevation:4,
         shadowOffset:{height:5}
     },
     ConBorde:{

@@ -22,6 +22,7 @@ export default class Home extends Component {
     };
     let token = this.props.token;
     this._retrieveData = this._retrieveData.bind(this);
+    this.closeDrawer = this.closeDrawer.bind(this);
     this._retrieveData();
     console.ignoredYellowBox = ['Require cycle:'];
   }
@@ -42,8 +43,10 @@ export default class Home extends Component {
 
   async componentWillMount() {
     this.getProfile();
-  }  /**
-   * Leer las actividades a realizar durante el día actual.
+  }  
+  
+  /**
+   * Obtener los datos del usuario
    */
   async getProfile()
   {
@@ -93,22 +96,31 @@ export default class Home extends Component {
     else{this.props.handler2(-1,token,[]);}
   }
 
+  /**
+   * cerrar SideBar
+   */
+  closeDrawer(){
+    this.drawer._root.close();
+  }
+
+
   render() {
     return (
       <Drawer
         ref={(ref) => { this.drawer = ref; }}
-        content={<SideBar handler={this.props.handler} handler2={this.props.handler2} handler3={this.props.handler3} token={token} data={this.props.data} indexArray={this.props.indexArray} user={user} _retrieveData={this._retrieveData} drawer={this.drawer}/>}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2} layout={1} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
         onClose={() => this.drawer._root.close()} 
         initializeOpen={false}
         openDrawerOffset={0}
         panOpenMask={.05}
         panCloseMask={.02}
-        styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}>
+        styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
+        >
         <Container>     
-            <Header hasTabs style={{paddingTop: 50, paddingBottom:30, height:"10%", elevation:0, borderBottomRightRadius:100, backgroundColor:COLOR.azul}}>
+            <Header hasTabs style={IconStyles.navbar}>
               <Left>
                   <Button transparent onPress={() => this.drawer._root.open()}>
-                    <Icon ios="ios-menu" android="md-menu" style={IconStyles.header}></Icon>
+                    <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
                   </Button>
               </Left>          
               <Body>
@@ -117,10 +129,10 @@ export default class Home extends Component {
             </Header>
           <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
           <Tabs tabContainerStyle={{elevation:0}}>
-            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Activos</Text></View></TabHeading>}>
+            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginLeft:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Activos</Text></View></TabHeading>}>
               <Activos handler2={this.props.handler2} token={token} data={this.props.data} estado={this.state.estado}/>
             </Tab>
-            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Completados</Text></View></TabHeading>}>
+            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginRight:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Completados</Text></View></TabHeading>}>
               <Completados handler2={this.props.handler2} token={token} data={this.props.data} estado={this.state.estado}/>
             </Tab>
           </Tabs>
