@@ -39,6 +39,7 @@ export default class Login extends Component {
     let username = this.state.email;
     let pass = this.state.password;
     this._storeData();
+    var that = this;
     fetch(api.ipLogin, {
     method: 'POST',
     headers: {
@@ -53,6 +54,7 @@ export default class Login extends Component {
       {
         token = response;
         fail = 0;
+        that.getPorcentaje(token);
         handler(1,token);
         toastr.showToast('Ha iniciado sesión!','success');
       }
@@ -76,6 +78,48 @@ export default class Login extends Component {
   }
 
   /**
+   * Obtener cantidad de las actividades (activas, completas, noRealizadas)
+   */
+  async getPorcentaje(token2){
+    let bodyInit = JSON.parse(token2._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var that = this;
+    await fetch(api.ipPorcentajeActividades, {
+      method: 'GET',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },
+      body: ''
+      }).then(function(response) {
+        //console.log(response);
+        if(response.ok === true)
+        {
+          var porcentajes = JSON.parse(response._bodyInit);
+          var general = (porcentajes.porcentaje_general.actividades_completas / porcentajes.porcentaje_general.todas_las_actividades) * 100;
+          that._storeDataPorcentajes(Math.floor(general),porcentajes);
+          //console.log(Math.floor(general));
+        }
+        else
+        {
+          console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else{
+            //toastr.showToast('Credenciales incorrectas','danger');
+          }
+        }
+        return response.json();
+      }).catch(function(error){
+        console.log(error);
+        toastr.showToast('Verifique su conexión a internet','warning');
+        if(error.toString().includes('Network request failed')){toastr.showToast('Contactese con el administrador','warning');}
+    });
+  }
+
+  /**
    * Guardar datos de usuario y contraseña en los datos globales de la aplicación
    */
   _storeData = async () => {
@@ -92,6 +136,17 @@ export default class Login extends Component {
       } catch (error) {
         console.log(error);
       }
+    }
+  }
+
+  /**
+   * Guardar datos de cantidad de actividades
+   */
+  _storeDataPorcentajes = async (general,porcentajes) => {
+    try {
+      await AsyncStorage.multiSet([['PORCENTAJE', ''+general],['PORCENTAJES', ''+porcentajes]]);
+    } catch (error) {
+      console.log(error);
     }
   }
 

@@ -52,7 +52,7 @@ export default class Index extends Component {
       });
       await Expo.Asset.loadAsync([
         Imagen.unidrogas,
-        //TODO: icono de home
+        Imagen.home,
         Imagen.actividad,
         Imagen.perfil,
         Imagen.agenda,

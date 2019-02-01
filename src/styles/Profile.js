@@ -69,7 +69,8 @@ export default StyleSheet.create({
         borderRadius:80
     },
     icono:{
-        width:30,
-        height:30
+        width:21,
+        height:21,
+        margin:4
     }
 });

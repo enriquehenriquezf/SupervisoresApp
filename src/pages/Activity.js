@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, H2, Card, Input, Picker, DatePicker, Drawer } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity,FlatList, ScrollView} from 'react-native';
+import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity,FlatList, ScrollView, Keyboard} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
 import NumericInput from 'react-native-numeric-input';
 import Overlay from 'react-native-modal-overlay';
@@ -27,6 +27,7 @@ let imgTemp2 = '';
 let TIEMPOAUSENCIA = 1800000;// más de media hora ausente     ( > 1800000 ) 
 let items2 = [];
 let Lista = null;
+let closingKeyboard;
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -1032,7 +1033,7 @@ export default class Activity extends Component {
       return [];
     }
     //console.log(this.state.productos);
-    return this.state.productos.filter(prod => prod.nombre_comercial.toLowerCase().search(query.toLowerCase()) >= 0);
+    return this.state.productos.filter(prod => prod.nombre_comercial.toLowerCase().indexOf(query.toLowerCase()) >= 0);//this.state.productos.filter(prod => prod.nombre_comercial.toLowerCase().search(query.toLowerCase()) >= 0);
   }
 
   /**
@@ -1078,6 +1079,7 @@ export default class Activity extends Component {
     this.setState({PRODUCTS: array, PRODUCTS2: array2});
     this.forceUpdate();
   }
+
   /** Cambiar opcion de motivo de ausencia */
   onValueChange(value) {
     this.setState({
@@ -1094,6 +1096,17 @@ export default class Activity extends Component {
       this.setState({chosenDate: newDate, PRODUCTS: array});
       this.forceUpdate();
     }
+  }
+
+  /**
+   * Cerrar el teclado despues de x tiempo
+   * @param x tiempo de espera para cerrar el teclado
+   */
+  closeKeyBoard(x){
+    clearTimeout(closingKeyboard);
+    closingKeyboard = setTimeout(function () {
+      Keyboard.dismiss()      
+    }, x*1000);
   }
 
   /**
@@ -1143,14 +1156,14 @@ export default class Activity extends Component {
             </Right>
           </Header>
           <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>
-            <Content>
+            <Content keyboardShouldPersistTaps='true'>
               <Text style={styles.sucursal}>{items.sucursal}</Text>
               <H2 style={styles.actividad}>{items.name}</H2>
               <Card style={{marginBottom: 10, marginTop: 10, elevation:0, borderColor:'rgba(255,255,255,0)'}}>
                 {
                   items.nombre_tabla === 'apertura' ?
                     <View>
-                      <Text style={{margin: 10}}>Hora de apertura: </Text>
+                      <Text style={styles.textInfo}>Hora de apertura: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Puntual'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Tarde'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={3} value={'Muy Tarde'} checked={this.state.checked}></RadioButton>
@@ -1161,7 +1174,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'kardex' ?
                     <View>
-                      <Text style={{margin: 10}}>Elaboración: </Text>
+                      <Text style={styles.textInfo}>Elaboración: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <FlatList data={this.state.LABORATORIES}
@@ -1170,18 +1183,21 @@ export default class Activity extends Component {
                         renderItem={({item,index}) =>
                             <View key={Math.floor(Math.random() * 1000) + 1}>
 
-                              <Text style={{margin: 5, fontWeight: 'bold'}}>{item.nuevo ?<Icon onPress={() => {var array = [...this.state.LABORATORIES]; var array2 = [...this.state.productos2]; array.splice(index,1); array2.splice(index,1); this.setState({LABORATORIES: array, PRODUCTS2: array, productos2:array2});}} ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>:null} Laboratorio: {item.nombre}</Text>
-                              <Text style={{margin: 5, fontWeight: 'bold'}}>Productos faltantes o sobrantes: </Text>
+                              <Text style={styles.textDocumento}>{item.nuevo ?<Icon onPress={() => {var array = [...this.state.LABORATORIES]; var array2 = [...this.state.productos2]; array.splice(index,1); array2.splice(index,1); this.setState({LABORATORIES: array, PRODUCTS2: array, productos2:array2});}} ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>:null} Laboratorio: {item.nombre}</Text>
+                              <Text style={styles.textDocumento}>Productos faltantes o sobrantes: </Text>
                               <Autocomplete
                                 autoCapitalize="none"
                                 data={this.state.productos2[index].prods}
                                 defaultValue={this.state.query2[index]}
+                                onChangeText={() => this.closeKeyBoard(1)}
                                 onEndEditing={text => this.BuscarProducto(text.nativeEvent.text,item.dk,index)}
                                 placeholder="Producto a buscar"
+                                inputContainerStyle={styles.autocompletar}
+                                listStyle={styles.autocompletarLista}
                                 renderItem={item => 
                                   (
                                     <TouchableOpacity onPress={() => {let {query2,PRODUCTS2,productos2} = this.state; query2[index] = ''; productos2[index].prods = []; var prods = PRODUCTS2[index].prods; prods.push({nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}); PRODUCTS2[index] = {...PRODUCTS2[index], prods: prods }; this.setState({ query2 , PRODUCTS2, productos2 }) } }>
-                                      <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
+                                      <Text style={styles.producto}>{item.nombre_comercial}</Text>
                                     </TouchableOpacity>
                                   )
                                 }
@@ -1192,11 +1208,11 @@ export default class Activity extends Component {
                                     <View style={{flex:2, justifyContent:'flex-start'}}>
                                       <ListItem button onPress={() => this.BorrarProducto(item,index)}>
                                         <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                                        <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
+                                        <Text style={styles.productosList}>{item.nombre_comercial}</Text>
                                       </ListItem>
                                     </View>
                                     <View style={{flex:1, justifyContent:'center'}}>
-                                      <NumericInput rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value,index)}/>
+                                      <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value,index)}/>
                                     </View>
                                   </View>
                                 }>
@@ -1204,16 +1220,18 @@ export default class Activity extends Component {
                             </View>
                         }>
                       </FlatList>
-                      <Text style={{margin: 5, fontWeight: 'bold'}}>Agregar Laboratorio: </Text>
+                      <Text style={styles.textDocumento}>Agregar Laboratorio: </Text>
                       <Autocomplete
                         autoCapitalize="none"
                         data={labs}
                         defaultValue={query3}
                         onChangeText={text => this.BuscarLaboratorio(text)}
                         placeholder="Laboratorio a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
                         renderItem={item => (
                           <TouchableOpacity onPress={() => {var array = [...this.state.PRODUCTS2]; var array2 = [...this.state.productos2]; array.push({dk:item.dk, nombre:item.nombre,prods:[],nuevo:true}); array2.push({index: array2.length,prods:[]}); this.setState({ query3: '', laboratorios:[], PRODUCTS2:array, LABORATORIES:array,productos2:array2 })} }>
-                            <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}><Icon ios='ios-add-circle-outline' android="md-add-circle-outline" style={{color: '#5cb85c', fontSize: 20}}></Icon> {item.nombre}</Text>
+                            <Text style={styles.producto}><Icon ios='ios-add-circle-outline' android="md-add-circle-outline" style={{color: COLOR.verde, fontSize: 20}}></Icon> {item.nombre}</Text>
                           </TouchableOpacity>
                         )}
                       />
@@ -1224,7 +1242,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'condiciones_locativas' ?
                     <View>
-                      <Text style={{margin: 10}}>Condiciones: </Text>
+                      <Text style={styles.textInfo}>Condiciones: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Excelentes'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Buenas'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={3} value={'Regulares'} checked={this.state.checked}></RadioButton>
@@ -1235,7 +1253,7 @@ export default class Activity extends Component {
                           note
                           mode="dropdown"
                           selectedValue={this.state.selected}
-                          itemStyle={{height:100,fontSize:10}}
+                          itemStyle={styles.picker}
                           itemTextStyle={{textTransform:'lowercase'}}
                           onValueChange={value => this.setState({selected:value})}
                         >                      
@@ -1249,7 +1267,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'convenio_exhibicion' ?
                     <View>
-                      <Text style={{margin: 10}}>Verificar permanencia de las exhibiciones: </Text>
+                      <Text style={styles.textInfo}>Verificar permanencia de las exhibiciones: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1259,19 +1277,21 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'libros_faltantes' ?
                     <View>
-                      <Text style={{margin: 10}}>Verificar libros faltantes a la fecha: </Text>
+                      <Text style={styles.textInfo}>Verificar libros faltantes a la fecha: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Al día'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
-                      <Text style={{margin: 5, fontWeight: 'bold'}}>Productos a vencer: </Text>
+                      <Text style={styles.textDocumento}>Productos a vencer: </Text>
                       <Autocomplete
                         autoCapitalize="none"
                         data={prods}
                         defaultValue={query}
                         onChangeText={text => this.BuscarProducto(text,'')}
                         placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
                         renderItem={item => (
                           <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
-                            <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
                           </TouchableOpacity>
                         )}
                       />
@@ -1281,11 +1301,11 @@ export default class Activity extends Component {
                             <View style={{flex:2, justifyContent:'flex-start'}}>
                               <ListItem button onPress={() => this.BorrarProducto(item)}>
                                 <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                                <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
                               </ListItem>
                             </View>
                             <View style={{flex:1, justifyContent:'center'}}>
-                              <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                              <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
                             </View>
                           </View>
                         }>
@@ -1298,7 +1318,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'ingreso_sucursal' ?
                     <View>
-                      <Text style={{margin: 10}}>Reporte de ingreso: </Text>
+                      <Text style={styles.textInfo}>Reporte de ingreso: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Al día'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1308,7 +1328,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'formulas_despacho' ?
                     <View>
-                      <Text style={{margin: 10}}>Reporte de ingreso: </Text>
+                      <Text style={styles.textInfo}>Reporte de ingreso: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1318,7 +1338,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'captura_cliente' ?
                     <View>
-                      <Text style={{margin: 10}}>Captación de clientes: </Text>
+                      <Text style={styles.textInfo}>Captación de clientes: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1328,7 +1348,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'documentacion_legal' ?
                     <View>
-                      <Text style={{margin: 10}}>Verificar Documentación legal: </Text>
+                      <Text style={styles.textInfo}>Verificar Documentación legal: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
 
@@ -1336,7 +1356,7 @@ export default class Activity extends Component {
                           note
                           mode="dropdown"
                           selectedValue={this.state.selected}
-                          itemStyle={{height:60,fontSize:10}}
+                          itemStyle={styles.picker}
                           itemTextStyle={{textTransform:'lowercase'}}
                           onValueChange={value => this.setState({selected:value})}
                         >                      
@@ -1350,7 +1370,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'evaluacion_pedidos' ?
                     <View>
-                      <Text style={{margin: 10}}>Pedidos realizados vs Remision: </Text>
+                      <Text style={styles.textInfo}>Pedidos realizados vs Remision: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Input placeholder="Número revisión"></Input>
@@ -1361,7 +1381,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'excesos' ?
                     <View>
-                      <Text style={{margin: 10}}>Revisar pedidos y excesos: </Text>
+                      <Text style={styles.textInfo}>Revisar pedidos y excesos: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1371,7 +1391,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'libro_agendaclientes' ?
                     <View>
-                      <Text style={{margin: 10}}>Revisar agenda de clientes: </Text>
+                      <Text style={styles.textInfo}>Revisar agenda de clientes: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1381,19 +1401,21 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'libro_vencimientos' ?
                     <View>
-                      <Text style={{margin: 10, fontWeight: 'bold'}}>Confirmar que estén separados los productos del libro de vencimientos: </Text>
+                      <Text style={styles.textInfo}>Confirmar que estén separados los productos del libro de vencimientos: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
-                      <Text style={{margin: 5, fontWeight: 'bold'}}>Productos a vencer: </Text>
+                      <Text style={styles.textInfo}>Productos a vencer: </Text>
                       <Autocomplete
                         autoCapitalize="none"
                         data={prods}
                         defaultValue={query}
                         onChangeText={text => this.BuscarProducto(text,'')}
                         placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
                         renderItem={item => (
                           <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,fecha_vencimiento:new Date(),codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
-                            <Text style={{borderBottomWidth:1, borderBottomColor:'#039BE5'}}>{item.nombre_comercial}</Text>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
                           </TouchableOpacity>
                         )}
                       />
@@ -1404,16 +1426,16 @@ export default class Activity extends Component {
                               <View style={{flex:2, justifyContent:'flex-start'}}>
                                 <ListItem button onPress={() => this.BorrarProducto(item)} style={{borderBottomWidth:0}}>
                                   <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                                  <Text style={{marginLeft:3}}>{item.nombre_comercial}</Text>
+                                  <Text style={[styles.textInfo,{margin:0,marginLeft:3}]}>{item.nombre_comercial}</Text>
                                 </ListItem>
                               </View>
                               <View style={{flex:1, justifyContent:'center'}}>
-                                <NumericInput rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
+                                <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value)}/>
                               </View>
                             </View>
                             <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', borderBottomWidth:1}}>
                               <View style={{flex:5, justifyContent:'flex-start'}}>
-                                <Text style={{marginLeft: 5, fontWeight: 'bold'}}>Fecha de Vencimiento: </Text>
+                                <Text style={[styles.textInfo,{margin:0,marginLeft: 5}]}>Fecha de Vencimiento: </Text>
                               </View>
                               <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
                                 <DatePicker
@@ -1442,7 +1464,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'papeleria_consignaciones' ?
                     <View>
-                      <Text style={{margin: 10}}>Verificar la papelería: </Text>
+                      <Text style={styles.textInfo}>Verificar la papelería: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1452,7 +1474,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'presupuesto_pedido' ?
                     <View>
-                      <Text style={{margin: 10}}>Revisar metodología utilizada para revisar el pedido: </Text>
+                      <Text style={styles.textInfo}>Revisar metodología utilizada para revisar el pedido: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1462,7 +1484,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'remisiones' ?
                     <View>
-                      <Text style={{margin: 10}}>Revisar remisiones grabadas a la fecha: </Text>
+                      <Text style={styles.textInfo}>Revisar remisiones grabadas a la fecha: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1472,7 +1494,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'revision_completa_inventario' ?
                     <View>
-                      <Text style={{margin: 10}}>Revision completa de los inventarios: </Text>
+                      <Text style={styles.textInfo}>Revision completa de los inventarios: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1482,7 +1504,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'seguimiento_vendedores' ?
                     <View>
-                      <Text style={{margin: 10}}>Revisión del desempeño de cada vendedor: </Text>
+                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
@@ -1493,7 +1515,7 @@ export default class Activity extends Component {
                   {
                     this.state.motivo !== '' ?
                       <View>
-                        <Text style={{margin: 5, fontWeight: 'bold'}}>Motivo de ausencia: </Text>
+                        <Text style={styles.textInfo}>Motivo de ausencia: </Text>
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}
@@ -1501,6 +1523,7 @@ export default class Activity extends Component {
                           placeholderStyle={{ color: "#bfc6ea" }}
                           placeholderIconColor="#007aff"
                           style={{ width: undefined }}
+                          itemStyle={styles.picker}
                           selectedValue={this.state.motivo}
                           onValueChange={this.onValueChange.bind(this)}
                         >
@@ -1519,9 +1542,9 @@ export default class Activity extends Component {
               </Card>
               {
                 items.estado === 'Activo' || items.estado === 'activo' ?
-                  <Button success regular block style={styles.boton} onPress={() => this.FinishActivity(this.props.handler2)}><Text> Finalizar </Text></Button>
+                  <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => this.FinishActivity(this.props.handler2)}><Text style={styles.textButton}> Finalizar </Text></Button>
                 :              
-                  <Button info regular block style={styles.boton} onPress={() => this.FinishActivity(this.props.handler2)}><Text> Modificar </Text></Button>
+                  <Button info regular block style={[styles.boton, styles.actualizar]} onPress={() => this.FinishActivity(this.props.handler2)}><Text style={styles.textButton}> Modificar </Text></Button>
               }
             </Content>
           </KeyboardAvoidingView>
@@ -1533,7 +1556,7 @@ export default class Activity extends Component {
             containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
             childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
           >
-            <Text style={{color:'white', textAlign:'justify'}}>{info}</Text>
+            <Text style={styles.descripcion}>{info}</Text>
           </Overlay>
           <Overlay
             visible={this.state.isVisibleActividad}
@@ -1544,10 +1567,10 @@ export default class Activity extends Component {
           >
             <View>
               <ScrollView>
-                <Text style={{margin: 5}}>{this.state.isVisibleActividad ? this.state.documentos.documento : ''}</Text>
+                <Text style={styles.textDocumento}>{this.state.isVisibleActividad ? this.state.documentos.documento : ''}</Text>
                 <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
                 <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
-                <Text style={{color:'black', textAlign:'justify'}}>Documento Vencido</Text>
+                <Text style={styles.textDescFoto}>Documento Vencido</Text>
                 <ListItem thumbnail style={{marginLeft:0}}>
                   <Left>
                     <TouchableOpacity onPress={() => this.verImagen(true)}>
@@ -1555,10 +1578,10 @@ export default class Activity extends Component {
                     </TouchableOpacity>
                   </Left>
                   <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                    <Button iconLeft regular block info style={[styles.boton,{marginLeft:0,marginRight:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                    <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                   </Body>
                 </ListItem>
-                <Text style={{color:'black', textAlign:'justify'}}>Documento Renovado</Text>
+                <Text style={styles.textDescFoto}>Documento Renovado</Text>
                 <ListItem thumbnail style={{marginLeft:0}}>
                   <Left>
                     <TouchableOpacity onPress={() => this.verImagen(false)}>
@@ -1566,13 +1589,13 @@ export default class Activity extends Component {
                     </TouchableOpacity>
                   </Left>
                   <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                    <Button iconLeft regular block info style={[styles.boton,{marginLeft:0,marginRight:0}]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                    <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                   </Body>
                 </ListItem>
                 <Form>
                   <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
                 </Form>
-                <Button success regular block style={styles.boton} onPress={() => this.UpdateData()}><Text> Actualizar </Text></Button>
+                <Button success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => this.UpdateData()}><Text> Actualizar </Text></Button>
               </ScrollView>
             </View>
           </Overlay>
@@ -1586,10 +1609,10 @@ export default class Activity extends Component {
           >
             <View>
               <ScrollView>
-                <Text style={{margin: 5}}>{this.state.isVisibleActividad2 ? this.state.documentos.condicion : ''}</Text>
+                <Text style={styles.textDocumento}>{this.state.isVisibleActividad2 ? this.state.documentos.condicion : ''}</Text>
                 <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
                 <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
-                <Text style={{color:'black', textAlign:'justify'}}>Foto de la condicion locativa</Text>
+                <Text style={styles.textDescFoto}>Foto de la condicion locativa</Text>
                 <ListItem thumbnail style={{marginLeft:0}}>
                   <Left>
                     <TouchableOpacity onPress={() => this.verImagen(true)}>
@@ -1597,13 +1620,13 @@ export default class Activity extends Component {
                     </TouchableOpacity>
                   </Left>
                   <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                    <Button iconLeft regular block info style={[styles.boton,{marginLeft:0,marginRight:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                    <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
                   </Body>
                 </ListItem>
                 <Form>
                   <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad2 ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
                 </Form>
-                <Button success regular block style={styles.boton} onPress={() => this.UpdateDataCondicion()}><Text> Actualizar </Text></Button>
+                <Button success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => this.UpdateDataCondicion()}><Text> Actualizar </Text></Button>
               </ScrollView>
             </View>
           </Overlay>

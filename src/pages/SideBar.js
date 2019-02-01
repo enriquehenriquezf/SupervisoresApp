@@ -8,7 +8,8 @@ export default class SideBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            estado: true
+            estado: true,
+            porcentaje:0
         };
         let token = this.props.token;
         this._retrieveData();
@@ -20,11 +21,14 @@ export default class SideBar extends React.Component {
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('ESTADO');
+      const value = await AsyncStorage.multiGet(['ESTADO','PORCENTAJE','PORCENTAJES']);
       if (value !== null) {
-          var state;
-          if(value === 'true'){state=true}else{state=false}
-        this.setState({estado : state});
+        var state;
+        var porcentaje = 0;
+        if(value[0][1] === 'true'){state=true}else{state=false}
+        if(value[1][1] !== null){porcentaje = value[1][1]}
+        //console.log(value[1][1]);
+        this.setState({estado : state, porcentaje: porcentaje});
       }
     } catch (error) {
       console.log(error);
@@ -65,23 +69,23 @@ export default class SideBar extends React.Component {
 
                 <View style={styles.threeButtons}>
                     <View style={[styles.rectangulo, styles.actividades]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 1 ? this.props.closeDrawer() : this.props.handler2(1,token,[])}}>
-                            <Text style={[styles.text]}>Actividad</Text>
-                            <Image source={Imagen.actividad} style={{width:"90%",height:"90%"}}></Image>
+                        <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 1 ? this.props.closeDrawer() : this.props.handler2(1,token,[])}}>
+                            <Text style={[styles.text,{fontSize:34, paddingTop:20}]}>Actividad</Text>
+                            <Image source={Imagen.actividad} style={{width:"50%",height:"50%",marginBottom:20}}></Image>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.columnas}>
                         <View style={[styles.cuadradoInsideColumna, styles.perfil]}>
-                            <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 5 ? this.props.closeDrawer() : this.props.handler2(5,token,[])}}>
+                            <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => {this.props.layout === 5 ? this.props.closeDrawer() : this.props.handler2(5,token,[])}}>
                                 <Text style={[styles.text]}>Perfil</Text>
-                                <Image source={Imagen.perfil} style={{width:"90%",height:"90%"}}></Image>
+                                <Image source={Imagen.perfil} style={{width:"50%",height:"50%"}}></Image>
                             </TouchableOpacity>
                         </View>
 
                         <View style={[styles.cuadradoInsideColumna, styles.agenda]}>
-                            <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 3 ? this.props.closeDrawer() : this.props.handler2(3,token,[])}}>
+                            <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => {this.props.layout === 3 ? this.props.closeDrawer() : this.props.handler2(3,token,[])}}>
                                 <Text style={[styles.text]}>Agenda</Text>
-                                <Image source={Imagen.agenda} style={{width:"90%",height:"90%"}}></Image>
+                                <Image source={Imagen.agenda} style={{width:"50%",height:"50%"}}></Image>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -94,46 +98,76 @@ export default class SideBar extends React.Component {
                                 this.state.estado === true ?
                                 <View>
                                     <Text style={[styles.text]}>Activo</Text>
-                                    <Image source={Imagen.activo} style={{width:"90%",height:"90%"}}></Image>
+                                    <Image source={Imagen.activo} style={{width:"40%",height:"65%", alignSelf:'center'}}></Image>
                                 </View>
                                 :
                                 <View>
                                     <Text style={[styles.text]}>Inactivo</Text>
-                                    <Image source={Imagen.inactivo} style={{width:"90%",height:"90%"}}></Image>
+                                    <Image source={Imagen.inactivo} style={{width:"40%",height:"65%", alignSelf:'center'}}></Image>
                                 </View>
                             }
                         </TouchableOpacity>
                     </View>
 
-                    <View style={[styles.rectangulo,styles.completado85]}>
+                    <View style={[styles.rectangulo,
+                            this.state.porcentaje <= 10 ?
+                                styles.completado10
+                            :
+                                this.state.porcentaje <= 20 ?
+                                    styles.completado20
+                                :
+                                    this.state.porcentaje <= 30 ?
+                                        styles.completado30
+                                    :
+                                        this.state.porcentaje <= 40 ?
+                                            styles.completado40
+                                        :
+                                            this.state.porcentaje <= 50 ?
+                                                styles.completado50
+                                            :
+                                                this.state.porcentaje <= 60 ?
+                                                    styles.completado60
+                                                :
+                                                    this.state.porcentaje <= 70 ?
+                                                        styles.completado70
+                                                    :
+                                                        this.state.porcentaje <= 85 ?
+                                                            styles.completado85
+                                                        :
+                                                            this.state.porcentaje <= 99 ?
+                                                                styles.completado99
+                                                            :
+                                                                styles.completado100
+
+                        ]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 7 ? this.props.closeDrawer() : console.log("completado")}}>
-                            <Text style={[styles.text]}>80%</Text>
-                            <Text style={[styles.text]}>Completado</Text>
+                            <Text style={[styles.text,{fontSize:32}]}>{this.state.porcentaje}%</Text>
+                            <Text style={[styles.text,{fontSize:24}]}>Completado</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
                 
                 <View style={styles.oneButton}>
                     <View style={styles.reportes}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 8 ? this.props.closeDrawer() : this.props.handler2(-1,token,[])}}>
-                            <Text style={[styles.text]}>Reportes</Text>
-                            <Image source={Imagen.reportes} style={{width:"50%",height:"90%"}}></Image>
+                        <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 8 ? this.props.closeDrawer() : this.props.handler2(-1,token,[])}}>
+                            <Text style={[styles.text,{fontSize:40,marginLeft:30}]}>Reportes</Text>
+                            <Image source={Imagen.reportes} style={{width:"25%",height:"75%",marginRight:30}}></Image>
                         </TouchableOpacity>
                     </View>
                 </View>
                 
                 <View style={styles.twoButtons}>
                     <View style={[styles.rectangulo,styles.servicioTecnico]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 9 ? this.props.closeDrawer() : this.props.handler2(-1,token,[])}}>
-                            <Text style={[styles.text]}>Servicio Tecnico</Text>
-                            <Image source={Imagen.servicioTecnico} style={{width:"90%",height:"90%"}}></Image>
+                        <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 9 ? this.props.closeDrawer() : this.props.handler2(-1,token,[])}}>
+                            <Text style={[styles.text, {height:"80%",width:"50%", fontSize:28, marginLeft:20}]}>Servicio Tecnico</Text>
+                            <Image source={Imagen.servicioTecnico} style={{width:"25%",height:"75%",marginRight:20}}></Image>
                         </TouchableOpacity>
                     </View>
 
                     <View style={[styles.cuadrado,styles.cerrarSesion]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => this.props.handler2(-1,token,[])}>
-                            <Text style={[styles.text]}>Cerrar Sesion</Text>
-                            <Image source={Imagen.cerrarSesion} style={{width:"90%",height:"90%"}}></Image>
+                        <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => this.props.handler2(-1,token,[])}>
+                            <Text style={[styles.text,{fontSize:16}]}>Cerrar Sesion</Text>
+                            <Image source={Imagen.cerrarSesion} style={{width:"45%",height:"50%"}}></Image>
                         </TouchableOpacity>
                     </View>
                 </View>

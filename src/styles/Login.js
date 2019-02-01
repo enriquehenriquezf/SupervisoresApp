@@ -42,8 +42,9 @@ export default StyleSheet.create({
         fontFamily:'BebasKai'
     },
     icon:{
-        width: 36,
-        height:36
+        width:24,
+        height:24,
+        margin:7
     },
     text:{
         fontSize: 20,

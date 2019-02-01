@@ -27,4 +27,5 @@ export const api = {
  ipListarCondiciones: baseUrl + "/supervisores_api/public/api/listarCondicionesLocativas",
  ipAccederCondicion: baseUrl + "/supervisores_api/public/api/accederCondicion",
  ipTerminarCondicion: baseUrl + "/supervisores_api/public/api/terminarCondicionesLocativas",
+ ipPorcentajeActividades: baseUrl + "/supervisores_api/public/api/porcentajeActividades",
 }
