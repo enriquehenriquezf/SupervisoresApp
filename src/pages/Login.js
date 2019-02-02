@@ -54,8 +54,7 @@ export default class Login extends Component {
       {
         token = response;
         fail = 0;
-        that.getPorcentaje(token);
-        handler(1,token);
+        that.getPorcentaje(token,handler);
         toastr.showToast('Ha iniciado sesión!','success');
       }
       else
@@ -80,7 +79,7 @@ export default class Login extends Component {
   /**
    * Obtener cantidad de las actividades (activas, completas, noRealizadas)
    */
-  async getPorcentaje(token2){
+  async getPorcentaje(token2,handler){
     let bodyInit = JSON.parse(token2._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     var that = this;
@@ -99,6 +98,7 @@ export default class Login extends Component {
           var porcentajes = JSON.parse(response._bodyInit);
           var general = (porcentajes.porcentaje_general.actividades_completas / porcentajes.porcentaje_general.todas_las_actividades) * 100;
           that._storeDataPorcentajes(Math.floor(general),porcentajes);
+          handler(1,token);
           //console.log(Math.floor(general));
         }
         else

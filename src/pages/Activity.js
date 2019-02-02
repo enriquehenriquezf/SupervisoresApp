@@ -47,6 +47,7 @@ export default class Activity extends Component {
       isVisible2: false,
       isVisibleActividad: false,
       isVisibleActividad2: false,
+      isLoadActividad: false,
       ausencia: false,
       motivo: '',
       selected:'0',
@@ -63,6 +64,7 @@ export default class Activity extends Component {
       query2:[],
       lista:null,
       documentos:{},
+      disable:false,
       showToast: false
     };
     let token = this.props.token;
@@ -95,9 +97,9 @@ export default class Activity extends Component {
     this.Descripcion();
     if(items.nombre_tabla === 'documentacion_legal'){this.ListarDocumentacion();}
     else if(items.nombre_tabla === 'condiciones_locativas'){this.ListarCondiciones();}
-    this._retrieveDataInit();
+    //this._retrieveDataInit();
     this._retrieveData();
-    this._retrieveDataAusente();
+    //this._retrieveDataAusente();
     this.setState({ loading: false });
   }
 
@@ -192,6 +194,7 @@ export default class Activity extends Component {
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     var that = this;
+    this.setState({isVisibleActividad:true})
     var noDisponible = Imagen.noDisponible;
     await fetch(api.ipAccederDocumento, {
       method: 'POST',
@@ -236,7 +239,7 @@ export default class Activity extends Component {
         else{
           imgTemp2 = api.ipImg + item.documento_renovado;
         }
-        that.setState({documentos: item, isVisibleActividad:true, imgVencido: imgTemp1, imgRenovado: imgTemp2,observacion2:item.observaciones, archivo:{}, archivo2:{}});
+        that.setState({documentos: item, isLoadActividad:true, imgVencido: imgTemp1, imgRenovado: imgTemp2,observacion2:item.observaciones, archivo:{}, archivo2:{}});
         if(item.estado_documento === 'Si' || item.estado_documento === '' || item.estado_documento === null)
         {
           that.SetChecked(1,'Si');
@@ -307,7 +310,7 @@ export default class Activity extends Component {
       if(response.ok === true)
       {
         var token2 = JSON.parse(response._bodyInit);
-        that.setState({isVisibleActividad:false});
+        that.setState({isVisibleActividad:false,isLoadActividad:false,disable:false});
         toastr.showToast(token2["message"],'success');
       }
       else{        
@@ -379,6 +382,7 @@ export default class Activity extends Component {
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     var that = this;
+    this.setState({isVisibleActividad2:true});
     var noDisponible = Imagen.noDisponible;
     await fetch(api.ipAccederCondicion, {
       method: 'POST',
@@ -416,7 +420,7 @@ export default class Activity extends Component {
         else{
           imgTemp1 = api.ipImg + item.foto_condicion;
         }
-        that.setState({documentos: item, isVisibleActividad2:true, imgVencido: imgTemp1, observacion2:item.observaciones, archivo:{}});
+        that.setState({documentos: item, isLoadActividad:true, imgVencido: imgTemp1, observacion2:item.observaciones, archivo:{}});
         if(item.estado_condicion === 'Si' || item.estado_condicion === '' || item.estado_condicion === null)
         {
           that.SetChecked(1,'Si');
@@ -477,7 +481,7 @@ export default class Activity extends Component {
         //var conds = that.state.lista;
         //conds[that.state.selected].props.color = '#5cb85c'
         var token2 = JSON.parse(response._bodyInit);
-        that.setState({isVisibleActividad2:false});
+        that.setState({isVisibleActividad2:false,isLoadActividad:false,disable:false});
         toastr.showToast(token2["message"],'success');
       }
       else{        
@@ -792,72 +796,75 @@ export default class Activity extends Component {
   /**
    * Obtener datos de tiempo inicial de ausencia en el plan de trabajo
    */
-  _retrieveDataAusente = async () => {
+  // _retrieveDataAusente = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('TIME_AUSENTE_' + items.nombre_tabla + '_' + items.id_actividad);
+  //     if (value !== null) {
+  //       var t2 = new Date().getTime().toString();        
+  //       var TiempoInact = 0;
+  //       if(items.tiempoInactivoInit !== 0 && items.tiempoInactivoInit > totalTimeInit){
+  //         TiempoInact = items.tiempoInactivo;
+  //       }
+  //       if((t2 - value) - TiempoInact > TIEMPOAUSENCIA){        
+  //         this.setState({
+  //           motivo: '0',
+  //           ausencia: true
+  //         });
+          
+  //       }
+  //       //console.log("TIME AUSENTE: " + totalTimeInit);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  /**
+   * Obtener datos de tiempo inicial del plan de trabajo
+   */
+  // _retrieveDataInit = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad);
+  //     if (value !== null) {
+  //       totalTimeInit = value;
+  //       //console.log("TOTAL TIME INIT: " + totalTimeInit);
+  //     }
+  //     else{this._storeDataInit()}
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  /**
+   * Obtener datos de tiempo actual del plan de trabajo
+   * Obtener datos de tiempo inicial del plan de trabajo
+   * Obtener datos de tiempo inicial de ausencia en el plan de trabajo
+   */
+  _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('TIME_AUSENTE_' + items.nombre_tabla + '_' + items.id_actividad);
-      if (value !== null) {
+      const value = await AsyncStorage.multiGet(['TIME_' + items.nombre_tabla + '_' + items.id_actividad,'TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad,'TIME_AUSENTE_' + items.nombre_tabla + '_' + items.id_actividad]);
+      if (value[0][1] !== null) {
+        time = value[0][1];
+        //console.log("TIME: " + time);
+      }
+      if (value[1][1] !== null) {
+        totalTimeInit = value[1][1];
+        //console.log("TOTAL TIME INIT: " + totalTimeInit);
+      }
+      else{this._storeDataInit()}
+      if (value[2][1] !== null) {
         var t2 = new Date().getTime().toString();        
         var TiempoInact = 0;
         if(items.tiempoInactivoInit !== 0 && items.tiempoInactivoInit > totalTimeInit){
           TiempoInact = items.tiempoInactivo;
         }
-        if((t2 - value) - TiempoInact > TIEMPOAUSENCIA){
-          /*ActionSheet.show(
-            {
-              options: BUTTONS,
-              title: "Motivo de Ausencia"
-            },
-            buttonIndex => {
-              if(buttonIndex === undefined){
-                toastr.showToast('Debe seleccionar una opción','warning');
-                this.handleBackPress();
-              }
-              else{
-                this.setState({
-                  motivo: buttonIndex,
-                  ausencia: true
-                });
-                this.forceUpdate();
-              }
-            }
-          );*/          
+        if((t2 - value[2][1]) - TiempoInact > TIEMPOAUSENCIA){        
           this.setState({
             motivo: '0',
             ausencia: true
-          });
-          
+          });          
         }
         //console.log("TIME AUSENTE: " + totalTimeInit);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  /**
-   * Obtener datos de tiempo inicial del plan de trabajo
-   */
-  _retrieveDataInit = async () => {
-    try {
-      const value = await AsyncStorage.getItem('TIMEINIT_' + items.nombre_tabla + '_' + items.id_actividad);
-      if (value !== null) {
-        totalTimeInit = value;
-        //console.log("TOTAL TIME INIT: " + totalTimeInit);
-      }
-      else{this._storeDataInit()}
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  /**
-   * Obtener datos de tiempo actual del plan de trabajo
-   */
-  _retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('TIME_' + items.nombre_tabla + '_' + items.id_actividad);
-      if (value !== null) {
-        time = value;
-        //console.log("TIME: " + time);
       }
     } catch (error) {
       console.log(error);
@@ -1548,6 +1555,7 @@ export default class Activity extends Component {
               }
             </Content>
           </KeyboardAvoidingView>
+
           <Overlay
             visible={this.state.isVisible}
             closeOnTouchOutside 
@@ -1558,92 +1566,107 @@ export default class Activity extends Component {
           >
             <Text style={styles.descripcion}>{info}</Text>
           </Overlay>
-          <Overlay
-            visible={this.state.isVisibleActividad}
-            animationType="zoomIn"
-            onClose={() => this.setState({isVisibleActividad: false})}
-            containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
-            childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
-          >
-            <View>
-              <ScrollView>
-                <Text style={styles.textDocumento}>{this.state.isVisibleActividad ? this.state.documentos.documento : ''}</Text>
-                <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
-                <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
-                <Text style={styles.textDescFoto}>Documento Vencido</Text>
-                <ListItem thumbnail style={{marginLeft:0}}>
-                  <Left>
-                    <TouchableOpacity onPress={() => this.verImagen(true)}>
-                      <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgVencido}}></Image>
-                    </TouchableOpacity>
-                  </Left>
-                  <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                    <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
-                  </Body>
-                </ListItem>
-                <Text style={styles.textDescFoto}>Documento Renovado</Text>
-                <ListItem thumbnail style={{marginLeft:0}}>
-                  <Left>
-                    <TouchableOpacity onPress={() => this.verImagen(false)}>
-                      <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgRenovado}}></Image>
-                    </TouchableOpacity>
-                  </Left>
-                  <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                    <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
-                  </Body>
-                </ListItem>
-                <Form>
-                  <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
-                </Form>
-                <Button success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => this.UpdateData()}><Text> Actualizar </Text></Button>
-              </ScrollView>
-            </View>
-          </Overlay>
 
-          <Overlay
-            visible={this.state.isVisibleActividad2}
-            animationType="zoomIn"
-            onClose={() => this.setState({isVisibleActividad2: false})}
-            containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
-            childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
-          >
-            <View>
-              <ScrollView>
-                <Text style={styles.textDocumento}>{this.state.isVisibleActividad2 ? this.state.documentos.condicion : ''}</Text>
-                <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
-                <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
-                <Text style={styles.textDescFoto}>Foto de la condicion locativa</Text>
-                <ListItem thumbnail style={{marginLeft:0}}>
-                  <Left>
-                    <TouchableOpacity onPress={() => this.verImagen(true)}>
-                      <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.imgVencido}}></Image>
-                    </TouchableOpacity>
-                  </Left>
-                  <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                    <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
-                  </Body>
-                </ListItem>
-                <Form>
-                  <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad2 ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
-                </Form>
-                <Button success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => this.UpdateDataCondicion()}><Text> Actualizar </Text></Button>
-              </ScrollView>
-            </View>
-          </Overlay>
+          {
+            items.nombre_tabla === 'documentacion_legal' ?
+              <Overlay
+                visible={this.state.isVisibleActividad}
+                animationType="zoomIn"
+                onClose={() => this.setState({isVisibleActividad: false,isLoadActividad:false})}
+                containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+                childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+              >
+                <View>
+                  <ScrollView>
+                    <Text style={styles.textDocumento}>{this.state.isLoadActividad ? this.state.documentos.documento : ''}</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
+                    <Text style={styles.textDescFoto}>Documento Vencido</Text>
+                    <ListItem thumbnail style={{marginLeft:0}}>
+                      <Left>
+                        <TouchableOpacity onPress={() => this.verImagen(true)}>
+                          <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isLoadActividad ? this.state.imgVencido : Imagen.noDisponible}}></Image>
+                        </TouchableOpacity>
+                      </Left>
+                      <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                        <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                      </Body>
+                    </ListItem>
+                    <Text style={styles.textDescFoto}>Documento Renovado</Text>
+                    <ListItem thumbnail style={{marginLeft:0}}>
+                      <Left>
+                        <TouchableOpacity onPress={() => this.verImagen(false)}>
+                          <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: this.state.isLoadActividad ? this.state.imgRenovado : Imagen.noDisponible}}></Image>
+                        </TouchableOpacity>
+                      </Left>
+                      <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                        <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(false)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                      </Body>
+                    </ListItem>
+                    <Form>
+                      <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
+                    </Form>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.UpdateData()}}><Text> Actualizar </Text></Button>
+                  </ScrollView>
+                </View>
+              </Overlay>
+            :
+              null
+          }
+          {
+            items.nombre_tabla === 'condiciones_locativas' ?
+              <Overlay
+                visible={this.state.isVisibleActividad2}
+                animationType="zoomIn"
+                onClose={() => this.setState({isVisibleActividad2: false,isLoadActividad:false})}
+                containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+                childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+              >
+                <View>
+                  <ScrollView>
+                    <Text style={styles.textDocumento}>{this.state.isLoadActividad ? this.state.documentos.condicion : ''}</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
+                    <Text style={styles.textDescFoto}>Foto de la condicion locativa</Text>
+                    <ListItem thumbnail style={{marginLeft:0}}>
+                      <Left>
+                        <TouchableOpacity onPress={() => this.verImagen(true)}>
+                          <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isLoadActividad ? this.state.imgVencido : Imagen.noDisponible}}></Image>
+                        </TouchableOpacity>
+                      </Left>
+                      <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                        <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Icon ios="ios-search" android="md-search"></Icon><Text>Buscar Imagen</Text></Button>
+                      </Body>
+                    </ListItem>
+                    <Form>
+                      <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
+                    </Form>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.UpdateDataCondicion()}}><Text> Actualizar </Text></Button>
+                  </ScrollView>
+                </View>
+              </Overlay>
+            :
+              null
+          }
+          {
+            (items.nombre_tabla === 'documentacion_legal' || items.nombre_tabla === 'condiciones_locativas') ?
+              <Overlay
+                visible={this.state.isVisible2}
+                closeOnTouchOutside 
+                animationType="zoomIn"
+                onClose={() => this.setState({isVisible2: false})}
+                containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
+                childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
+              >
+                <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center'}}>
+                  <Text onPress={() => this.setState({isVisible2: false})} style={{color: 'white', textAlign:'right', alignSelf:'flex-end'}}>X</Text>
+                  <Image style={{height: 500, width:280}} source={{uri: imgOverlay}}></Image>
+                </View>
+              </Overlay>
+            :
+              null
+          }
 
-          <Overlay
-            visible={this.state.isVisible2}
-            closeOnTouchOutside 
-            animationType="zoomIn"
-            onClose={() => this.setState({isVisible2: false})}
-            containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
-            childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
-          >
-            <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center'}}>
-              <Text onPress={() => this.setState({isVisible2: false})} style={{color: 'white', textAlign:'right', alignSelf:'flex-end'}}>X</Text>
-              <Image style={{height: 500, width:280}} source={{uri: imgOverlay}}></Image>
-            </View>
-          </Overlay>
         </Container>
       </Drawer>
     );
