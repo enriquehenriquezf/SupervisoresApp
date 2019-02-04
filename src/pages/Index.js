@@ -9,6 +9,7 @@ import Profile from './Profile';
 import ChangePass from './ChangePass';
 import ShowSucursales from './ShowSucursales';
 import ShowActivities from './ShowActivities';
+import Stats from './Stats';
 import {api} from '../services/api'
 import { Imagen } from '../components/Imagenes';
 
@@ -161,6 +162,8 @@ export default class Index extends Component {
       AppComponent = Profile
     } else if(this.state.index == 6){
       AppComponent = ChangePass
+    } else if(this.state.index == 7){
+      AppComponent = Stats
     } else if(this.state.index == -1){
       this._OnLogout();
       AppComponent = Login

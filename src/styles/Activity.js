@@ -98,5 +98,9 @@ export default StyleSheet.create({
         marginLeft:25,
         marginRight:25,
         borderColor:COLOR.azul
+    },
+    iconoBoton:{
+        height:21,
+        width:21
     }
 });

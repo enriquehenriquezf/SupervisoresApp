@@ -20,6 +20,7 @@ export default class Login extends Component {
       loading: true,
       error:null,
       checked:true,
+      estado:true,
       showToast: false
     };
     this._OnLogin = this._OnLogin.bind(this);
@@ -144,7 +145,7 @@ export default class Login extends Component {
    */
   _storeDataPorcentajes = async (general,porcentajes) => {
     try {
-      await AsyncStorage.multiSet([['PORCENTAJE', ''+general],['PORCENTAJES', ''+porcentajes]]);
+      await AsyncStorage.multiSet([['PORCENTAJE', ''+general],['PORCENTAJES', JSON.stringify(porcentajes)],['ESTADO',this.state.estado]]);
     } catch (error) {
       console.log(error);
     }
@@ -155,10 +156,12 @@ export default class Login extends Component {
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.multiGet(['USER','PASS']);
+      const value = await AsyncStorage.multiGet(['USER','PASS','ESTADO']);
       if (value !== null) {
         //console.log(value);
-        this.setState({ email: value[0][1] , password: value[1][1]});
+        var state = 'true';
+        if(value[2][1] !== null){if(value[2][1] === 'false'){state='false'}}
+        this.setState({ email: value[0][1] , password: value[1][1], estado: state});
       }
     } catch (error) {
       console.log(error);

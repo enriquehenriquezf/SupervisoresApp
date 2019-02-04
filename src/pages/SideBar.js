@@ -9,7 +9,8 @@ export default class SideBar extends React.Component {
         super(props);
         this.state = {
             estado: true,
-            porcentaje:0
+            porcentaje:0,
+            porcentajes:{}
         };
         let token = this.props.token;
         this._retrieveData();
@@ -25,10 +26,12 @@ export default class SideBar extends React.Component {
       if (value !== null) {
         var state;
         var porcentaje = 0;
+        var porcentajes = {};
         if(value[0][1] === 'true'){state=true}else{state=false}
         if(value[1][1] !== null){porcentaje = value[1][1]}
+        if(value[2][1] !== null){porcentajes = JSON.parse(value[2][1])}
         //console.log(value[1][1]);
-        this.setState({estado : state, porcentaje: porcentaje});
+        this.setState({estado : state, porcentaje: porcentaje, porcentajes:porcentajes});
       }
     } catch (error) {
       console.log(error);
@@ -76,16 +79,16 @@ export default class SideBar extends React.Component {
                     </View>
                     <View style={styles.columnas}>
                         <View style={[styles.cuadradoInsideColumna, styles.perfil]}>
-                            <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => {this.props.layout === 5 ? this.props.closeDrawer() : this.props.handler2(5,token,[])}}>
-                                <Text style={[styles.text]}>Perfil</Text>
-                                <Image source={Imagen.perfil} style={{width:"50%",height:"50%"}}></Image>
+                            <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 5 ? this.props.closeDrawer() : this.props.handler2(5,token,[])}}>
+                                <Text style={[styles.text,{paddingTop:10}]}>Perfil</Text>
+                                <Image source={Imagen.perfil} style={{width:"60%",height:"60%",marginBottom:10}}></Image>
                             </TouchableOpacity>
                         </View>
 
                         <View style={[styles.cuadradoInsideColumna, styles.agenda]}>
-                            <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => {this.props.layout === 3 ? this.props.closeDrawer() : this.props.handler2(3,token,[])}}>
-                                <Text style={[styles.text]}>Agenda</Text>
-                                <Image source={Imagen.agenda} style={{width:"50%",height:"50%"}}></Image>
+                            <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 3 ? this.props.closeDrawer() : this.props.handler2(3,token,[])}}>
+                                <Text style={[styles.text,{paddingTop:5}]}>Agenda</Text>
+                                <Image source={Imagen.agenda} style={{width:"50%",height:"50%",marginBottom:10}}></Image>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -140,9 +143,9 @@ export default class SideBar extends React.Component {
                                                                 styles.completado100
 
                         ]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 7 ? this.props.closeDrawer() : console.log("completado")}}>
-                            <Text style={[styles.text,{fontSize:32}]}>{this.state.porcentaje}%</Text>
-                            <Text style={[styles.text,{fontSize:24}]}>Completado</Text>
+                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 7 ? this.props.closeDrawer() : this.props.handler2(7,token,this.state.porcentajes)}}>
+                            <Text style={[styles.text,{fontSize:34}]}>{this.state.porcentaje}%</Text>
+                            <Text style={[styles.text,{fontSize:28}]}>Completado</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -167,7 +170,7 @@ export default class SideBar extends React.Component {
                     <View style={[styles.cuadrado,styles.cerrarSesion]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => this.props.handler2(-1,token,[])}>
                             <Text style={[styles.text,{fontSize:16}]}>Cerrar Sesion</Text>
-                            <Image source={Imagen.cerrarSesion} style={{width:"45%",height:"55%"}}></Image>
+                            <Image source={Imagen.cerrarSesion} style={{width:"40%",height:"55%"}}></Image>
                         </TouchableOpacity>
                     </View>
                 </View>
