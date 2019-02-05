@@ -28,4 +28,9 @@ export const api = {
  ipAccederCondicion: baseUrl + "/supervisores_api/public/api/accederCondicion",
  ipTerminarCondicion: baseUrl + "/supervisores_api/public/api/terminarCondicionesLocativas",
  ipPorcentajeActividades: baseUrl + "/supervisores_api/public/api/porcentajeActividades",
+ ipObtenerReporteSucursal: baseUrl + "/supervisores_api/public/api/obtenerReporteSucursal",
+ ipHomeGerente: baseUrl + "/supervisores_api/public/api/homeGerente",
+ ipReporteSupervisor: baseUrl + "/supervisores_api/public/api/reporteSupervisor",
+ ipDetalleRepSucursal: baseUrl + "/supervisores_api/public/api/detalleRepSucursal",
+ ipEnviarMensajeReporte: baseUrl + "/supervisores_api/public/api/enviarMensajeReporte",
 }

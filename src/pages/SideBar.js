@@ -152,7 +152,7 @@ export default class SideBar extends React.Component {
                 
                 <View style={styles.oneButton}>
                     <View style={styles.reportes}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 8 ? this.props.closeDrawer() : this.props.handler2(-1,token,[])}}>
+                        <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 8 ? this.props.closeDrawer() : this.props.handler2(8,token,[])}}>
                             <Text style={[styles.text,{fontSize:40,marginLeft:30}]}>Reportes</Text>
                             <Image source={Imagen.reportes} style={{width:"25%",height:"75%",marginRight:30}}></Image>
                         </TouchableOpacity>
@@ -170,7 +170,7 @@ export default class SideBar extends React.Component {
                     <View style={[styles.cuadrado,styles.cerrarSesion]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => this.props.handler2(-1,token,[])}>
                             <Text style={[styles.text,{fontSize:16}]}>Cerrar Sesion</Text>
-                            <Image source={Imagen.cerrarSesion} style={{width:"40%",height:"55%"}}></Image>
+                            <Image source={Imagen.cerrarSesion} style={{width:"45%",height:"55%"}}></Image>
                         </TouchableOpacity>
                     </View>
                 </View>

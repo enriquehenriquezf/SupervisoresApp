@@ -23,5 +23,6 @@ export const Imagen = {
     find: require('../../assets/Icons/icono-supppp-04.png'),
     check: require('../../assets/Icons/icono-supppp-01.png'),
     uncheck: require('../../assets/Icons/icono-supppp-02.png'),
+    equis: require('../../assets/Icons/icono-supppp-03.png'),
     profileBorder: require('../../assets/Icons/icono-sup-01.png'),
 }

@@ -25,6 +25,7 @@ export const Preload = {
     Imagen.find;
     Imagen.check;
     Imagen.uncheck;
+    Imagen.equis;
     Imagen.profileBorder;
   }
 }

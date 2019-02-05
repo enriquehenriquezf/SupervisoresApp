@@ -1603,7 +1603,7 @@ export default class Activity extends Component {
                   /***
                 * Mostrar layout luego de cargar los datos
                 */
-                !this.state.isLoadActividad && this.state.isVisibleActividad?
+                !this.state.isLoadActividad && this.state.isVisibleActividad2?
                   <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
                 :
                   <View>

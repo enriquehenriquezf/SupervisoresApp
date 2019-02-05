@@ -27,7 +27,7 @@ export default class Home extends Component {
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
-/**
+  /**
    * Obtener Estado del supervisor
    */
   _retrieveData = async () => {

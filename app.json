@@ -6,9 +6,10 @@
     "privacy": "public",
     "sdkVersion": "31.0.0",
     "platforms": ["ios", "android"],
-    "version": "0.7.9",
+    "version": "0.8.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "primaryColor": "#00A1E4",
     "splash": {
       "image": "./assets/unidrogas.png",
       "resizeMode": "contain",

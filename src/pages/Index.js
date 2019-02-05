@@ -10,6 +10,7 @@ import ChangePass from './ChangePass';
 import ShowSucursales from './ShowSucursales';
 import ShowActivities from './ShowActivities';
 import Stats from './Stats';
+import Reportes from './Reportes';
 import {api} from '../services/api'
 import { Imagen } from '../components/Imagenes';
 
@@ -71,6 +72,7 @@ export default class Index extends Component {
         Imagen.find,
         Imagen.check,
         Imagen.uncheck,
+        Imagen.equis,
         Imagen.profileBorder
       ]);
     }catch(error){console.log(error)}
@@ -164,6 +166,8 @@ export default class Index extends Component {
       AppComponent = ChangePass
     } else if(this.state.index == 7){
       AppComponent = Stats
+    } else if(this.state.index == 8){
+      AppComponent = Reportes
     } else if(this.state.index == -1){
       this._OnLogout();
       AppComponent = Login
