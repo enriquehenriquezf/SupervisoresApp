@@ -64,34 +64,34 @@ export default StyleSheet.create({
         backgroundColor:'#8CD7DF'
     },
     completado10:{
-        backgroundColor:'#F53F3F'
+        backgroundColor:COLOR.completado10
     },
     completado20:{
-        backgroundColor:'#F26041'
+        backgroundColor:COLOR.completado20
     },
     completado30:{
-        backgroundColor:'#F07143'
+        backgroundColor:COLOR.completado30
     },
     completado40:{
-        backgroundColor:'#ED9545'
+        backgroundColor:COLOR.completado40
     },
     completado50:{
-        backgroundColor:'#EBB246'
+        backgroundColor:COLOR.completado50
     },
     completado60:{
-        backgroundColor:'#E8D348'
+        backgroundColor:COLOR.completado60
     },
     completado70:{
-        backgroundColor:'#DBE64A'
+        backgroundColor:COLOR.completado70
     },
     completado85:{
-        backgroundColor:'#ACE14D'
+        backgroundColor:COLOR.completado85
     },
     completado99:{
-        backgroundColor:'#8DDE4E'
+        backgroundColor:COLOR.completado99
     },
     completado100:{
-        backgroundColor:'#46D116'
+        backgroundColor:COLOR.completado100
     },
     reportes:{
         backgroundColor:'#5A8B91',

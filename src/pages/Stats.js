@@ -14,7 +14,9 @@ export default class Stats extends Component {
     super(props);
     this.state = {
       loading: true,
+      porcentaje:0,
       porcentajes:{},
+      color:'',
       showToast: false
     };
     let token = this.props.token;
@@ -72,10 +74,39 @@ export default class Stats extends Component {
         if(response.ok === true)
         {
           var porcentajes = JSON.parse(response._bodyInit);
-          console.log(porcentajes)
+          //console.log(porcentajes)
           var general = (porcentajes.porcentaje_general.actividades_completas / porcentajes.porcentaje_general.todas_las_actividades) * 100;
           that._storeDataPorcentajes(Math.floor(general),porcentajes);
-          that.setState({porcentajes:porcentajes});
+          var color = '';
+          Math.floor(general) <= 10 ?
+            color = COLOR.completado10
+          :
+            Math.floor(general) <= 20 ?
+              color = COLOR.completado20
+            :
+              Math.floor(general) <= 30 ?
+                color = COLOR.completado30
+              :
+                Math.floor(general) <= 40 ?
+                  color = COLOR.completado40
+                :
+                  Math.floor(general) <= 50 ?
+                    color = COLOR.completado50
+                  :
+                    Math.floor(general) <= 60 ?
+                      color = COLOR.completado60
+                    :
+                      Math.floor(general) <= 70 ?
+                        color = COLOR.completado70
+                      :
+                        Math.floor(general) <= 85 ?
+                          color = COLOR.completado85
+                        :
+                          Math.floor(general) <= 99 ?
+                            color = COLOR.completado99
+                          :
+                            color = COLOR.completado100
+          that.setState({porcentaje: Math.floor(general),color:color, porcentajes:porcentajes});
           //console.log(Math.floor(general));
         }
         else
@@ -148,28 +179,60 @@ export default class Stats extends Component {
           {
             this.state.porcentajes.hasOwnProperty('porcentaje_general') ?
             <Content>
-                <Card key={1} style={{borderRadius:10,backgroundColor:COLOR.azul, borderColor:COLOR.azul, borderWidth:1, marginTop:25, marginLeft:20, marginRight:20}}>
-                    <Text style={{color:'white', fontSize:24, fontFamily:'BebasNeueBold', textAlign:'center'}}>Porcentaje general</Text>
-                    <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
-                        <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Activas: {this.state.porcentajes.porcentaje_general.actividades_activas}</Text>
-                        <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Completas: {this.state.porcentajes.porcentaje_general.actividades_completas}</Text>
-                        <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> No Realizadas: {this.state.porcentajes.porcentaje_general.actividades_noRealizadas}</Text>
-                        <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Total: {this.state.porcentajes.porcentaje_general.todas_las_actividades}</Text>
+                <Card key={1} style={{borderRadius:10, borderWidth:1, marginTop:25, marginLeft:20, marginRight:20,backgroundColor:this.state.color, borderColor:this.state.color}}>
+                    <Text style={{color:'white', fontSize:24, fontFamily:'BebasNeueBold', paddingLeft:10, paddingTop:5}}>Porcentaje general: {this.state.porcentaje}%</Text>
+                    <Card key={Math.floor(Math.random() * 100) + 101} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
+                        <Text style={{color:this.state.color,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Activas: {this.state.porcentajes.porcentaje_general.actividades_activas}</Text>
+                        <Text style={{color:this.state.color,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Completas: {this.state.porcentajes.porcentaje_general.actividades_completas}</Text>
+                        <Text style={{color:this.state.color,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> No Realizadas: {this.state.porcentajes.porcentaje_general.actividades_noRealizadas}</Text>
+                        <Text style={{color:this.state.color,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Total: {this.state.porcentajes.porcentaje_general.todas_las_actividades}</Text>
                     </Card>
                 </Card>
-                <Card key={Math.floor(Math.random() * 100) + 101} style={{borderRadius:10,backgroundColor:COLOR.azul, borderColor:COLOR.azul, borderWidth:1, marginTop:25, marginLeft:20, marginRight:20}}>
-                    <Text style={{color:'white', fontSize:24, fontFamily:'BebasNeueBold', textAlign:'center'}}>Porcentaje Sucursal</Text>
-                    {
-                        this.state.porcentajes.porcentaje_sucursal.map((data,index) => {
-                            <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
-                                <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Activas: {data.actividades_activas}</Text>
-                                <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Completas: {data.actividades_completas}</Text>
-                                <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> No Realizadas: {data.actividades_noRealizadas}</Text>
-                                <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Total: {data.todas_las_actividades}</Text>
-                            </Card>
-                        })//FIXME: error
-                    }
-                </Card>
+                  {
+                    Object.values(this.state.porcentajes.porcentaje_sucursal).map((data,index) => {
+                      var color2='';
+                      var sucursal = Math.floor((data.actividades_completas / data.todas_las_actividades) * 100);
+                      sucursal <= 10 ?
+                        color2 = COLOR.completado10
+                      :
+                        sucursal <= 20 ?
+                          color2 = COLOR.completado20
+                        :
+                          sucursal <= 30 ?
+                            color2 = COLOR.completado30
+                          :
+                            sucursal <= 40 ?
+                              color2 = COLOR.completado40
+                            :
+                              sucursal <= 50 ?
+                                color2 = COLOR.completado50
+                              :
+                                sucursal <= 60 ?
+                                  color2 = COLOR.completado60
+                                :
+                                  sucursal <= 70 ?
+                                    color2 = COLOR.completado70
+                                  :
+                                    sucursal <= 85 ?
+                                      color2 = COLOR.completado85
+                                    :
+                                      sucursal <= 99 ?
+                                        color2 = COLOR.completado99
+                                      :
+                                        color2 = COLOR.completado100
+                      return(
+                        <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderRadius:10, borderWidth:1, marginTop:25, marginLeft:20, marginRight:20,backgroundColor:color2, borderColor:color2}}>
+                          <Text style={{color:'white', fontSize:24, fontFamily:'BebasNeueBold', paddingLeft:10, paddingTop:5}}>{data.nombre_sucursal}: {sucursal}%</Text>
+                          <Card key={Math.floor(Math.random() * 10000) + 10001} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
+                            <Text style={{color:color2,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Activas: {data.actividades_activas}</Text>
+                            <Text style={{color:color2,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Completas: {data.actividades_completas}</Text>
+                            <Text style={{color:color2,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> No Realizadas: {data.actividades_noRealizadas}</Text>
+                            <Text style={{color:color2,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Total: {data.todas_las_actividades}</Text>
+                          </Card>
+                        </Card>
+                      )
+                    })
+                  }
             </Content>
             : 
                 null
