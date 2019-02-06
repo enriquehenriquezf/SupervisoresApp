@@ -268,8 +268,8 @@ export default class Reportes extends Component {
       var token2 = JSON.parse(response._bodyInit);
       if(response.ok === true)
       {
-        console.log(token2["detalle"]);
-        console.log(token2["mensajes"]);
+        //console.log(token2["detalle"]);
+        //console.log(token2["mensajes"]);
         if(token2["detalle"].foto === '' || token2["detalle"].foto === null){
           imgTemp1 = Imagen.noDisponible;
         }
@@ -309,7 +309,7 @@ export default class Reportes extends Component {
         mensaje:this.state.mensaje,
       })
     }).then(function(response) {
-      console.log(response);
+      //console.log(response);
       var token2 = JSON.parse(response._bodyInit);
       if(response.ok === true)
       {
