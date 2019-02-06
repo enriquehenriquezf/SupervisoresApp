@@ -82,5 +82,26 @@ export default StyleSheet.create({
         alignItems:'center',
         width:40,
         height:40
-    }
+    },
+    producto:{
+        borderBottomWidth:1,
+        borderBottomColor:COLOR.azul,
+        fontFamily:'BebasNeueBold',
+        fontSize:20,
+    },
+    autocompletar:{
+        borderColor:COLOR.azul,
+        borderLeftWidth:1,
+        borderRightWidth:1,
+        borderTopWidth:1,
+        borderBottomWidth:1,
+        borderRadius:4,
+        marginLeft:20,
+        marginRight:20
+    },
+    autocompletarLista:{
+        marginLeft:25,
+        marginRight:25,
+        borderColor:COLOR.azul
+    },
 });

@@ -22,7 +22,7 @@ export class UserInfo extends Component {
 
     render() {
         return (
-            <Card style={{borderColor:'rgba(255,255,255,0)', elevation:0}}>
+            <Card style={{borderColor:'rgba(255,255,255,0)', elevation:0, shadowOpacity:0}}>
                 <List>
                     <ListItem thumbnail button style={{marginBottom: 5}} onPress={() => this._OnItemPress(5,this.props.handler2, this.props.user)}>
                     <Left>

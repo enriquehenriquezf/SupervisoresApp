@@ -2,16 +2,16 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Content, Header, Left, Body, Right, Icon, Button, Spinner,Drawer, Card, Text, Input, Form, Textarea,ListItem } from 'native-base';
 import Overlay from 'react-native-modal-overlay';
+import Autocomplete from 'react-native-autocomplete-input';
 import IconStyles from '../styles/Icons';
 import styles from '../styles/Reportes';
 import {toastr} from '../components/Toast';
 import {api} from '../services/api'
-import {View, BackHandler,Image, AsyncStorage,TouchableOpacity, RefreshControl} from 'react-native';
+import {View, BackHandler,Image, AsyncStorage,TouchableOpacity, RefreshControl, ScrollView} from 'react-native';
 import SideBar from './SideBar';
 import { UserInfo } from '../components/UserInfo';
 import { COLOR } from '../components/Colores';
 import { Imagen } from '../components/Imagenes';
-import { DIMENSIONS } from 'react-native-numeric-input';
 
 let items = null;
 let user = [];
@@ -29,11 +29,18 @@ export default class Reportes extends Component {
         asunto:'',
         observacion: '',
         isVisibleReporte: false,
+        isVisibleDetalleReporte:false,
         isLoadReporte: false,
         imgReporte: Imagen.noDisponible,
         isVisible2: false,
         disable:false,
         reportes:[],
+        SUCURSALES:[],
+        suc_nombre:'',
+        suc_id:0,
+        mensajes:[],
+        mensajeInit:{},
+        mensaje:''
     };
     let token = this.props.token;
     items = this.props.data;
@@ -135,6 +142,9 @@ export default class Reportes extends Component {
     return true;
   }
 
+  /**
+   * Obtener lista de reportes creados
+   */
   async getReportes(){
     //ipObtenerReporteSucursal
     //ipHomeGerente
@@ -185,6 +195,9 @@ export default class Reportes extends Component {
     else{this.props.handler2(-1,token,[]);}
   }
 
+  /**
+   * Crear reporte con asunto, observaciones e imagen
+   */
   async CrearReporte(){
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
@@ -206,42 +219,163 @@ export default class Reportes extends Component {
         'Accept':'application/json'
       },      
       body: JSON.stringify({
-        id_sucursal: 294,//FIXME: poner dinamico
-        nombre_sucursal:'BOTICA 02',//FIXME: poner dinamico
+        id_sucursal: this.state.suc_id,
+        nombre_sucursal:this.state.suc_nombre,
         nombre_reporte: this.state.asunto,
         foto: file1,
         observaciones: this.state.observacion,
       })
     }).then(function(response) {
-      console.log(response);
+      //console.log(response);
+      var token2 = JSON.parse(response._bodyInit);
       if(response.ok === true)
       {
-        var token2 = JSON.parse(response._bodyInit);
-        that.setState({isVisibleActividad:false,isLoadActividad:false,disable:false});
         toastr.showToast(token2["message"],'success');
+        that.getReportes();
+        that.setState({isVisibleReporte:false,isLoadReporte:false,disable:false});
       }
-      else{        
+      else{
+        toastr.showToast(token2["message"],'warning'); 
         console.log(response);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
       console.log(error);
     });
-    this.getReportes();
-    this.setState({isVisibleReporte:false})
   }
 
-  getDetalleReporte(){
-      //ipDetalleRepSucursal
-    //this.setState({isVisibleReporte:true})
-    toastr.showToast("En Desarrollo!",'warning');
+  /**
+   * Obtener detalle de un reporte en especifico
+   * @param data datos del reporte seleccionado
+   */
+  async getDetalleReporte(data){
+    this.setState({isVisibleDetalleReporte:true, mensajes:[], mensajeInit:{}})
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    let that = this;
+    await fetch(api.ipDetalleRepSucursal, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_reporte: data.id_reporte
+      })
+    }).then(function(response) {
+      //console.log(response);
+      var token2 = JSON.parse(response._bodyInit);
+      if(response.ok === true)
+      {
+        console.log(token2["detalle"]);
+        console.log(token2["mensajes"]);
+        if(token2["detalle"].foto === '' || token2["detalle"].foto === null){
+          imgTemp1 = Imagen.noDisponible;
+        }
+        else{
+          imgTemp1 = api.ipImg + token2["detalle"].foto;
+        }
+        that.setState({mensajes:token2["mensajes"], mensajeInit:token2["detalle"], imgReporte:imgTemp1});
+        //toastr.showToast(token2["detalle"],'success');
+      }
+      else{
+        toastr.showToast(token2["message"],'warning'); 
+        console.log(response);
+      }
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
 
   }
 
-  EnviarMensaje(){
-      //ipEnviarMensajeReporte
+  /**
+   * Enviar mensaje al coordinador en un reporte especifico
+   */
+  async EnviarMensaje(){
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    let that = this;
+    await fetch(api.ipEnviarMensajeReporte, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_reporte: this.state.mensajeInit.id_reporte,
+        mensaje:this.state.mensaje,
+      })
+    }).then(function(response) {
+      console.log(response);
+      var token2 = JSON.parse(response._bodyInit);
+      if(response.ok === true)
+      {
+        toastr.showToast(token2["message"],'success');
+        that.setState({isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
+      }
+      else{
+        toastr.showToast(token2["message"],'warning'); 
+        console.log(response);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
   }
 
+  /** buscar Sucursales */
+  BuscarSucursales(query){
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    let sucs = [];
+    var that = this;
+    if(query !== ''){
+      fetch(api.ipBuscarSucursales, {
+        method: 'POST',
+        headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/json',
+            'Accept':'application/json'
+        },
+        body: JSON.stringify({
+          nombre_sucursal: query.toLowerCase()
+        })
+      }).then(function(response) {
+        //console.log(response);
+        if(response.ok === true && response.status === 200)
+        {
+          newToken = JSON.parse(response._bodyInit);
+          console.log(newToken.sucursales['data']);
+          Object.values(newToken.sucursales['data']).forEach(element => {
+            sucs.push({nombre: element.nombre, id: element.id_suscursal, codigo: element.cod_sucursal});
+          });
+          //console.log(sucs)
+          that.setState({SUCURSALES: sucs,query:query});
+        }
+        else
+        {
+          //console.log(response);
+          if(response.status === 500){
+            toastr.showToast('Error con el servidor','danger');
+          }
+          else if(response.status === 401){
+            toastr.showToast('Su sesión expiró','danger');
+          }
+          else{
+            toastr.showToast('No se encontraron Sucursales','warning');
+            that.setState({SUCURSALES: sucs,query:query});
+          }
+        }
+        //return response.json();
+      }).catch(function(error){
+        toastr.showToast('Su sesión expiró','danger');
+        console.log(error);
+      });
+    }else{this.setState({SUCURSALES: sucs,query:query});}
+  }
 
   /**
    * Seleccionar un archivo desde el UI del dispositivo
@@ -292,6 +426,8 @@ export default class Reportes extends Component {
     if (this.state.loading) {
       return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
     }
+    const { query } = this.state;
+    const sucursales = this.state.SUCURSALES;
     return (
       <Drawer
         ref={(ref) => { this.drawer = ref; }}
@@ -318,48 +454,48 @@ export default class Reportes extends Component {
             <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
             <Content refreshControl={
                 <RefreshControl
-                    refreshing={this.state.refreshing}
-                    onRefresh={() => this.getReportes()}
-                    colors={[COLOR.azul]}
+                  refreshing={this.state.refreshing}
+                  onRefresh={() => this.getReportes()}
+                  colors={[COLOR.azul]}
                 />
                 }>
                 <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => this.setState({isVisibleReporte:true})}><Text style={styles.textButton}> Crear Nuevo </Text></Button>
                 {
-                    this.state.reportes.map((data,index) => {
-                        return(
-                            <ListItem key={Math.floor(Math.random() * 1000) + 1001} button underlayColor={COLOR.azulTransparente} onPress={() => this.getDetalleReporte()} style={styles.SinBorde}>
-                                <Left >
-                                    <View style={styles.ReporteBackground}>
-                                        <Text style={styles.ReporteText}>{data.nombre_reporte}</Text>
-                                    </View>
-                                </Left>
-                                <Right>
-                                    {
-                                        data.estado_corregido === 1 &&
-                                        <View style={{flexDirection:'row'}}>
-                                            <View style={[styles.estado,{backgroundColor:'rgba(0,0,0,0.1)', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
-                                                <Image style={styles.iconoBoton} source={Imagen.equis}></Image>
-                                            </View>
-                                            <View style={[styles.estado,{backgroundColor:COLOR.rojo}]}>
-                                                <Image style={styles.iconoBoton} source={Imagen.uncheck}></Image>
-                                            </View>
-                                        </View>
-                                    }
-                                    {                  
-                                        data.estado_corregido !== 1 && 
-                                        <View style={{flexDirection:'row'}}>
-                                            <View style={[styles.estado,{backgroundColor:'transparent', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
-                                                <Image style={styles.iconoBoton} source={Imagen.equis}></Image>
-                                            </View>
-                                            <View style={[styles.estado,{backgroundColor:COLOR.verde}]}>
-                                                <Image style={styles.iconoBoton} source={Imagen.check}></Image>
-                                            </View>
-                                        </View>
-                                    }
-                                </Right>
-                            </ListItem>
-                        )
-                    })
+                  this.state.reportes.map((data,index) => {
+                    return(
+                      <ListItem key={Math.floor(Math.random() * 1000) + 1001} button underlayColor={COLOR.azulTransparente} onPress={() => this.getDetalleReporte(data)} style={styles.SinBorde}>
+                        <Left >
+                            <View style={styles.ReporteBackground}>
+                              <Text style={styles.ReporteText}>{data.nombre_reporte}</Text>
+                            </View>
+                        </Left>
+                        <Right>
+                            {
+                              data.estado_corregido === 1 &&
+                              <View style={{flexDirection:'row'}}>
+                                <View style={[styles.estado,{backgroundColor:'rgba(0,0,0,0.1)', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
+                                  <Image style={styles.iconoBoton} source={Imagen.equis}></Image>
+                                </View>
+                                <View style={[styles.estado,{backgroundColor:COLOR.rojo}]}>
+                                  <Image style={styles.iconoBoton} source={Imagen.uncheck}></Image>
+                                </View>
+                              </View>
+                            }
+                            {                  
+                              data.estado_corregido !== 1 && 
+                              <View style={{flexDirection:'row'}}>
+                                <View style={[styles.estado,{backgroundColor:'transparent', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
+                                  <Image style={styles.iconoBoton} source={Imagen.equis}></Image>
+                                </View>
+                                <View style={[styles.estado,{backgroundColor:COLOR.verde}]}>
+                                  <Image style={styles.iconoBoton} source={Imagen.check}></Image>
+                                </View>
+                              </View>
+                            }
+                        </Right>
+                      </ListItem>
+                    )
+                  })
                 }
             </Content>
 
@@ -372,6 +508,20 @@ export default class Reportes extends Component {
               >
                 <View style={{justifyContent:'space-between'}}>
                     <Input style={[styles.asunto,{width:250}]} placeholder="Asunto"  onChangeText={(text) => this.setState({asunto: text})}></Input>                      
+                    <Autocomplete
+                        autoCapitalize="none"
+                        data={sucursales}
+                        defaultValue={query}
+                        onChangeText={text => this.BuscarSucursales(text)}
+                        placeholder="Sucursal"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {this.setState({suc_nombre: item.nombre, suc_id: item.id, query: item.nombre})} }>
+                            <Text style={styles.producto}><Icon ios='ios-add-circle-outline' android="md-add-circle-outline" style={{color: COLOR.verde, fontSize: 20}}></Icon> {item.nombre}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
                     <Form>
                         <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion: text})} />
                     </Form>
@@ -386,6 +536,65 @@ export default class Reportes extends Component {
                         </Body>
                     </ListItem>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.CrearReporte()}}><Text> Enviar </Text></Button>
+                </View>
+            </Overlay>
+
+            <Overlay
+                visible={this.state.isVisibleDetalleReporte}
+                animationType="zoomIn"
+                onClose={() => this.setState({isVisibleDetalleReporte: false,isLoadReporte:false})}
+                containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+                childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+              >
+                <View style={{justifyContent:'space-between'}}>
+                  <ScrollView>                    
+                    {
+                      this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
+                        <ListItem key={Math.floor(Math.random() * 100) + 101} thumbnail style={{backgroundColor:COLOR.verde, borderRadius:10, marginLeft:40, marginRight:10,marginBottom:10}}>
+                          <Left style={{flexDirection:'column'}}>
+                            <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{this.state.mensajeInit.nombre} {this.state.mensajeInit.apellido}</Text>
+                              <TouchableOpacity onPress={() => this.verImagen()}>
+                                  <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isVisibleDetalleReporte ? (this.state.mensajeInit.foto !== null? this.state.mensajeInit.foto : Imagen.noDisponible) : Imagen.noDisponible}}></Image>
+                              </TouchableOpacity>
+                          </Left>
+                          <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                              <Text style={{fontFamily:'BebasKai'}}>{this.state.mensajeInit.nombre_reporte}</Text>
+                              <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{this.state.mensajeInit.observaciones}</Text>
+                          </Body>
+                        </ListItem>
+                      : null
+                    }
+                    {
+                      this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
+                        this.state.mensajes.map((data,index) => {
+                          return(
+                          data.tipo_usuario === 1 ?
+                            <ListItem key={Math.floor(Math.random() * 10000) + 10001} thumbnail style={{backgroundColor:COLOR.azul, borderRadius:10, marginLeft:10, marginRight:40,marginBottom:10}}>
+                                <Left style={{flexDirection:'column'}}>
+                                  <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.nombre_usuario}</Text>
+                                </Left>
+                                <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                                    <Text style={{fontFamily:'BebasKai'}}>{data.mensaje}</Text>
+                                    <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.fecha}</Text>
+                                </Body>
+                            </ListItem>
+                          :
+                            <ListItem key={Math.floor(Math.random() * 10000) + 10001} thumbnail style={{backgroundColor:COLOR.verde, borderRadius:10, marginLeft:40, marginRight:10,marginBottom:10}}>
+                              <Left style={{flexDirection:'column'}}>
+                                <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.nombre_usuario}</Text>
+                              </Left>
+                              <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                                  <Text style={{fontFamily:'BebasKai'}}>{data.mensaje}</Text>
+                                  <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.fecha}</Text>
+                              </Body>
+                            </ListItem>
+                          )
+                        })
+                      : null
+                    }
+                    <Input style={[styles.asunto,{width:250}]} placeholder="Mensaje"  onChangeText={(text) => this.setState({mensaje: text})}></Input>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.EnviarMensaje()}}><Text> Enviar Mensaje </Text></Button>
+                  </ScrollView>
                 </View>
             </Overlay>
 

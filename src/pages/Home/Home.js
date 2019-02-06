@@ -128,8 +128,8 @@ export default class Home extends Component {
               </Body>
             </Header>
           <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
-          <Tabs tabContainerStyle={{elevation:0}}>
-            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginLeft:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Activos</Text></View></TabHeading>}>
+          <Tabs tabContainerStyle={{elevation:0, shadowOpacity:0}} tabBarUnderlineStyle={{backgroundColor:'transparent',elevation:0, shadowOpacity:0}}>
+            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading activeTextStyle={{color:'#ff0000'}} style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginLeft:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Activos</Text></View></TabHeading>}>
               <Activos handler2={this.props.handler2} token={token} data={this.props.data} estado={this.state.estado}/>
             </Tab>
             <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginRight:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Completados</Text></View></TabHeading>}>
