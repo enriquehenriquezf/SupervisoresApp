@@ -108,7 +108,8 @@ export default class Login extends Component {
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }
-          else{
+          else if(401){
+            handler(8,token);
             //toastr.showToast('Credenciales incorrectas','danger');
           }
         }
