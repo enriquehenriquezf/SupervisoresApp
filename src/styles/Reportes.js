@@ -9,10 +9,8 @@ export default StyleSheet.create({
     },
     observaciones:{
         borderColor: COLOR.azulTransparente,
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        borderLeftWidth: 0,
-        borderRightWidth: 0,
+        borderRadius:10,
+        borderWidth: 1,
         marginLeft: 20,
         marginRight: 20,
         marginBottom: 5,
@@ -50,7 +48,6 @@ export default StyleSheet.create({
         paddingBottom:5
     },
     asunto:{
-        fontFamily:'BebasKai',
         color: COLOR.azul,
         fontSize: 20,
         borderColor:COLOR.azul,
@@ -91,13 +88,11 @@ export default StyleSheet.create({
     },
     autocompletar:{
         borderColor:COLOR.azul,
-        borderLeftWidth:1,
-        borderRightWidth:1,
-        borderTopWidth:1,
-        borderBottomWidth:1,
+        borderWidth:1,
         borderRadius:4,
         marginLeft:20,
-        marginRight:20
+        marginRight:20,
+        marginBottom:10,
     },
     autocompletarLista:{
         marginLeft:25,

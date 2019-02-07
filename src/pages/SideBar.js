@@ -71,21 +71,21 @@ export default class SideBar extends React.Component {
                 </View>
 
                 <View style={styles.threeButtons}>
-                    <View style={[styles.rectangulo, styles.actividades]}>
+                    <View style={[styles.rectangulo, styles.actividades, this.props.layout === 1 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 1 ? this.props.closeDrawer() : this.props.handler2(1,token,[])}}>
                             <Text style={[styles.text,{fontSize:34, paddingTop:20}]}>Actividad</Text>
                             <Image source={Imagen.actividad} style={{width:"50%",height:"50%",marginBottom:20}}></Image>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.columnas}>
-                        <View style={[styles.cuadradoInsideColumna, styles.perfil]}>
+                        <View style={[styles.cuadradoInsideColumna, styles.perfil, this.props.layout === 5 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
                             <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 5 ? this.props.closeDrawer() : this.props.handler2(5,token,[])}}>
                                 <Text style={[styles.text,{paddingTop:10}]}>Perfil</Text>
                                 <Image source={Imagen.perfil} style={{width:"60%",height:"60%",marginBottom:10}}></Image>
                             </TouchableOpacity>
                         </View>
 
-                        <View style={[styles.cuadradoInsideColumna, styles.agenda]}>
+                        <View style={[styles.cuadradoInsideColumna, styles.agenda, this.props.layout === 3 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
                             <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 3 ? this.props.closeDrawer() : this.props.handler2(3,token,[])}}>
                                 <Text style={[styles.text,{paddingTop:5}]}>Agenda</Text>
                                 <Image source={Imagen.agenda} style={{width:"50%",height:"50%",marginBottom:10}}></Image>
@@ -112,7 +112,7 @@ export default class SideBar extends React.Component {
                         </TouchableOpacity>
                     </View>
 
-                    <View style={[styles.rectangulo,
+                    <View style={[styles.rectangulo, this.props.layout === 7 ?{shadowOffset:{height:8}, elevation: 8} : null,
                             this.state.porcentaje <= 10 ?
                                 styles.completado10
                             :
@@ -151,7 +151,7 @@ export default class SideBar extends React.Component {
                 </View>
                 
                 <View style={styles.oneButton}>
-                    <View style={styles.reportes}>
+                    <View style={[styles.reportes, this.props.layout === 8 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 8 ? this.props.closeDrawer() : this.props.handler2(8,token,[])}}>
                             <Text style={[styles.text,{fontSize:40,marginLeft:30}]}>Reportes</Text>
                             <Image source={Imagen.reportes} style={{width:"25%",height:"75%",marginRight:30}}></Image>
@@ -160,7 +160,7 @@ export default class SideBar extends React.Component {
                 </View>
                 
                 <View style={styles.twoButtons}>
-                    <View style={[styles.rectangulo,styles.servicioTecnico]}>
+                    <View style={[styles.rectangulo,styles.servicioTecnico, this.props.layout === 9 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 9 ? this.props.closeDrawer() : this.props.handler2(-1,token,[])}}>
                             <Text style={[styles.text, {height:"80%",width:"50%", fontSize:28, marginLeft:20}]}>Servicio Tecnico</Text>
                             <Image source={Imagen.servicioTecnico} style={{width:"25%",height:"75%",marginRight:20}}></Image>

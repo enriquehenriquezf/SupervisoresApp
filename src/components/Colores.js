@@ -3,9 +3,11 @@
  */
 export const COLOR = {
  azul : '#00A1E4',
- azulTransparente : 'rgba(0,161,228,0.65)',
+ azul70 : '#00A1E4B3',
+ azulTransparente : 'rgba(0,161,228,0.65)',//A6
  verde: '#7EB700',
- verdeTransparente: 'rgba(126,183,0,0.65)',
+ verde70: '#7EB700B3',
+ verdeTransparente: 'rgba(126,183,0,0.65)',//A6
  gris: '#8f8f8f',
  rojo: '#F53F3F',
  amarillo: '#EBC908',

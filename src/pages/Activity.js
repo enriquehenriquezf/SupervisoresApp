@@ -1600,7 +1600,7 @@ export default class Activity extends Component {
                 childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
               >
                 {
-                  /***
+                /***
                 * Mostrar layout luego de cargar los datos
                 */
                 !this.state.isLoadActividad && this.state.isVisibleActividad2?

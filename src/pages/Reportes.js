@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Content, Header, Left, Body, Right, Icon, Button, Spinner,Drawer, Card, Text, Input, Form, Textarea,ListItem } from 'native-base';
+import { Container, Content, Header, Left, Body, Right, Icon, Button, Spinner,Drawer, Text, Input, Form, Textarea,ListItem } from 'native-base';
 import Overlay from 'react-native-modal-overlay';
 import Autocomplete from 'react-native-autocomplete-input';
 import IconStyles from '../styles/Icons';
@@ -276,7 +276,7 @@ export default class Reportes extends Component {
         else{
           imgTemp1 = api.ipImg + token2["detalle"].foto;
         }
-        that.setState({mensajes:token2["mensajes"], mensajeInit:token2["detalle"], imgReporte:imgTemp1});
+        that.setState({mensajes:token2["mensajes"], mensajeInit:token2["detalle"], imgReporte:imgTemp1, isLoadReporte:true});
         //toastr.showToast(token2["detalle"],'success');
       }
       else{
@@ -348,7 +348,7 @@ export default class Reportes extends Component {
         if(response.ok === true && response.status === 200)
         {
           newToken = JSON.parse(response._bodyInit);
-          console.log(newToken.sucursales['data']);
+          //console.log(newToken.sucursales['data']);
           Object.values(newToken.sucursales['data']).forEach(element => {
             sucs.push({nombre: element.nombre, id: element.id_suscursal, codigo: element.cod_sucursal});
           });
@@ -459,21 +459,23 @@ export default class Reportes extends Component {
                   colors={[COLOR.azul]}
                 />
                 }>
-                <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => this.setState({isVisibleReporte:true})}><Text style={styles.textButton}> Crear Nuevo </Text></Button>
+                <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => this.setState({imgReporte:Imagen.noDisponible,isVisibleReporte:true})}><Text style={styles.textButton}> Crear Nuevo </Text></Button>
                 {
                   this.state.reportes.map((data,index) => {
                     return(
-                      <ListItem key={Math.floor(Math.random() * 1000) + 1001} button underlayColor={COLOR.azulTransparente} onPress={() => this.getDetalleReporte(data)} style={styles.SinBorde}>
-                        <Left >
+                      <ListItem key={index} button underlayColor={COLOR.azulTransparente} style={styles.SinBorde}>
+                        <Left>
                             <View style={styles.ReporteBackground}>
-                              <Text style={styles.ReporteText}>{data.nombre_reporte}</Text>
+                              <TouchableOpacity style={{width:"100%", height: "100%", justifyContent:'center'}} onPress={() => this.getDetalleReporte(data)}>
+                                <Text style={styles.ReporteText}>{data.nombre_reporte}</Text>
+                              </TouchableOpacity>
                             </View>
                         </Left>
                         <Right>
                             {
                               data.estado_corregido === 1 &&
                               <View style={{flexDirection:'row'}}>
-                                <View style={[styles.estado,{backgroundColor:'rgba(0,0,0,0.1)', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
+                                <View style={[styles.estado,{backgroundColor:'transparent', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
                                   <Image style={styles.iconoBoton} source={Imagen.equis}></Image>
                                 </View>
                                 <View style={[styles.estado,{backgroundColor:COLOR.rojo}]}>
@@ -481,7 +483,7 @@ export default class Reportes extends Component {
                                 </View>
                               </View>
                             }
-                            {                  
+                            {           
                               data.estado_corregido !== 1 && 
                               <View style={{flexDirection:'row'}}>
                                 <View style={[styles.estado,{backgroundColor:'transparent', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
@@ -507,7 +509,9 @@ export default class Reportes extends Component {
                 childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
               >
                 <View style={{justifyContent:'space-between'}}>
-                    <Input style={[styles.asunto,{width:250}]} placeholder="Asunto"  onChangeText={(text) => this.setState({asunto: text})}></Input>                      
+                  <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
+                  <ScrollView>
+                    <Input style={[styles.asunto,{width:"82%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
                     <Autocomplete
                         autoCapitalize="none"
                         data={sucursales}
@@ -517,25 +521,20 @@ export default class Reportes extends Component {
                         inputContainerStyle={styles.autocompletar}
                         listStyle={styles.autocompletarLista}
                         renderItem={item => (
-                          <TouchableOpacity onPress={() => {this.setState({suc_nombre: item.nombre, suc_id: item.id, query: item.nombre})} }>
-                            <Text style={styles.producto}><Icon ios='ios-add-circle-outline' android="md-add-circle-outline" style={{color: COLOR.verde, fontSize: 20}}></Icon> {item.nombre}</Text>
+                          <TouchableOpacity onPress={() => {this.setState({suc_nombre: item.nombre, suc_id: item.id, query: item.nombre}); this.BuscarSucursales(item.nombre)} }>
+                            <Text style={styles.producto}> {item.nombre}</Text>
                           </TouchableOpacity>
                         )}
                       />
                     <Form>
-                        <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion: text})} />
+                        <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{marginTop:0, height:100}]} onChangeText={(text) => this.setState({observacion: text})} />
                     </Form>
-                    <ListItem thumbnail style={{marginLeft:0}}>
-                        <Left>
-                            <TouchableOpacity onPress={() => this.verImagen()}>
-                                <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isVisibleReporte ? this.state.imgReporte : Imagen.noDisponible}}></Image>
-                            </TouchableOpacity>
-                        </Left>
-                        <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                            <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker()}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
-                        </Body>
-                    </ListItem>
+                    <TouchableOpacity onPress={() => this.verImagen()} style={{width:64, alignSelf:'center',marginBottom:10}}>
+                      <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isVisibleReporte ? this.state.imgReporte : Imagen.noDisponible}}></Image>
+                    </TouchableOpacity>
+                    <Button regular block info style={[styles.boton, styles.actualizar,{marginBottom:0}]} onPress={() => this.openFilePicker()}><Text>Cargar Imagen</Text></Button>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.CrearReporte()}}><Text> Enviar </Text></Button>
+                  </ScrollView>
                 </View>
             </Overlay>
 
@@ -546,56 +545,61 @@ export default class Reportes extends Component {
                 containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
                 childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
               >
-                <View style={{justifyContent:'space-between'}}>
-                  <ScrollView>                    
-                    {
-                      this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
-                        <ListItem key={Math.floor(Math.random() * 100) + 101} thumbnail style={{backgroundColor:COLOR.verde, borderRadius:10, marginLeft:40, marginRight:10,marginBottom:10}}>
-                          <Left style={{flexDirection:'column'}}>
-                            <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{this.state.mensajeInit.nombre} {this.state.mensajeInit.apellido}</Text>
-                              <TouchableOpacity onPress={() => this.verImagen()}>
-                                  <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isVisibleDetalleReporte ? (this.state.mensajeInit.foto !== null? this.state.mensajeInit.foto : Imagen.noDisponible) : Imagen.noDisponible}}></Image>
-                              </TouchableOpacity>
-                          </Left>
-                          <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                              <Text style={{fontFamily:'BebasKai'}}>{this.state.mensajeInit.nombre_reporte}</Text>
-                              <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{this.state.mensajeInit.observaciones}</Text>
-                          </Body>
-                        </ListItem>
-                      : null
-                    }
-                    {
-                      this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
-                        this.state.mensajes.map((data,index) => {
-                          return(
-                          data.tipo_usuario === 1 ?
-                            <ListItem key={Math.floor(Math.random() * 10000) + 10001} thumbnail style={{backgroundColor:COLOR.azul, borderRadius:10, marginLeft:10, marginRight:40,marginBottom:10}}>
-                                <Left style={{flexDirection:'column'}}>
-                                  <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.nombre_usuario}</Text>
-                                </Left>
-                                <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                                    <Text style={{fontFamily:'BebasKai'}}>{data.mensaje}</Text>
-                                    <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.fecha}</Text>
+              {
+                /***
+                * Mostrar layout luego de cargar los datos
+                */
+                !this.state.isLoadReporte && this.state.isVisibleDetalleReporte?
+                  <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
+                :
+                  <View style={{justifyContent:'space-between'}}>
+                    <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleDetalleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
+                    <ScrollView>                    
+                      {
+                        this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
+                          <ListItem key={Math.floor(Math.random() * 200) + 201} thumbnail style={{backgroundColor:COLOR.verde70, borderRadius:10,marginBottom:10, marginLeft:0}}>
+                            <Left style={{flexDirection:'column'}}>
+                              <Text style={{color:'white', fontSize:12, paddingTop:5, paddingLeft:5}}>{this.state.mensajeInit.nombre} {this.state.mensajeInit.apellido}</Text>
+                                <TouchableOpacity onPress={() => this.verImagen()}>
+                                    <Image ref={component => this._img1 = component} style={{width: 50, height: 50, marginLeft:5,marginBottom:10}} source={{uri: this.state.isVisibleDetalleReporte ? (this.state.mensajeInit.foto !== null? api.ipImg + this.state.mensajeInit.foto : Imagen.noDisponible) : Imagen.noDisponible}}></Image>
+                                </TouchableOpacity>
+                            </Left>
+                            <Body style={{borderBottomColor: 'rgba(255,255,255,0)', paddingBottom:5, paddingTop:0,marginLeft:7}}>
+                                <Text style={{color:'white', textAlign:'justify', marginBottom:5}}>{this.state.mensajeInit.nombre_reporte}</Text>
+                                <Text style={{color:'white', textAlign:'justify', fontSize:14, paddingLeft:10}}>{this.state.mensajeInit.observaciones}</Text>
+                            </Body>
+                          </ListItem>
+                        : null
+                      }
+                      {
+                        this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
+                          this.state.mensajes.map((data,index) => {
+                            return(
+                            data.tipo_usuario === 1 ?
+                                <ListItem key={index*1000} thumbnail style={{backgroundColor:COLOR.azul70, borderRadius:10, marginRight:60,marginBottom:10, marginLeft:0}}>
+                                  <Body style={{borderBottomColor: 'rgba(255,255,255,0)', paddingBottom:5, paddingTop:5, marginLeft:5}}>
+                                    <Text style={{color:'white', fontSize:12,alignSelf:'flex-start'}}>{data.nombre_usuario}</Text>
+                                    <Text style={{color:'white', textAlign:'justify', paddingLeft:5}}>{data.mensaje}</Text>
+                                    <Text style={{color:'white', fontSize:12, marginRight:12, textAlign:'right'}}>{data.fecha}</Text>
+                                  </Body>
+                              </ListItem>
+                            :
+                              <ListItem key={index*1000} thumbnail style={{backgroundColor:COLOR.verde70, borderRadius:10, marginLeft:60,marginBottom:10}}>
+                                <Body style={{borderBottomColor: 'rgba(255,255,255,0)', paddingBottom:5, paddingTop:5, marginLeft:5}}>
+                                  <Text style={{color:'white', fontSize:12,alignSelf:'flex-start'}}>{data.nombre_usuario}</Text>
+                                  <Text style={{color:'white', textAlign:'justify', paddingLeft:5}}>{data.mensaje}</Text>
+                                  <Text style={{color:'white', fontSize:12, marginRight:12, textAlign:'right'}}>{data.fecha}</Text>
                                 </Body>
-                            </ListItem>
-                          :
-                            <ListItem key={Math.floor(Math.random() * 10000) + 10001} thumbnail style={{backgroundColor:COLOR.verde, borderRadius:10, marginLeft:40, marginRight:10,marginBottom:10}}>
-                              <Left style={{flexDirection:'column'}}>
-                                <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.nombre_usuario}</Text>
-                              </Left>
-                              <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                                  <Text style={{fontFamily:'BebasKai'}}>{data.mensaje}</Text>
-                                  <Text style={{fontFamily:'BebasNeueBold', fontSize:12}}>{data.fecha}</Text>
-                              </Body>
-                            </ListItem>
-                          )
-                        })
-                      : null
-                    }
-                    <Input style={[styles.asunto,{width:250}]} placeholder="Mensaje"  onChangeText={(text) => this.setState({mensaje: text})}></Input>
-                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.EnviarMensaje()}}><Text> Enviar Mensaje </Text></Button>
-                  </ScrollView>
-                </View>
+                              </ListItem>
+                            )
+                          })
+                        : null
+                      }
+                      <Input style={[styles.asunto,{width:230}]} placeholder="Mensaje"  onChangeText={(text) => this.setState({mensaje: text})}></Input>
+                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.EnviarMensaje()}}><Text> Enviar Mensaje </Text></Button>
+                    </ScrollView>
+                  </View>
+              }
             </Overlay>
 
             <Overlay
