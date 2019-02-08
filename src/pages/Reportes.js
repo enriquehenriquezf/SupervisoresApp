@@ -40,7 +40,8 @@ export default class Reportes extends Component {
         suc_id:0,
         mensajes:[],
         mensajeInit:{},
-        mensaje:''
+        mensaje:'',
+        notificaciones: []
     };
     let token = this.props.token;
     items = this.props.data;
@@ -121,6 +122,62 @@ export default class Reportes extends Component {
     else{this.props.handler2(-1,token,[]);}
   }
 
+  /**
+   * Obtener log de las notificaciones de mensajes
+   */
+  async getLogNotificaciones()
+  {
+    let handler2 = false;
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var logs = [];
+    var reportes = [];
+    var that = this;
+    await fetch(api.ipLogNotificacionesUsuario, {
+      method: 'GET',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
+      },
+      body: ''
+    }).then(function(response) {
+      //console.log(response);
+      newToken = JSON.parse(response._bodyInit);
+      //console.log(newToken["message"]);
+      if(response.ok === true && response.status === 200)
+      {
+        logs = newToken["message"];
+        reportes = that.state.reportes;
+        logs.forEach(element => {
+          //TODO: poner notificacion en el reporte
+        })
+      }
+      else
+      {
+        //console.log(response);
+        if(response.status === 500){
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+          handler2 = true;
+        }
+        else{
+          //toastr.showToast(newToken[actividades],'warning');
+        }
+      }
+      //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      handler2 = true;
+      console.log(error);
+    });
+    if(!handler2){
+      this.setState({ notificaciones: logs});
+    }
+    else{this.props.handler2(-1,token,[]);}
+  }
 
   componentDidMount()
   {
@@ -146,8 +203,6 @@ export default class Reportes extends Component {
    * Obtener lista de reportes creados
    */
   async getReportes(){
-    //ipObtenerReporteSucursal
-    //ipHomeGerente
     this.setState({ refreshing: true });
     var that = this;
     let handler2 = false;
@@ -190,6 +245,7 @@ export default class Reportes extends Component {
       console.log(error);
     });
     if(!handler2){
+      this.getLogNotificaciones();
       this.setState({ loading: false, refreshing: false });
     }
     else{this.props.handler2(-1,token,[]);}
