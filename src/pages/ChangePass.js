@@ -122,7 +122,7 @@ export default class ChangePass extends Component {
     return (
       <Drawer
         ref={(ref) => { this.drawer = ref; }}
-        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={-1} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2} rol={1} layout={-1} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
         onClose={() => this.drawer._root.close()} 
         initializeOpen={false}
         openDrawerOffset={0}
@@ -133,7 +133,7 @@ export default class ChangePass extends Component {
         <Container>
           <Header hasTabs style={IconStyles.navbar}>
             <Left>
-              <Button transparent onPress={() => this.drawer._root.open()}>
+              <Button transparent onPress={() => items.FromLogin ? null : this.drawer._root.open()}>
                 <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
               </Button>
             </Left>       
@@ -147,11 +147,15 @@ export default class ChangePass extends Component {
             <Content>
               <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>
                   {/* <Thumbnail square large source={Imagen.profileBorder} style={{width:160, height:160}}/> */}
-                  <Thumbnail large
-                  source={{uri: items.foto}}
-                  style={styles.foto}
-                  />
-                  <H2 style={styles.textH2}>{items.nombre} {items.apellido}</H2>
+                  {!items.FromLogin && 
+                    <Thumbnail large
+                    source={{uri: items.foto}}
+                    style={styles.foto}
+                    />
+                  }
+                  {!items.FromLogin &&
+                    <H2 style={styles.textH2}>{items.nombre} {items.apellido}</H2>
+                  }
                   <Item style={styles.item}>
                       <Image source={Imagen.mail} style={styles.icono}></Image>
                       <Input placeholder='Correo' placeholderTextColor={COLOR.gris} defaultValue={items.correo} onChangeText={(text) => this.setState({email: text})} keyboardType='email-address' autoCapitalize='none'  style={styles.input}/>

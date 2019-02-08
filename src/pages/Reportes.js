@@ -95,7 +95,7 @@ export default class Reportes extends Component {
       }
       else
       {
-        console.log(response);
+        //console.log(response);
         if(response.status === 500){
           toastr.showToast('Error con el servidor','danger');
         }
@@ -431,7 +431,7 @@ export default class Reportes extends Component {
     return (
       <Drawer
         ref={(ref) => { this.drawer = ref; }}
-        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={8} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={8} rol={user.id_rol} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
         onClose={() => this.drawer._root.close()} 
         initializeOpen={false}
         openDrawerOffset={0}
@@ -443,7 +443,8 @@ export default class Reportes extends Component {
             <Header hasTabs style={IconStyles.navbar}>
                 <Left>
                     <Button transparent onPress={() => this.drawer._root.open()}>
-                    <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+                    {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                      <Image style={IconStyles.menu2} source={Imagen.home}></Image>
                     </Button>
                 </Left>       
                 <Body>

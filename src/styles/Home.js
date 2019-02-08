@@ -53,7 +53,8 @@ export default StyleSheet.create({
     text:{
         fontFamily:'BebasKai',
         color: COLOR.azul,
-        fontSize: 24
+        fontSize: 24,
+        marginRight:6
     },
     text2:{
         fontFamily:'BebasKai',

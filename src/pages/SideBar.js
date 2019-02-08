@@ -2,6 +2,7 @@ import React from "react";
 import { Image, View, TouchableOpacity, Dimensions, AsyncStorage } from "react-native";
 import { Text, Container, Content, Icon} from "native-base";
 import styles from '../styles/SideBar';
+import IconStyles from '../styles/Icons';
 import { Imagen } from "../components/Imagenes";
 
 export default class SideBar extends React.Component {
@@ -66,13 +67,14 @@ export default class SideBar extends React.Component {
             <View style={{width:"100%", height:Dimensions.get('window').height, paddingLeft:20, paddingRight:20}}>
                 <View style={styles.header}>
                     <TouchableOpacity style={{marginLeft:20, marginTop:30}} onPress={() => this.props.closeDrawer()}>
-                        <Icon ios="ios-menu" android="md-menu" style={{fontSize: 40, color: 'white'}}></Icon>
+                        {/* <Icon ios="ios-menu" android="md-menu" style={{fontSize: 40, color: 'white'}}></Icon> */}
+                        <Image style={IconStyles.menu2} source={Imagen.home}></Image>
                     </TouchableOpacity>
                 </View>
 
                 <View style={styles.threeButtons}>
                     <View style={[styles.rectangulo, styles.actividades, this.props.layout === 1 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 1 ? this.props.closeDrawer() : this.props.handler2(1,token,[])}}>
+                        <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 1 ? this.props.closeDrawer() : this.props.handler2(1,token,[])}} disabled={this.props.rol !== 1 ? true : false}>
                             <Text style={[styles.text,{fontSize:34, paddingTop:20}]}>Actividad</Text>
                             <Image source={Imagen.actividad} style={{width:"50%",height:"50%",marginBottom:20}}></Image>
                         </TouchableOpacity>
@@ -86,7 +88,7 @@ export default class SideBar extends React.Component {
                         </View>
 
                         <View style={[styles.cuadradoInsideColumna, styles.agenda, this.props.layout === 3 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
-                            <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 3 ? this.props.closeDrawer() : this.props.handler2(3,token,[])}}>
+                            <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 3 ? this.props.closeDrawer() : this.props.handler2(3,token,[])}} disabled={this.props.rol !== 1 ? true : false}>
                                 <Text style={[styles.text,{paddingTop:5}]}>Agenda</Text>
                                 <Image source={Imagen.agenda} style={{width:"50%",height:"50%",marginBottom:10}}></Image>
                             </TouchableOpacity>
@@ -96,7 +98,7 @@ export default class SideBar extends React.Component {
                 
                 <View style={styles.twoButtons}>
                     <View style={[styles.cuadrado,styles.activo]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this._storeData(!this.state.estado); this.props.layout === 1 ? this.props._retrieveData() : null}}>
+                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this._storeData(!this.state.estado); this.props.layout === 1 ? this.props._retrieveData() : null}} disabled={this.props.rol !== 1 ? true : false}>
                             {
                                 this.state.estado === true ?
                                 <View>
@@ -143,7 +145,7 @@ export default class SideBar extends React.Component {
                                                                 styles.completado100
 
                         ]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 7 ? this.props.closeDrawer() : this.props.handler2(7,token,this.state.porcentajes)}}>
+                        <TouchableOpacity style={{flex:1,justifyContent:'center'}} onPress={() => {this.props.layout === 7 ? this.props.closeDrawer() : this.props.handler2(7,token,this.state.porcentajes)}} disabled={this.props.rol !== 1 ? true : false}>
                             <Text style={[styles.text,{fontSize:34}]}>{this.state.porcentaje}%</Text>
                             <Text style={[styles.text,{fontSize:28}]}>Completado</Text>
                         </TouchableOpacity>

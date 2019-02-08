@@ -229,7 +229,7 @@ export default class Profile extends Component {
     return (
       <Drawer
         ref={(ref) => { this.drawer = ref; }}
-        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={5} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={5} rol={items.id_rol} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
         onClose={() => this.drawer._root.close()} 
         initializeOpen={false}
         openDrawerOffset={0}
@@ -241,7 +241,8 @@ export default class Profile extends Component {
           <Header hasTabs style={IconStyles.navbar}>
             <Left>
               <Button transparent onPress={() => this.drawer._root.open()}>
-                <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+                {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                <Image style={IconStyles.menu2} source={Imagen.home}></Image>
               </Button>
               {/*<Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
                 <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>

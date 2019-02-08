@@ -2,11 +2,12 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, List,ListItem,Text, Icon, Button, Spinner, Card, Drawer } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View, BackHandler} from 'react-native';
+import {View, BackHandler, Image} from 'react-native';
 import IconStyles from '../styles/Icons';
 import {api} from '../services/api';
 import SideBar from './SideBar';
 import { COLOR } from '../components/Colores';
+import { Imagen } from '../components/Imagenes';
 
 let items = [];
 let sucursalActual = null;
@@ -149,7 +150,7 @@ export default class ShowSucursales extends Component {
     return (
       <Drawer
         ref={(ref) => { this.drawer = ref; }}
-        content={<SideBar handler={this.props.handler} handler2={this.props.handler2}  layout={3} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
+        content={<SideBar handler={this.props.handler} handler2={this.props.handler2} rol={1} layout={3} token={token} data={this.props.data} indexArray={this.props.indexArray} _retrieveData={this._retrieveData} closeDrawer={this.closeDrawer}/>}
         onClose={() => this.drawer._root.close()} 
         initializeOpen={false}
         openDrawerOffset={0}
@@ -161,7 +162,8 @@ export default class ShowSucursales extends Component {
           <Header hasTabs style={IconStyles.navbar}>
             <Left>
               <Button transparent onPress={() => this.drawer._root.open()}>
-                <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+                {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                <Image style={IconStyles.menu2} source={Imagen.home}></Image>
               </Button>
             </Left>           
             <Body>

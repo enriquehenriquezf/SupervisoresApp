@@ -41,6 +41,12 @@ export default StyleSheet.create({
         height: 37,
         fontFamily:'BebasKai'
     },
+    pass:{
+        color: COLOR.azul,
+        borderLeftWidth: 2,
+        borderLeftColor: COLOR.azulTransparente,
+        height: 37,
+    },
     icon:{
         width:24,
         height:24,

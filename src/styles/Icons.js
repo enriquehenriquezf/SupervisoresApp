@@ -14,6 +14,10 @@ export default StyleSheet.create({
         fontSize: 40,
         color: 'white'
     },
+    menu2: {
+        width: 40,
+        height: 40
+    },
     header: {
         fontSize: 40,
         color: Platform.OS === 'ios' ? 'black' : 'white'
@@ -25,28 +29,4 @@ export default StyleSheet.create({
     back: {
         marginLeft: Platform.OS === 'ios' ? 5 : 0
     },
-    estado:{
-        flex:1,
-        flexDirection:'row',
-        justifyContent:'flex-end',
-        alignItems:'center'
-    },
-    activo:{
-        color: "#5cb85c",
-        fontSize:20
-    },
-    inactivo:{
-        color: "#d9534f",
-        fontSize:20
-    },
-    dropdown:{
-        color: Platform.OS === 'ios' ? 'black' : 'white',
-        fontSize:20,
-        marginRight: 5,
-        marginTop: Platform.OS === 'ios' ? 0 : 6
-    },
-    StateTitle:{
-        marginLeft: Platform.OS === 'ios' ? 2 : 5,
-        marginRight:5
-    }
 });
