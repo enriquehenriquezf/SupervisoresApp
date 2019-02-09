@@ -85,6 +85,7 @@ export default StyleSheet.create({
         borderBottomColor:COLOR.azul,
         fontFamily:'BebasNeueBold',
         fontSize:20,
+        height:30
     },
     autocompletar:{
         borderColor:COLOR.azul,

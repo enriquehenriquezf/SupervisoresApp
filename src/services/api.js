@@ -34,4 +34,5 @@ export const api = {
  ipEnviarMensajeReporte: baseUrl + "/supervisores_api/public/api/enviarMensajeReporte",
  ipBuscarSucursales: baseUrl + "/supervisores_api/public/api/searchSucursales",
  ipLogNotificacionesUsuario: baseUrl + "/supervisores_api/public/api/logNotificacionesUsuario",
+ ipNotificacionLeidaMensaje: baseUrl + "/supervisores_api/public/api/notificacionLeidaMensaje",
 }

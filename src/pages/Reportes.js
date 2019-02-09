@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Content, Header, Left, Body, Right, Icon, Button, Spinner,Drawer, Text, Input, Form, Textarea,ListItem } from 'native-base';
+import { Container, Content, Header, Left, Body, Right, Icon, Button, Spinner,Drawer, Text, Input, Form, Textarea,ListItem, Badge } from 'native-base';
 import Overlay from 'react-native-modal-overlay';
 import Autocomplete from 'react-native-autocomplete-input';
 import IconStyles from '../styles/Icons';
@@ -150,7 +150,11 @@ export default class Reportes extends Component {
         logs = newToken["message"];
         reportes = that.state.reportes;
         logs.forEach(element => {
-          //TODO: poner notificacion en el reporte
+          if(element.leido === 0){
+            var index = reportes.findIndex(i => i.id_reporte === element.id_plan_trabajo);// .indexOf({id_reporte: element.id_plan_trabajo, nombre_reporte: element.nombre_plan});
+            reportes[index] = {...reportes[index], notificacion: true, id_notificacion: element.id}
+            //console.log(reportes);
+          }
         })
       }
       else
@@ -333,6 +337,9 @@ export default class Reportes extends Component {
           imgTemp1 = api.ipImg + token2["detalle"].foto;
         }
         that.setState({mensajes:token2["mensajes"], mensajeInit:token2["detalle"], imgReporte:imgTemp1, isLoadReporte:true});
+        if(data.notificacion){
+          that.LeerNotificacion(data);
+        }
         //toastr.showToast(token2["detalle"],'success');
       }
       else{
@@ -371,6 +378,47 @@ export default class Reportes extends Component {
       {
         toastr.showToast(token2["message"],'success');
         that.setState({isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
+      }
+      else{
+        toastr.showToast(token2["message"],'warning'); 
+        console.log(response);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+  
+  /**
+   * Leer Notificación
+   */
+  async LeerNotificacion(data){
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    let that = this;
+    var reportes = [];
+    await fetch(api.ipNotificacionLeidaMensaje, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_notificacion: data.id_notificacion,
+      })
+    }).then(function(response) {
+      //console.log(response);
+      var token2 = JSON.parse(response._bodyInit);
+      if(response.ok === true)
+      {
+        reportes = that.state.reportes;
+        var index = reportes.findIndex(i => i.id_reporte === data.id_reporte);
+        reportes[index].notificacion = false;
+        reportes[index] = {...reportes[index]}
+        that.setState({reportes: reportes});
+        //toastr.showToast(token2["message"],'success');
       }
       else{
         toastr.showToast(token2["message"],'warning'); 
@@ -527,6 +575,11 @@ export default class Reportes extends Component {
                                 <Text style={styles.ReporteText}>{data.nombre_reporte}</Text>
                               </TouchableOpacity>
                             </View>
+                            {data.notificacion &&
+                              <Badge style={{position:'absolute', left:"70%"}}>
+                                <Text>1</Text>
+                              </Badge>
+                            }
                         </Left>
                         <Right>
                             {
@@ -565,7 +618,7 @@ export default class Reportes extends Component {
                 containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
                 childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
               >
-                <View style={{justifyContent:'space-between'}}>
+                <View style={{justifyContent:'space-between', width:"100%"}}>
                   <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                   <ScrollView>
                     <Input style={[styles.asunto,{width:"82%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
@@ -609,7 +662,7 @@ export default class Reportes extends Component {
                 !this.state.isLoadReporte && this.state.isVisibleDetalleReporte?
                   <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
                 :
-                  <View style={{justifyContent:'space-between'}}>
+                  <View style={{justifyContent:'space-between', width:"100%"}}>
                     <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleDetalleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                     <ScrollView>                    
                       {
