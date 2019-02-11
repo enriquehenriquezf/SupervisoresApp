@@ -705,8 +705,8 @@ export default class Reportes extends Component {
                           })
                         : null
                       }
-                      <Input style={[styles.asunto,{width:230}]} placeholder="Mensaje"  onChangeText={(text) => this.setState({mensaje: text})}></Input>
-                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.EnviarMensaje()}}><Text> Enviar Mensaje </Text></Button>
+                      {this.state.mensajeInit.estado_corregido !== 2 && <Input style={[styles.asunto,{width:230}]} placeholder="Mensaje"  onChangeText={(text) => this.setState({mensaje: text})}></Input>}
+                      {this.state.mensajeInit.estado_corregido !== 2 && <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.EnviarMensaje()}}><Text> Enviar Mensaje </Text></Button>}
                     </ScrollView>
                   </View>
               }

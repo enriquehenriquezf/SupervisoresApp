@@ -1,12 +1,13 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Form, Item, Input,Text, Button, Icon, Spinner, H1, CheckBox, ListItem } from 'native-base';
+import { Container, Header, Left, Body, Right, Content, Form, Item, Input,Text, Button, Icon, Spinner, CheckBox, ListItem } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image } from 'react-native';
+import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image, ScrollView } from 'react-native';
 import styles from '../styles/Login';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
 import { COLOR } from '../components/Colores';
+import Overlay from 'react-native-modal-overlay';
 
 let fail = 0;
 let swChange = false;
@@ -21,6 +22,10 @@ export default class Login extends Component {
       error:null,
       checked:true,
       estado:true,
+      privacidad:'0',
+      tutorial:'0',
+      isVisiblePrivacidad:false,
+      politicas: 'El Responsable del Tratamiento, adopta las medidas necesarias para garantizar la seguridad, integridad y confidencialidad de los datos conforme a lo dispuesto en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, de 27 de abril de 2016,  relativo  a  la  protección  de  las  personas  físicas  en  lo  que  respecta  al  tratamiento  de  datos  personales  y  a  la  libre circulación de los mismos. Si  bien  el  Responsable,  realiza  copias  de  seguridad  de  los  contenidos  alojados  en  sus  servidores,  sin  embargo  no  se responsabiliza de la pérdida o el borrado accidental de los datos por parte de los Usuarios. De igual manera, no garantiza la  reposición  total  de  los  datos  borrados  por  los  Usuarios,  ya  que los  citados  datos  podrían  haber  sido  suprimidos  y/o modificados durante el periodo de tiempo transcurrido desde la última copia de seguridad. Los  servicios  facilitados  o  prestados  a  través  de  la  Aplicación, excepto  los  servicios  específicos  de  backup,  no  incluyen  la reposición de los contenidos conservados en las copias de seguridad realizadas por el Responsable del Tratamiento, cuando esta  pérdida  sea  imputable  al  usuario;  en  este  caso,  se  determinará  una  tarifa  acorde  a  la  complejidad  y  volumen  de  la recuperación,  siempre  previa  aceptación  del  usuario.  La  reposición  de  datos  borrados  sólo  está  incluida  en  el  precio  del servicio cuando la pérdida del contenido sea debida a causas atribuibles al Responsable.',
       showToast: false
     };
     this._OnLogin = this._OnLogin.bind(this);
@@ -127,7 +132,7 @@ export default class Login extends Component {
   _storeData = async () => {
     if(this.state.checked){
       try {
-        await AsyncStorage.multiSet([['USER', this.state.email],['PASS', this.state.password]]);
+        await AsyncStorage.multiSet([['USER', this.state.email],['PASS', this.state.password],['PRIVACIDAD',this.state.privacidad]]);
       } catch (error) {
         console.log(error);
       }
@@ -135,6 +140,7 @@ export default class Login extends Component {
     else{
       try {
         await AsyncStorage.multiRemove(['USER', 'PASS']);
+        await AsyncStorage.setItem('PRIVACIDAD',this.state.privacidad);
       } catch (error) {
         console.log(error);
       }
@@ -157,12 +163,17 @@ export default class Login extends Component {
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.multiGet(['USER','PASS','ESTADO']);
+      const value = await AsyncStorage.multiGet(['USER','PASS','ESTADO','PRIVACIDAD','TUTORIAL']);
       if (value !== null) {
         //console.log(value);
         var state = 'true';
+        var priv = false;
         if(value[2][1] !== null){if(value[2][1] === 'false'){state='false'}}
-        this.setState({ email: value[0][1] , password: value[1][1], estado: state});
+        if(value[3][1] !== '2' || value[3][1] === null){priv = true}
+        this.setState({ email: value[0][1] , password: value[1][1], estado: state, privacidad:value[3][1],tutorial:value[4][1], isVisiblePrivacidad:priv});
+      }
+      else{
+        this.setState({privacidad:'0', tutorial:'0', isVisiblePrivacidad:true})
       }
     } catch (error) {
       console.log(error);
@@ -225,7 +236,7 @@ export default class Login extends Component {
     return (
       <Container>
         <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.8 : 1}}>
-          <Content style={{ marginTop: 50}}>
+          <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
             <View>
               <Image style={{height: 139, width: 135, marginLeft: 'auto', marginRight:'auto', marginBottom: -(height/5)}} source={Imagen.unidrogas}/>
               <Form style={{paddingTop:height/4}}>
@@ -254,6 +265,24 @@ export default class Login extends Component {
             </View>
           </Content>
         </KeyboardAvoidingView>
+        <Overlay
+          visible={this.state.isVisiblePrivacidad}
+          animationType="zoomIn"
+          closeOnTouchOutside={false}
+          onClose={() => this.setState({isVisiblePrivacidad: true})}
+          containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+          childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10,padding:10,paddingTop:20,paddingBottom:20}}
+        >
+          <ScrollView>
+            {
+              //FIXME: arreglar scroll
+            }
+            <Text style={{fontFamily:'BebasKai', paddingHorizontal:20}}>{this.state.politicas}</Text>
+            <Button onPress={() => {this.setState({isVisiblePrivacidad: false, privacidad:'2'})}}>
+              <Text>Aceptar</Text>
+            </Button>
+          </ScrollView>
+        </Overlay>
       </Container>
     );
   }
