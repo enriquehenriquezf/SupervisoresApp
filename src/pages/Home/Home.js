@@ -120,7 +120,7 @@ export default class Home extends Component {
         <Container>     
             <Header hasTabs style={IconStyles.navbar}>
               <Left>
-                  <Button transparent onPress={() => this.drawer._root.open()}>
+                  <Button transparent onPress={() => {this.drawer._root.open()}}>
                     {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
                     <Image style={IconStyles.menu2} source={Imagen.home}></Image>
                   </Button>

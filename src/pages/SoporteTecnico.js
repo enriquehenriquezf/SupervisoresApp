@@ -5,7 +5,7 @@ import IconStyles from '../styles/Icons';
 import styles from '../styles/Reportes';
 import {toastr} from '../components/Toast';
 import {api} from '../services/api'
-import {View, BackHandler,Image} from 'react-native';
+import {View, BackHandler,Image,KeyboardAvoidingView} from 'react-native';
 import SideBar from './SideBar';
 import { Imagen } from '../components/Imagenes';
 
@@ -15,6 +15,8 @@ export default class Stats extends Component {
     super(props);
     this.state = {
       loading: true,
+      asunto:'',
+      mensaje:'',
       showToast: false
     };
     let token = this.props.token;
@@ -55,22 +57,25 @@ export default class Stats extends Component {
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     var that = this;
-    await fetch(api.ipPorcentajeActividades, {
-      method: 'GET',
+    await fetch(api.ipSoporteTecnico, {
+      method: 'POST',
       headers: {
         'Authorization': auth,
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
-      body: ''
+      body: JSON.stringify({
+          asunto: this.state.asunto,
+          mensaje: this.state.mensaje
+        })
       }).then(function(response) {
         console.log(response);
         if(response.ok === true)
         {
-          //var porcentajes = JSON.parse(response._bodyInit);
-          //console.log(porcentajes)
-          //that.setState({porcentaje: Math.floor(general),color:color, porcentajes:porcentajes});
-          //console.log(Math.floor(general));
+          var resp = JSON.parse(response._bodyInit);
+          //console.log(resp)
+          that.setState({disable:false});
+          toastr.showToast(JSON.parse(response._bodyInit),'success');
         }
         else
         {
@@ -117,7 +122,7 @@ export default class Stats extends Component {
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
         <Container>
-          <Header hasTabs style={IconStyles.navbar}>
+          <Header style={IconStyles.navbar}>
             <Left>
               <Button transparent onPress={() => this.drawer._root.open()}>
                 {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
@@ -129,15 +134,17 @@ export default class Stats extends Component {
             <Right>
             </Right>
           </Header>
-            <Content>
-                <View style={{marginTop:50}}>
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: .9}}>
+            <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
+                <View style={{marginTop:60}}>
                     <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
                     <Form>
-                        <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{height:200}]} onChangeText={(text) => this.setState({observacion: text})} />
+                        <Textarea bordered placeholder="Mensaje" style={[styles.observaciones,{height:200}]} onChangeText={(text) => this.setState({mensaje: text})} />
                     </Form>
-                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:20}]} onPress={() => {this.setState({disable:true}); this.CrearReporte()}}><Text> Enviar </Text></Button>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:20}]} onPress={() => {this.setState({disable:true}); this.EnviarBug()}}><Text> Enviar </Text></Button>
                 </View>
             </Content>
+          </KeyboardAvoidingView>
         </Container>
       </Drawer>
     );

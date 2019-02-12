@@ -9,10 +9,10 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "expo": "^31.0.2",
+    "expo": "^32.0.0",
     "native-base": "^2.8.1",
     "react": "16.5.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-autocomplete-input": "^3.6.0",
     "react-native-modal-overlay": "^1.2.3",
     "react-native-numeric-input": "^1.6.5",

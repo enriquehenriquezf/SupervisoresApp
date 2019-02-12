@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Left, Body, Right, Content, List,ListItem,Text, Badge, Icon, Spinner, Card } from 'native-base';
+import { Left, Body, Right, Content, List,ListItem,Text, Spinner, Accordion, Icon } from 'native-base';
 import {toastr} from '../../../components/Toast';
 import {View, RefreshControl, AsyncStorage} from 'react-native';
 import styles from '../../../styles/Home';
@@ -11,6 +11,14 @@ let items = [];
 let sucursalActual = null;
 let tiempoInactivo=0;
 let tiempoInactivoInit=0;
+var hand;
+var itemPress;
+var estado;//FIXME: acordeon
+var dataArray = [
+  { title: {first:true, sucursal:'Botica 02', direccion:'kra 1 calle 2'}, content: [{actividad: ' condiciones Locativas', prioridad: 1},{actividad: 'Kardex', prioridad: 2}] },
+  { title: {first:false, sucursal:'Botica 03', direccion:'kra 1 calle 2'}, content: [{actividad: ' Kardex', prioridad: 2},{actividad: ' Doc Legal', prioridad: 3}] },
+  { title: {first:false, sucursal:'Botica 05', direccion:'kra 1 calle 2'}, content: [{actividad: ' Doc Legal', prioridad: 3}] }
+];
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -20,12 +28,15 @@ export default class Home extends Component {
       showToast: false
     };
     let token = this.props.token;
+    hand = this.props.handler2;
+    itemPress = this._OnItemPress;
+    estado = this.props.estado;
     let newToken = null;
     tiempoInactivo=0;
     tiempoInactivoInit=0;
     this._retrieveData();
-    items = [];
     this._OnItemPress = this._OnItemPress.bind(this);
+    items = [];
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -148,13 +159,50 @@ export default class Home extends Component {
    */
   _OnItemPress(index,handler, item)
   {
-    if(this.props.estado !== 'false' || index === 5){
+    if(this.props.estado !== 'false' || index === 5){//FIXME: acordion no puede acceder al this
       handler(index,token,item);
     }
     else
     {
       toastr.showToast('Cambie su estado a Activo','warning');
     }
+  }
+
+  _renderHeader(item, expanded) {
+    return (
+      <View style={{flexDirection: "row",justifyContent: "space-between",alignItems: "center", padding:10}}>
+        <Text style={[styles.sucursalText,{paddingLeft:10}]}>{item.title.sucursal}</Text>
+        {expanded
+          ? <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-up" />
+          : <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-down" />}
+      </View>
+    );
+  }
+  _renderContent(item) {
+    return(
+      item.content.map((element,index) =>{
+        return (
+          <ListItem key={index} button underlayColor={COLOR.azulTransparente} onPress={() => itemPress(2,hand, item)} style={styles.SinBorde}>
+            <Left >
+              <View style={styles.ActividadBackground}>
+                <Text style={styles.ActividadText}>{element.actividad}</Text>
+              </View>
+            </Left>
+            <Right>
+            {
+              element.prioridad === 3 && <View style={[styles.prioridad,{backgroundColor:COLOR.rojo}]}><Text style={styles.ActividadText}>urgente</Text></View>
+            }
+            {                  
+              element.prioridad === 2 && <View style={[styles.prioridad,{backgroundColor:COLOR.amarillo}]}><Text style={styles.ActividadText}>media</Text></View>
+            }
+            {                  
+              element.prioridad === 1 && <View style={[styles.prioridad,{backgroundColor:COLOR.verde}]}><Text style={styles.ActividadText}>normal</Text></View>
+            }
+            </Right>
+          </ListItem>
+        )
+      })
+    );
   }
 
   render() {
@@ -206,6 +254,7 @@ export default class Home extends Component {
             </ListItem>
           }>
         </List>
+        {/* <Accordion dataArray={dataArray} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}} /> */}
       </Content>
     );
   }

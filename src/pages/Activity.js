@@ -521,7 +521,11 @@ export default class Activity extends Component {
     /**
      * Seleccionar el radioButton que se obtuvo de la base de datos
      */
-    if(items.calificacion_pv === 'Puntual' || items.nombre_tabla === 'apertura')
+    if(items.calificacion_pv === 'Puntual' && items.nombre_tabla === 'apertura')
+    {
+      this.SetChecked(1,'Puntual');
+    }
+    else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && items.nombre_tabla === 'apertura')
     {
       this.SetChecked(1,'Puntual');
     }
@@ -537,7 +541,11 @@ export default class Activity extends Component {
     {
       this.SetChecked(1,'Completo');
     }
-    else if(items.calificacion_pv === 'Al día' || items.nombre_tabla === 'libros_faltantes' || items.nombre_tabla === 'ingreso_sucursal')
+    else if(items.calificacion_pv === 'Al día' && (items.nombre_tabla === 'libros_faltantes' || items.nombre_tabla === 'ingreso_sucursal'))
+    {
+      this.SetChecked(1,'Al día');
+    }
+    else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && (items.nombre_tabla === 'libros_faltantes' || items.nombre_tabla === 'ingreso_sucursal'))
     {
       this.SetChecked(1,'Al día');
     }
@@ -545,7 +553,11 @@ export default class Activity extends Component {
     {
       this.SetChecked(2,'Pendiente');
     }
-    else if(items.calificacion_pv === 'Excelentes' || items.nombre_tabla === 'condiciones_locativas')
+    else if(items.calificacion_pv === 'Excelentes' && items.nombre_tabla === 'condiciones_locativas')
+    {
+      this.SetChecked(1,'Excelentes');
+    }
+    else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && items.nombre_tabla === 'condiciones_locativas')
     {
       this.SetChecked(1,'Excelentes');
     }
@@ -564,6 +576,10 @@ export default class Activity extends Component {
     else if(items.calificacion_pv === 'Pesimas')
     {
       this.SetChecked(5,'Pesimas');
+    }    
+    else if(items.calificacion_pv === null || items.calificacion_pv === 'noalificado')
+    {
+      this.SetChecked(1,'Completo');
     }
     var array = [];
     var array2 = [];
