@@ -13,18 +13,15 @@ let tiempoInactivo=0;
 let tiempoInactivoInit=0;
 var hand;
 var itemPress;
-var estado;//FIXME: acordeon
-var dataArray = [
-  { title: {first:true, sucursal:'Botica 02', direccion:'kra 1 calle 2'}, content: [{actividad: ' condiciones Locativas', prioridad: 1},{actividad: 'Kardex', prioridad: 2}] },
-  { title: {first:false, sucursal:'Botica 03', direccion:'kra 1 calle 2'}, content: [{actividad: ' Kardex', prioridad: 2},{actividad: ' Doc Legal', prioridad: 3}] },
-  { title: {first:false, sucursal:'Botica 05', direccion:'kra 1 calle 2'}, content: [{actividad: ' Doc Legal', prioridad: 3}] }
-];
+var estado;
+var dataArray = [];
 export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
       refreshing: false,
+      actividades: [],
       showToast: false
     };
     let token = this.props.token;
@@ -36,6 +33,7 @@ export default class Home extends Component {
     tiempoInactivoInit=0;
     this._retrieveData();
     this._OnItemPress = this._OnItemPress.bind(this);
+    this._renderContent = this._renderContent.bind(this);
     items = [];
     console.ignoredYellowBox = ['Require cycle:'];
   }
@@ -43,6 +41,11 @@ export default class Home extends Component {
   async componentWillMount() {
     this.getPlanesDeTrabajo();
   }
+
+  componentDidUpdate(){
+    estado = this.props.estado;
+  }
+
   /**
    * Leer las actividades a realizar durante el día actual.
    */
@@ -50,6 +53,7 @@ export default class Home extends Component {
   {
     this.setState({ refreshing: true });
     items = [];
+    dataArray = [];
     let handler2 = false;
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
@@ -71,6 +75,8 @@ export default class Home extends Component {
           let keys = Object.keys(newToken[actividades]);
           var i = 0;
           var j = 0;
+          var title = {};
+          var content = [];
           Object.values(newToken[actividades]).forEach(element => {
             //console.log(JSON.stringify(element));
             var item = {
@@ -100,12 +106,16 @@ export default class Home extends Component {
               separador: false
             };
             if(item.titulo !== undefined){item.name = item.titulo;}
-            if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:true});}
-            if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}); j = j + 1; sucursalActual = element.nombre_sucursal}
-            items.push(item);
+            // if(i === 0){sucursalActual = element.nombre_sucursal; items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:true});}
+            // if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}); j = j + 1; sucursalActual = element.nombre_sucursal}
+            // items.push(item);
+            if(i === 0){sucursalActual = element.nombre_sucursal; title = {sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:true};}
+            if(sucursalActual !== element.nombre_sucursal){dataArray.push({title: title, content: content}); content = []; title = {sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}; j = j + 1; sucursalActual = element.nombre_sucursal}
+            content.push(item);
             i = i + 1;          j = j + 1;
           });
-          //items[j].borde = true;
+          dataArray.push({title: title, content: content});
+          ////items[j].borde = true;
           //console.log(items)
       }
       else
@@ -129,7 +139,7 @@ export default class Home extends Component {
       console.log(error);
     });
     if(!handler2){
-      this.setState({ loading: false, refreshing: false });
+      this.setState({ actividades: dataArray,loading: false, refreshing: false });
     }
     else{this.props.handler2(-1,token,[]);}
   }
@@ -159,7 +169,7 @@ export default class Home extends Component {
    */
   _OnItemPress(index,handler, item)
   {
-    if(this.props.estado !== 'false' || index === 5){//FIXME: acordion no puede acceder al this
+    if(estado !== 'false' || index === 5){
       handler(index,token,item);
     }
     else
@@ -182,10 +192,10 @@ export default class Home extends Component {
     return(
       item.content.map((element,index) =>{
         return (
-          <ListItem key={index} button underlayColor={COLOR.azulTransparente} onPress={() => itemPress(2,hand, item)} style={styles.SinBorde}>
+          <ListItem key={index} button underlayColor={COLOR.azulTransparente} onPress={() => itemPress(2,hand, element)} style={styles.SinBorde}>
             <Left >
               <View style={styles.ActividadBackground}>
-                <Text style={styles.ActividadText}>{element.actividad}</Text>
+                <Text style={styles.ActividadText}>{element.name}</Text>
               </View>
             </Left>
             <Right>
@@ -220,7 +230,7 @@ export default class Home extends Component {
             colors={[COLOR.azul]}
           />
         }>
-        <List dataArray={items}
+        {/* <List dataArray={items}
           renderRow={(item) =>
           item.separador === true ?
             <View>
@@ -253,8 +263,8 @@ export default class Home extends Component {
               </Right>
             </ListItem>
           }>
-        </List>
-        {/* <Accordion dataArray={dataArray} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}} /> */}
+        </List> */}
+        <Accordion dataArray={this.state.actividades} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}}/>
       </Content>
     );
   }
