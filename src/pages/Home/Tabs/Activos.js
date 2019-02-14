@@ -97,6 +97,13 @@ export default class Home extends Component {
               laboratorios_asignados: element.laboratorios_asignados,
               laboratorios_realizados: element.laboratorios_realizados,
               numero_consecutivo: element.numero_consecutivo,
+              ano_actual: element.ano_actual,
+              ano_anterior: element.ano_anterior,
+              implementar_estrategia: element.implementar_estrategia,
+              fecha_resolucion:element.fecha_resolucion,
+              numero_facturas_autorizadas:element.numero_facturas_autorizadas,
+              fecha_ultima_factura:element.fecha_ultima_factura,
+              numero_ultima_factura:element.numero_ultima_factura,              
               tiempo_actividad: element.tiempo_actividad,
               motivo_ausencia: element.motivo_ausencia,
               tiempoInactivo: tiempoInactivo,
@@ -110,10 +117,11 @@ export default class Home extends Component {
             // if(sucursalActual !== element.nombre_sucursal){items.push({sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}); j = j + 1; sucursalActual = element.nombre_sucursal}
             // items.push(item);
             if(i === 0){sucursalActual = element.nombre_sucursal; title = {sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:true};}
-            if(sucursalActual !== element.nombre_sucursal){dataArray.push({title: title, content: content}); content = []; title = {sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}; j = j + 1; sucursalActual = element.nombre_sucursal}
+            if(sucursalActual !== element.nombre_sucursal){content.sort(function(a,b){return a.name > b.name}); dataArray.push({title: title, content: content}); content = []; title = {sucursal: element.nombre_sucursal,direccion: element.direccion, separador: true, first:false}; j = j + 1; sucursalActual = element.nombre_sucursal}
             content.push(item);
             i = i + 1;          j = j + 1;
           });
+          content.sort(function(a,b){return a.name > b.name});
           dataArray.push({title: title, content: content});
           ////items[j].borde = true;
           //console.log(items)

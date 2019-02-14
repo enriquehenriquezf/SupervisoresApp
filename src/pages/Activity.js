@@ -35,8 +35,8 @@ export default class Activity extends Component {
       archivo: {},
       archivo2: {},
       loading: true,
-      checked: 1 ,
-      checked2: 1 ,
+      checked: 5 ,
+      checked2: 5 ,
       calificacion_pv: 'Completo',
       observacion: '',
       observacion2: '',
@@ -66,6 +66,13 @@ export default class Activity extends Component {
       documentos:{},
       disable:false,
       porcentajes:{},
+      ano_actual:'0',
+      ano_anterior:'0',
+      estrategia:'',
+      facturas_autorizadas:'',
+      fecha_resolucion: new Date(),
+      numero_ultima_factura:'',
+      fecha_ultima_factura: new Date(),
       showToast: false
     };
     let token = this.props.token;
@@ -243,11 +250,11 @@ export default class Activity extends Component {
         that.setState({documentos: item, isLoadActividad:true, imgVencido: imgTemp1, imgRenovado: imgTemp2,observacion2:item.observaciones, archivo:{}, archivo2:{}});
         if(item.estado_documento === 'Si' || item.estado_documento === '' || item.estado_documento === null)
         {
-          that.SetChecked(1,'Si');
+          that.SetChecked(5,'Si');
         }
         else if(item.estado_documento === 'No')
         {
-          that.SetChecked(2,'No');
+          that.SetChecked(1,'No');
         }
       }
       else{        
@@ -359,7 +366,7 @@ export default class Activity extends Component {
          */
         Lista = items2.map((data,index) => {
           return(
-            (data.estado_condicion === 'Si' || data.estado_condicion === 'No') ?
+            (data.estado_condicion === 'Bueno' || data.estado_condicion === 'Malo') ?
               <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.condicion} value={index} color={'#5cb85c'} />
             :
               <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.condicion} value={index} color={'#000000'} />
@@ -422,13 +429,13 @@ export default class Activity extends Component {
           imgTemp1 = api.ipImg + item.foto_condicion;
         }
         that.setState({documentos: item, isLoadActividad:true, imgVencido: imgTemp1, observacion2:item.observaciones, archivo:{}});
-        if(item.estado_condicion === 'Si' || item.estado_condicion === '' || item.estado_condicion === null)
+        if(item.estado_condicion === 'Bueno' || item.estado_condicion === '' || item.estado_condicion === null)
         {
-          that.SetChecked(1,'Si');
+          that.SetChecked(5,'Bueno');
         }
-        else if(item.estado_condicion === 'No')
+        else if(item.estado_condicion === 'Malo')
         {
-          that.SetChecked(2,'No');
+          that.SetChecked(1,'Malo');
         }
       }
       else{        
@@ -523,47 +530,47 @@ export default class Activity extends Component {
      */
     if(items.calificacion_pv === 'Puntual' && items.nombre_tabla === 'apertura')
     {
-      this.SetChecked(1,'Puntual');
+      this.SetChecked(5,'Puntual');
     }
     else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && items.nombre_tabla === 'apertura')
     {
-      this.SetChecked(1,'Puntual');
+      this.SetChecked(5,'Puntual');
     }
     else if(items.calificacion_pv === 'Tarde')
     {
-      this.SetChecked(2,'Tarde');
+      this.SetChecked(3,'Tarde');
     }
     else if(items.calificacion_pv === 'Muy Tarde')
     {
-      this.SetChecked(3,'Muy Tarde');
+      this.SetChecked(1,'Muy Tarde');
     }
     else if(items.calificacion_pv === 'Completo')
     {
-      this.SetChecked(1,'Completo');
+      this.SetChecked(5,'Completo');
     }
     else if(items.calificacion_pv === 'Al día' && (items.nombre_tabla === 'libros_faltantes' || items.nombre_tabla === 'ingreso_sucursal'))
     {
-      this.SetChecked(1,'Al día');
+      this.SetChecked(5,'Al día');
     }
     else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && (items.nombre_tabla === 'libros_faltantes' || items.nombre_tabla === 'ingreso_sucursal'))
     {
-      this.SetChecked(1,'Al día');
+      this.SetChecked(5,'Al día');
     }
     else if(items.calificacion_pv === 'Pendiente')
     {
-      this.SetChecked(2,'Pendiente');
+      this.SetChecked(1,'Pendiente');
     }
     else if(items.calificacion_pv === 'Excelentes' && items.nombre_tabla === 'condiciones_locativas')
     {
-      this.SetChecked(1,'Excelentes');
+      this.SetChecked(5,'Excelentes');
     }
     else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && items.nombre_tabla === 'condiciones_locativas')
     {
-      this.SetChecked(1,'Excelentes');
+      this.SetChecked(5,'Excelentes');
     }
     else if(items.calificacion_pv === 'Buenas')
     {
-      this.SetChecked(2,'Buenas');
+      this.SetChecked(4,'Buenas');
     }
     else if(items.calificacion_pv === 'Regulares')
     {
@@ -571,15 +578,15 @@ export default class Activity extends Component {
     }
     else if(items.calificacion_pv === 'Malas')
     {
-      this.SetChecked(4,'Malas');
+      this.SetChecked(2,'Malas');
     }
     else if(items.calificacion_pv === 'Pesimas')
     {
-      this.SetChecked(5,'Pesimas');
+      this.SetChecked(1,'Pesimas');
     }    
     else if(items.calificacion_pv === null || items.calificacion_pv === 'noalificado')
     {
-      this.SetChecked(1,'Completo');
+      this.SetChecked(5,'Completo');
     }
     var array = [];
     var array2 = [];
@@ -605,7 +612,7 @@ export default class Activity extends Component {
       });
     }
 
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo,PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
      * @example rango: a una distancia de 5000*10^-7 grados de latitud y longitud
@@ -663,7 +670,7 @@ export default class Activity extends Component {
    */
   SetChecked(i,calificacion_pv)
   {
-    if(calificacion_pv === 'Si' || calificacion_pv === 'No'){
+    if(calificacion_pv === 'Si' || calificacion_pv === 'No' || calificacion_pv === 'Bueno' || calificacion_pv === 'Malo'){
       var docs = this.state.documentos;
       docs.estado_documento = calificacion_pv;
       docs.estado_condicion = calificacion_pv;
@@ -688,7 +695,8 @@ export default class Activity extends Component {
     this._storeDataAusente();
     var totalTl = new Date().getTime();
     totalTime = totalTl - totalTimeInit;
-
+    var diferencia = 0;
+    diferencia = this.state.ano_actual - this.state.ano_anterior;
     /** Motivo de Ausencia */
     if(this.state.ausencia){
       if(items.motivo_ausencia === 'no ausentado'){
@@ -706,7 +714,7 @@ export default class Activity extends Component {
           'Accept':'application/json'
       },
       body: JSON.stringify({
-        calificacion_pv: this.state.calificacion_pv, 
+        calificacion_pv: this.state.checked,//this.state.calificacion_pv, 
         nombre_tabla: items.nombre_tabla,
         id_plan_trabajo: items.id_plan_trabajo, 
         id_actividad: id,
@@ -714,12 +722,20 @@ export default class Activity extends Component {
         productos: JSON.stringify(this.state.PRODUCTS),
         numero_consecutivo:this.state.numero_consecutivo,
         laboratorios_realizados: JSON.stringify(this.state.PRODUCTS2),
+        ano_actual:this.state.ano_actual,
+        ano_anterior:this.state.ano_anterior,
+        diferencia:Math.abs(diferencia),
+        implementar_estrategia:this.state.estrategia,
+        fecha_resolucion:this.state.fecha_resolucion,
+        numero_facturas_autorizadas:this.state.facturas_autorizadas,
+        fecha_ultima_factura:this.state.fecha_ultima_factura,
+        numero_ultima_factura:this.state.numero_ultima_factura,
         tiempo_actividad: time,
         tiempo_total: totalTime,
         motivo_ausencia: items.motivo_ausencia
       })
     }).then(function(response) {
-      //console.log(response);
+      console.log(response);
       newToken = JSON.parse(response._bodyInit);
       var message = "message";
       if(response.ok === true && response.status === 200)
@@ -1157,9 +1173,9 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'apertura' ?
                     <View>
                       <Text style={styles.textInfo}>Hora de apertura: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Puntual'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Tarde'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={3} value={'Muy Tarde'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Puntual'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={3} value={'Tarde'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Muy Tarde'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
@@ -1168,8 +1184,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'kardex' ?
                     <View>
                       <Text style={styles.textInfo}>Elaboración: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <FlatList data={this.state.LABORATORIES}
                         extraData={this.state}
                         keyExtractor={(item, index) => index.toString()}
@@ -1236,11 +1252,11 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'condiciones_locativas' ?
                     <View>
                       <Text style={styles.textInfo}>Condiciones: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Excelentes'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Buenas'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Excelentes'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={4} value={'Buenas'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={3} value={'Regulares'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={4} value={'Malas'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Pesimas'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Malas'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pesimas'} checked={this.state.checked}></RadioButton>
                       
                       <Picker
                           textStyle={styles.picker}
@@ -1258,11 +1274,38 @@ export default class Activity extends Component {
                     null
                 }
                 {
-                  items.nombre_tabla === 'convenio_exhibicion' ?
+                  items.nombre_tabla === 'exhibiciones' ?
                     <View>
                       <Text style={styles.textInfo}>Verificar permanencia de las exhibiciones: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={styles.textDocumento}>Productos en exhibición: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={prods}
+                        defaultValue={query}
+                        onChangeText={text => this.BuscarProducto(text,'')}
+                        placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }) }>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <List dataArray={this.state.PRODUCTS}
+                        renderRow={(item) =>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:2, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => this.BorrarProducto(item)}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                          </View>
+                        }>
+                      </List> 
                     </View>
                   :
                     null
@@ -1271,8 +1314,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'libros_faltantes' ?
                     <View>
                       <Text style={styles.textInfo}>Verificar libros faltantes a la fecha: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Al día'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Al día'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={styles.textDocumento}>Productos a vencer: </Text>
                       <Autocomplete
                         autoCapitalize="none"
@@ -1303,37 +1346,43 @@ export default class Activity extends Component {
                           </View>
                         }>
                       </List>                  
-                      <Input placeholder="Número Consecutivo" defaultValue={this.state.numero_consecutivo} onChangeText={text => this.setState({numero_consecutivo: text})}></Input>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Número Consecutivo" defaultValue={this.state.numero_consecutivo} onChangeText={text => this.setState({numero_consecutivo: text})}></Input>
                     </View>
                   :
                     null
                 }
-                {
+                {//TODO: cambiar o borrar
                   items.nombre_tabla === 'ingreso_sucursal' ?
                     <View>
                       <Text style={styles.textInfo}>Reporte de ingreso: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Al día'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Al día'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
                 }
-                {
+                {//TODO: cambiar o borrar
                   items.nombre_tabla === 'formulas_despachos' ?
                     <View>
                       <Text style={styles.textInfo}>Se debe revisar estén descargadas del sistema todas las fórmulas y pendientes:</Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
                 }
                 {
-                  items.nombre_tabla === 'captura_cliente' ?
+                  items.nombre_tabla === 'evolucion_clientes' ?
                     <View>
                       <Text style={styles.textInfo}>Captación de clientes: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()-1}: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_anterior} onChangeText={text => this.setState({ano_anterior: text})}></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()}: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_actual} onChangeText={text => this.setState({ano_actual: text})}></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Estrategias a implementar para aumentar clientes: </Text>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Estrategias" defaultValue={this.state.estrategia} onChangeText={text => this.setState({estrategia: text})}></Input>
                     </View>
                   :
                     null
@@ -1342,8 +1391,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'documentacion_legal' ?
                     <View>
                       <Text style={styles.textInfo}>Verificar Documentación legal: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
 
                         <Picker
                           textStyle={styles.picker}
@@ -1360,33 +1409,33 @@ export default class Activity extends Component {
                   :
                     null
                 }              
-                {
+                {//TODO: cambiar o borrar
                   items.nombre_tabla === 'evaluacion_pedidos' ?
                     <View>
                       <Text style={styles.textInfo}>Pedidos realizados vs Remision: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Input placeholder="Número revisión"></Input>
                     </View>
                   :
                     null
                 }
-                {
+                {//TODO: cambiar o borrar
                   items.nombre_tabla === 'excesos' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar pedidos y excesos: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
                 }
-                {
+                {//TODO: cambiar o borrar
                   items.nombre_tabla === 'libro_agendaclientes' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar agenda de clientes: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
@@ -1395,8 +1444,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'libro_vencimientos' ?
                     <View>
                       <Text style={styles.textInfo}>Confirmar que estén separados los productos del libro de vencimientos: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={styles.textInfo}>Productos a vencer: </Text>
                       <Autocomplete
                         autoCapitalize="none"
@@ -1455,11 +1504,45 @@ export default class Activity extends Component {
                     null
                 }
                 {
-                  items.nombre_tabla === 'papeleria_consignaciones' ?
+                  items.nombre_tabla === 'facturacion' ?
                     <View>
                       <Text style={styles.textInfo}>Verificar la papelería: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha Resolución: </Text>
+                      <DatePicker
+                          defaultDate={items.fecha_resolucion !== null? new Date(items.fecha_resolucion.substr(0,10)) : this.state.fecha_resolucion}//FIXME: fecha aparece 1 dia antes
+                          minimumDate={new Date(2019, 0, 1)}
+                          locale={"es"}
+                          timeZoneOffsetInMinutes={undefined}
+                          modalTransparent={false}
+                          animationType={"fade"}
+                          androidMode={"default"}
+                          placeHolderText={items.fecha_resolucion === null? "Seleccionar Fecha" : undefined }
+                          textStyle={{ color: "green",paddingLeft:20 }}
+                          placeHolderTextStyle={{ color: "#d3d3d3",paddingLeft:20 }}
+                          onDateChange={newDate => this.setState({fecha_resolucion: newDate.toJSON().substr(0,10)})}
+                          disabled={false}
+                      />
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de facturas autorizadas: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="# de facturas" defaultValue={this.state.facturas_autorizadas} onChangeText={text => this.setState({facturas_autorizadas: text})}></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha de la última factura: </Text>
+                      <DatePicker
+                          defaultDate={items.fecha_ultima_factura !== null? new Date(items.fecha_ultima_factura.substr(0,10)) : this.state.fecha_ultima_factura}//FIXME: fecha aparece 1 dia antes
+                          minimumDate={new Date(2019, 0, 1)}
+                          locale={"es"}
+                          timeZoneOffsetInMinutes={undefined}
+                          modalTransparent={false}
+                          animationType={"fade"}
+                          androidMode={"default"}
+                          placeHolderText={items.fecha_ultima_factura === null? "Seleccionar Fecha" : undefined }
+                          textStyle={{ color: "green",paddingLeft:20 }}
+                          placeHolderTextStyle={{ color: "#d3d3d3",paddingLeft:20 }}
+                          onDateChange={newDate => this.setState({fecha_ultima_factura: newDate.toJSON().substr(0,10)})}
+                          disabled={false}
+                      />
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de la última factura: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="# de factura" defaultValue={this.state.numero_ultima_factura} onChangeText={text => this.setState({numero_ultima_factura: text})}></Input>
                     </View>
                   :
                     null
@@ -1468,8 +1551,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'presupuesto_pedido' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar metodología utilizada para revisar el pedido: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
@@ -1478,8 +1561,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'remisiones' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar remisiones grabadas a la fecha: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
@@ -1488,8 +1571,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'revision_completa_inventario' ?
                     <View>
                       <Text style={styles.textInfo}>Revision completa de los inventarios: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
@@ -1498,8 +1581,8 @@ export default class Activity extends Component {
                   items.nombre_tabla === 'seguimiento_vendedores' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
@@ -1517,10 +1600,11 @@ export default class Activity extends Component {
                           placeholderIconColor="#007aff"
                           style={{ width: undefined }}
                           itemStyle={styles.picker}
+                          itemTextStyle={styles.picker}
                           selectedValue={this.state.motivo}
                           onValueChange={this.onValueChange.bind(this)}
                         >
-                          <Picker.Item label="SINIESTRO" value="0" />
+                          <Picker.Item label="SINIESTRO" value="0"/>
                           <Picker.Item label="VISITAS DE ENTIDADES PÚBLICAS" value="1" />
                           <Picker.Item label="REQUERIMIENTO GERENCIAL" value="2" />
                           <Picker.Item label="AUSENCIA ADMINISTRADOR" value="3" />
@@ -1572,8 +1656,8 @@ export default class Activity extends Component {
                   <View>
                     <ScrollView>
                       <Text style={styles.textDocumento}>{this.state.isLoadActividad ? this.state.documentos.documento : ''}</Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Si'} checked={this.state.checked2}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'No'} checked={this.state.checked2}></RadioButton>
                       <Text style={styles.textDescFoto}>Documento Vencido</Text>
                       <ListItem thumbnail style={{marginLeft:0}}>
                         <Left>
@@ -1626,8 +1710,8 @@ export default class Activity extends Component {
                   <View>
                     <ScrollView>
                       <Text style={styles.textDocumento}>{this.state.isLoadActividad ? this.state.documentos.condicion : ''}</Text>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Si'} checked={this.state.checked2}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={2} value={'No'} checked={this.state.checked2}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Bueno'} checked={this.state.checked2}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Malo'} checked={this.state.checked2}></RadioButton>
                       <Text style={styles.textDescFoto}>Foto de la condicion locativa</Text>
                       <ListItem thumbnail style={{marginLeft:0}}>
                         <Left>
