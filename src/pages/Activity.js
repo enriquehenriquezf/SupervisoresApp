@@ -633,7 +633,7 @@ export default class Activity extends Component {
         else
         {
           toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
-          this.handleBackPress();
+          //this.handleBackPress();
         }
       },
       (error) => {
@@ -1511,7 +1511,7 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha Resolución: </Text>
                       <DatePicker
-                          defaultDate={items.fecha_resolucion !== null? new Date(items.fecha_resolucion.substr(0,10)) : this.state.fecha_resolucion}//FIXME: fecha aparece 1 dia antes
+                          defaultDate={items.fecha_resolucion !== null? new Date(items.fecha_resolucion) : this.state.fecha_resolucion}
                           minimumDate={new Date(2019, 0, 1)}
                           locale={"es"}
                           timeZoneOffsetInMinutes={undefined}
@@ -1521,14 +1521,14 @@ export default class Activity extends Component {
                           placeHolderText={items.fecha_resolucion === null? "Seleccionar Fecha" : undefined }
                           textStyle={{ color: "green",paddingLeft:20 }}
                           placeHolderTextStyle={{ color: "#d3d3d3",paddingLeft:20 }}
-                          onDateChange={newDate => this.setState({fecha_resolucion: newDate.toJSON().substr(0,10)})}
+                          onDateChange={newDate => this.setState({fecha_resolucion: newDate})}
                           disabled={false}
                       />
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de facturas autorizadas: </Text>
                       <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="# de facturas" defaultValue={this.state.facturas_autorizadas} onChangeText={text => this.setState({facturas_autorizadas: text})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha de la última factura: </Text>
                       <DatePicker
-                          defaultDate={items.fecha_ultima_factura !== null? new Date(items.fecha_ultima_factura.substr(0,10)) : this.state.fecha_ultima_factura}//FIXME: fecha aparece 1 dia antes
+                          defaultDate={items.fecha_ultima_factura !== null? new Date(items.fecha_ultima_factura) : this.state.fecha_ultima_factura}
                           minimumDate={new Date(2019, 0, 1)}
                           locale={"es"}
                           timeZoneOffsetInMinutes={undefined}
@@ -1538,7 +1538,7 @@ export default class Activity extends Component {
                           placeHolderText={items.fecha_ultima_factura === null? "Seleccionar Fecha" : undefined }
                           textStyle={{ color: "green",paddingLeft:20 }}
                           placeHolderTextStyle={{ color: "#d3d3d3",paddingLeft:20 }}
-                          onDateChange={newDate => this.setState({fecha_ultima_factura: newDate.toJSON().substr(0,10)})}
+                          onDateChange={newDate => this.setState({fecha_ultima_factura: newDate})}
                           disabled={false}
                       />
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de la última factura: </Text>
