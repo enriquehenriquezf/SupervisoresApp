@@ -73,6 +73,7 @@ export default class Activity extends Component {
       fecha_resolucion: new Date(),
       numero_ultima_factura:'',
       fecha_ultima_factura: new Date(),
+      ptc:[],
       showToast: false
     };
     let token = this.props.token;
@@ -522,7 +523,7 @@ export default class Activity extends Component {
 
   componentDidMount()
   {
-    //console.log(items);
+    console.log(items);
     /** Agregar el metodo handleBackPress al evento de presionar el boton "Back" de android */
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     /**
@@ -612,7 +613,7 @@ export default class Activity extends Component {
       });
     }
 
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.data});
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
      * @example rango: a una distancia de 5000*10^-7 grados de latitud y longitud
@@ -633,7 +634,7 @@ export default class Activity extends Component {
         else
         {
           toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
-          //this.handleBackPress();
+          this.handleBackPress();
         }
       },
       (error) => {
@@ -697,6 +698,10 @@ export default class Activity extends Component {
     totalTime = totalTl - totalTimeInit;
     var diferencia = 0;
     diferencia = this.state.ano_actual - this.state.ano_anterior;
+    var arr = this.state.ptc;
+    var ind = 0;
+    if(items.nombre_tabla === 'actividades_ptc'){if(this.state.calificacion_pv === 'Si '){ind = this.state.checked-5; arr[ind].respuesta = 5;}else{ind = this.state.checked-1; arr[ind].respuesta = 1}}
+    console.log(arr);
     /** Motivo de Ausencia */
     if(this.state.ausencia){
       if(items.motivo_ausencia === 'no ausentado'){
@@ -709,9 +714,9 @@ export default class Activity extends Component {
     await fetch(api.ipActivity, {
       method: 'POST',
       headers: {
-          'Authorization': auth,
-          'Content-Type': 'application/json',
-          'Accept':'application/json'
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
       },
       body: JSON.stringify({
         calificacion_pv: this.state.checked,//this.state.calificacion_pv, 
@@ -730,6 +735,7 @@ export default class Activity extends Component {
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
         fecha_ultima_factura:this.state.fecha_ultima_factura,
         numero_ultima_factura:this.state.numero_ultima_factura,
+        data:arr,
         tiempo_actividad: time,
         tiempo_total: totalTime,
         motivo_ausencia: items.motivo_ausencia
@@ -1351,12 +1357,26 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//TODO: cambiar o borrar
-                  items.nombre_tabla === 'ingreso_sucursal' ?
+                {//FIXME: no se puede modificar array
+                  items.nombre_tabla === 'actividades_ptc' ?
                     <View>
-                      <Text style={styles.textInfo}>Reporte de ingreso: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Al día'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      {JSON.parse(items.data).map((data,index) => {
+                        return(
+                          data.tipo === 1 ?
+                            <View key={index}>
+                              <Text style={styles.textInfo}>{data.titulo}: </Text>
+                              <RadioButton SetChecked={this.SetChecked} i={5+index} value={'Si '} checked={this.state.checked}></RadioButton>
+                              <RadioButton SetChecked={this.SetChecked} i={1+index} value={'No '} checked={this.state.checked}></RadioButton>
+                            </View>
+                          : 
+                            data.tipo === 2 ?
+                              <View key={index}>
+                                <Text style={styles.textInfo}>{data.titulo}: </Text>
+                                <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder={data.titulo} defaultValue={data.respuesta} onChangeText={text => {let array = this.state.ptc; array[index].respuesta = text; console.log(array[index]); console.log(array); this.setState({ptc: array})} }></Input>
+                              </View>
+                            : null
+                        )
+                      })}
                     </View>
                   :
                     null
@@ -1547,7 +1567,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {
+                {//TODO: cambiar o borrar
                   items.nombre_tabla === 'presupuesto_pedido' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar metodología utilizada para revisar el pedido: </Text>

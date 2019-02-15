@@ -87,6 +87,8 @@ export default class Home extends Component {
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,
               fecha_ultima_factura:element.fecha_ultima_factura,
               numero_ultima_factura:element.numero_ultima_factura,   
+              descripcion_ptc:element.descripcion_ptc,
+              data:element.data,       
               tiempo_actividad: element.tiempo_actividad,
               motivo_ausencia: element.motivo_ausencia,
               tiempoInactivo: tiempoInactivo,
