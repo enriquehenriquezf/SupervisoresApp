@@ -84,6 +84,7 @@ export default class Activity extends Component {
     timeInit = new Date().getTime();
     imgOverlay = '';
     items2 = [];
+    this._imgs = [];
     this.SetChecked = this.SetChecked.bind(this);
     this.ModificarProducto = this.ModificarProducto.bind(this);
     this.setDate = this.setDate.bind(this);
@@ -613,7 +614,7 @@ export default class Activity extends Component {
       });
     }
 
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.data});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: JSON.parse(items.data)});
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
      * @example rango: a una distancia de 5000*10^-7 grados de latitud y longitud
@@ -677,6 +678,23 @@ export default class Activity extends Component {
       docs.estado_condicion = calificacion_pv;
       this.setState({ checked2: i, documentos: docs });
     }
+    else if(calificacion_pv === 'Si ' || calificacion_pv === 'No '){
+      var arr = this.state.ptc;
+      var ind = 0;
+      if(items.nombre_tabla === 'actividades_ptc'){
+        if(calificacion_pv === 'Si ')
+        {
+          ind = i-5;
+          arr[ind].respuesta = 5;
+        }
+        else{
+          ind = i-1;
+          arr[ind].respuesta = 1
+        }
+        this.setState({ ptc:arr});
+      }
+      //console.log(arr);
+    }
     else{
       this.setState({ checked: i, calificacion_pv: calificacion_pv });
     }
@@ -699,9 +717,6 @@ export default class Activity extends Component {
     var diferencia = 0;
     diferencia = this.state.ano_actual - this.state.ano_anterior;
     var arr = this.state.ptc;
-    var ind = 0;
-    if(items.nombre_tabla === 'actividades_ptc'){if(this.state.calificacion_pv === 'Si '){ind = this.state.checked-5; arr[ind].respuesta = 5;}else{ind = this.state.checked-1; arr[ind].respuesta = 1}}
-    console.log(arr);
     /** Motivo de Ausencia */
     if(this.state.ausencia){
       if(items.motivo_ausencia === 'no ausentado'){
@@ -735,7 +750,7 @@ export default class Activity extends Component {
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
         fecha_ultima_factura:this.state.fecha_ultima_factura,
         numero_ultima_factura:this.state.numero_ultima_factura,
-        data:arr,
+        data:JSON.stringify(arr),
         tiempo_actividad: time,
         tiempo_total: totalTime,
         motivo_ausencia: items.motivo_ausencia
@@ -882,7 +897,7 @@ export default class Activity extends Component {
    * Seleccionar un archivo desde el UI del dispositivo
    * @param {boolean} vencido verifica si se va a modificar la imagen de documento vencido
    */
-  openFilePicker = async (vencido) => {
+  openFilePicker = async (vencido,index) => {
     try{
       let file = await Expo.DocumentPicker.getDocumentAsync({type: '*/*'});
       //console.log(file);
@@ -895,15 +910,27 @@ export default class Activity extends Component {
           file_type: tipo
         };
         //console.log(attachment);
-        if(vencido){
-          imgTemp1 = attachment.uri;
-          this._img1.setNativeProps({src: [{uri: imgTemp1}]});
-          this.setState({archivo: attachment, imgVencido: imgTemp1});
-        }else{
-          imgTemp2 = attachment.uri;
-          this._img2.setNativeProps({src: [{uri: imgTemp2}]});//'data:image/png;base64,' + imgsource
-          this.setState({archivo2: attachment, imgRenovado: imgTemp2});
+        if(index === -1){
+          if(vencido){
+            imgTemp1 = attachment.uri;
+            this._img1.setNativeProps({src: [{uri: imgTemp1}]});
+            this.setState({archivo: attachment, imgVencido: imgTemp1});
+          }else{
+            imgTemp2 = attachment.uri;
+            this._img2.setNativeProps({src: [{uri: imgTemp2}]});//'data:image/png;base64,' + imgsource
+            this.setState({archivo2: attachment, imgRenovado: imgTemp2});
+          }
         }
+        else{
+          imgTemp1 = attachment.uri;
+          var file64;
+          var arr = this.state.ptc;
+          await Expo.FileSystem.readAsStringAsync(imgTemp1, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+            file64 = response;
+          });
+          arr[index].respuesta = file64;
+          this._imgs[index].setNativeProps({src: [{uri: imgTemp1}]});
+          this.setState({ptc: arr, archivo: attachment, imgVencido: imgTemp1});}
       }
     }
     catch(error){
@@ -1092,6 +1119,15 @@ export default class Activity extends Component {
     }
     this.setState({PRODUCTS: array, PRODUCTS2: array2});
     this.forceUpdate();
+  }
+
+  /**
+   * Modificar datos del ptc
+   */
+  updatePTC(index){
+    var array = this.state.ptc;
+    array[index].respuesta = this.state.PRODUCTS;
+    this.setState({ptc:array});
   }
 
   /** Cambiar opcion de motivo de ausencia */
@@ -1357,24 +1393,86 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//FIXME: no se puede modificar array
+                {
                   items.nombre_tabla === 'actividades_ptc' ?
                     <View>
-                      {JSON.parse(items.data).map((data,index) => {
+                      {this.state.ptc.map((data,index) => {
                         return(
                           data.tipo === 1 ?
                             <View key={index}>
                               <Text style={styles.textInfo}>{data.titulo}: </Text>
-                              <RadioButton SetChecked={this.SetChecked} i={5+index} value={'Si '} checked={this.state.checked}></RadioButton>
-                              <RadioButton SetChecked={this.SetChecked} i={1+index} value={'No '} checked={this.state.checked}></RadioButton>
+                              <RadioButton SetChecked={this.SetChecked} i={5+index} value={'Si '} checked={data.respuesta === ''? 5+index : data.respuesta+index}></RadioButton>
+                              <RadioButton SetChecked={this.SetChecked} i={1+index} value={'No '} checked={data.respuesta === ''? 5+index : data.respuesta+index}></RadioButton>
                             </View>
                           : 
                             data.tipo === 2 ?
                               <View key={index}>
                                 <Text style={styles.textInfo}>{data.titulo}: </Text>
-                                <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder={data.titulo} defaultValue={data.respuesta} onChangeText={text => {let array = this.state.ptc; array[index].respuesta = text; console.log(array[index]); console.log(array); this.setState({ptc: array})} }></Input>
+                                <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholderTextColor={COLOR.gris} placeholder={data.titulo} defaultValue={data.respuesta} onChangeText={text => {let array = this.state.ptc; array[index].respuesta = text; this.setState({ptc: array})} }></Input>
                               </View>
-                            : null
+                            : 
+                              data.tipo === 3 ?
+                                <View key={index}>
+                                  <Text style={styles.textInfo}>{data.titulo}: </Text>
+                                  <Form>
+                                    <Textarea bordered placeholder={data.titulo} defaultValue={data.respuesta} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => {let array = this.state.ptc; array[index].respuesta = text; this.setState({ptc: array})} } />
+                                  </Form>
+                                </View>
+                              : 
+                                data.tipo === 4 ?
+                                  <View key={index}>{/** FIXME: UpdatePTC no se actualiza correctamente ni se borra (Crear callback function o promise) */}
+                                    <Text style={styles.textInfo}>{data.titulo}: </Text>
+                                    <Autocomplete
+                                      autoCapitalize="none"
+                                      data={prods}
+                                      defaultValue={query}
+                                      onChangeText={text => this.BuscarProducto(text,'')}
+                                      placeholder="Producto a buscar"
+                                      inputContainerStyle={styles.autocompletar}
+                                      listStyle={styles.autocompletarLista}
+                                      renderItem={item => (
+                                        <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }, () => {this.updatePTC(index);}); } }>
+                                          <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                                        </TouchableOpacity>
+                                      )}
+                                    />
+                                    <List dataArray={this.state.PRODUCTS.length > 0 ? this.state.PRODUCTS : this.state.PRODUCTS = data.respuesta}
+                                      renderRow={(item) =>
+                                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                                          <View style={{flex:2, justifyContent:'flex-start'}}>
+                                            <ListItem button onPress={() => {this.BorrarProducto(item); this.updatePTC(index);}}>
+                                              <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                              <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                                            </ListItem>
+                                          </View>
+                                          <View style={{flex:1, justifyContent:'center'}}>
+                                            <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => {this.ModificarProducto(item,value); this.updatePTC(index);}}/>
+                                          </View>
+                                        </View>
+                                      }>
+                                    </List>
+                                  </View>
+                                :  
+                                  data.tipo === 5 ?
+                                    <View key={index}>
+                                      <Text style={styles.textInfo}>{data.titulo}: </Text>
+                                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder={data.titulo} defaultValue={data.respuesta} onChangeText={text => {let array = this.state.ptc; array[index].respuesta = text; this.setState({ptc: array})} }></Input>
+                                    </View>
+                                  :  
+                                    data.tipo === 6 ?
+                                      <View key={index}>{/** //FIXME: leer imagen desde servidor*/}
+                                        <ListItem thumbnail style={{marginLeft:0}}>
+                                          <Left>
+                                            <TouchableOpacity onPress={() => this.verImagen(true)}>
+                                              <Image ref={component => this._imgs[index] = component} style={{width: 50, height: 50}} source={{uri: this.state.ptc[index].respuesta !== '' ? 'data:image/png;base64,' + this.state.ptc[index].respuesta : Imagen.noDisponible}}></Image>
+                                            </TouchableOpacity>
+                                          </Left>
+                                          <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                                            <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,index)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                                          </Body>
+                                        </ListItem>
+                                      </View>
+                                    : null
                         )
                       })}
                     </View>
@@ -1686,7 +1784,7 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
                         </Body>
                       </ListItem>
                       <Text style={styles.textDescFoto}>Documento Renovado</Text>
@@ -1697,7 +1795,7 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(false)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(false,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
                         </Body>
                       </ListItem>
                       <Form>
@@ -1740,7 +1838,7 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
                         </Body>
                       </ListItem>
                       <Form>
