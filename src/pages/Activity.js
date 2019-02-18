@@ -74,6 +74,7 @@ export default class Activity extends Component {
       numero_ultima_factura:'',
       fecha_ultima_factura: new Date(),
       ptc:[],
+      updated:false,
       showToast: false
     };
     let token = this.props.token;
@@ -614,7 +615,8 @@ export default class Activity extends Component {
       });
     }
 
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: JSON.parse(items.data)});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
      * @example rango: a una distancia de 5000*10^-7 grados de latitud y longitud
@@ -942,11 +944,16 @@ export default class Activity extends Component {
    * Muestra el overlay con la imagen en pantalla completa
    * @param {boolean} vencido 
    */
-  verImagen(vencido){
-    if(vencido){
-      imgOverlay = this.state.imgVencido;
+  verImagen(vencido, index){
+    if(index === -1){
+      if(vencido){
+        imgOverlay = this.state.imgVencido;
+      }
+      else{imgOverlay = this.state.imgRenovado;}
     }
-    else{imgOverlay = this.state.imgRenovado;}
+    else{
+      imgOverlay = this.state.ptc[index].respuesta.length > 500 ? 'data:image/png;base64,' + this.state.ptc[index].respuesta : api.ipImg + this.state.ptc[index].respuesta 
+    }
     this.setState({isVisible2: true});
   }
 
@@ -1123,10 +1130,13 @@ export default class Activity extends Component {
 
   /**
    * Modificar datos del ptc
+   * @param index posicion del item a modificar en el array del ptc
+   * @param tipo tipo de modificacion @example tipo: 1 = productos , tipo: 2 = laboratorios
    */
-  updatePTC(index){
+  updatePTC(index, tipo){
     var array = this.state.ptc;
-    array[index].respuesta = this.state.PRODUCTS;
+    if(tipo === 1){array[index].respuesta = this.state.PRODUCTS;}
+    else if(tipo === 2){array[index].respuesta = this.state.PRODUCTS2;}
     this.setState({ptc:array});
   }
 
@@ -1420,7 +1430,7 @@ export default class Activity extends Component {
                                 </View>
                               : 
                                 data.tipo === 4 ?
-                                  <View key={index}>{/** FIXME: UpdatePTC no se actualiza correctamente ni se borra (Crear callback function o promise) */}
+                                  <View key={index}>
                                     <Text style={styles.textInfo}>{data.titulo}: </Text>
                                     <Autocomplete
                                       autoCapitalize="none"
@@ -1431,40 +1441,66 @@ export default class Activity extends Component {
                                       inputContainerStyle={styles.autocompletar}
                                       listStyle={styles.autocompletarLista}
                                       renderItem={item => (
-                                        <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }, () => {this.updatePTC(index);}); } }>
+                                        <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] }, () => {this.updatePTC(index,1);}); } }>
                                           <Text style={styles.producto}>{item.nombre_comercial}</Text>
                                         </TouchableOpacity>
                                       )}
                                     />
-                                    <List dataArray={this.state.PRODUCTS.length > 0 ? this.state.PRODUCTS : this.state.PRODUCTS = data.respuesta}
+                                    <List dataArray={!this.state.updated ? (this.state.PRODUCTS.length > 0 ? this.state.PRODUCTS : this.state.PRODUCTS = data.respuesta) : this.state.PRODUCTS}
                                       renderRow={(item) =>
                                         <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
                                           <View style={{flex:2, justifyContent:'flex-start'}}>
-                                            <ListItem button onPress={() => {this.BorrarProducto(item); this.updatePTC(index);}}>
+                                            <ListItem button onPress={() => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS: array, updated:true}, () => {this.forceUpdate(); this.updatePTC(index,1);})}}>
                                               <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
                                               <Text style={styles.productosList}>{item.nombre_comercial}</Text>
                                             </ListItem>
                                           </View>
                                           <View style={{flex:1, justifyContent:'center'}}>
-                                            <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => {this.ModificarProducto(item,value); this.updatePTC(index);}}/>
+                                            <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array[ind] = {...array[ind], cant: value}; this.setState({PRODUCTS: array}, () => {this.forceUpdate(); this.updatePTC(index,1);})} }/>
                                           </View>
                                         </View>
                                       }>
                                     </List>
                                   </View>
                                 :  
-                                  data.tipo === 5 ?
+                                  data.tipo === 5 ?                                  
                                     <View key={index}>
                                       <Text style={styles.textInfo}>{data.titulo}: </Text>
-                                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder={data.titulo} defaultValue={data.respuesta} onChangeText={text => {let array = this.state.ptc; array[index].respuesta = text; this.setState({ptc: array})} }></Input>
+                                      <Autocomplete
+                                        autoCapitalize="none"
+                                        data={labs}
+                                        defaultValue={query}
+                                        onChangeText={text => this.BuscarLaboratorio(text)}
+                                        placeholder="Producto a buscar"
+                                        inputContainerStyle={styles.autocompletar}
+                                        listStyle={styles.autocompletarLista}
+                                        renderItem={item => (
+                                          <TouchableOpacity onPress={() => {this.setState({ query: '', laboratorios:[], PRODUCTS2: [...this.state.PRODUCTS2, {dk:item.dk, nombre:item.nombre,prods:[]}] }, () => {this.updatePTC(index,2);}); } }>
+                                            <Text style={styles.producto}>{item.nombre}</Text>
+                                          </TouchableOpacity>
+                                        )}
+                                      />
+                                      <List dataArray={!this.state.updated ? (this.state.PRODUCTS2.length > 0 ? this.state.PRODUCTS2 : this.state.PRODUCTS2 = data.respuesta) : this.state.PRODUCTS2}
+                                        renderRow={(item) =>
+                                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                                            <View style={{flex:2, justifyContent:'flex-start'}}>
+                                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS2]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS2: array, updated:true}, () => {this.forceUpdate(); this.updatePTC(index,2);})}}>
+                                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                                <Text style={styles.productosList}>{item.nombre}</Text>
+                                              </ListItem>
+                                            </View>
+                                          </View>
+                                        }>
+                                      </List>
                                     </View>
                                   :  
                                     data.tipo === 6 ?
-                                      <View key={index}>{/** //FIXME: leer imagen desde servidor*/}
+                                      <View key={index}>
+                                        <Text style={styles.textInfo}>{data.titulo}: </Text>
                                         <ListItem thumbnail style={{marginLeft:0}}>
                                           <Left>
-                                            <TouchableOpacity onPress={() => this.verImagen(true)}>
-                                              <Image ref={component => this._imgs[index] = component} style={{width: 50, height: 50}} source={{uri: this.state.ptc[index].respuesta !== '' ? 'data:image/png;base64,' + this.state.ptc[index].respuesta : Imagen.noDisponible}}></Image>
+                                            <TouchableOpacity onPress={() => this.verImagen(true, index)}>
+                                              <Image ref={component => this._imgs[index] = component} style={{width: 50, height: 50}} source={{uri: this.state.ptc[index].respuesta !== '' ? (this.state.ptc[index].respuesta.length > 500 ? 'data:image/png;base64,' + this.state.ptc[index].respuesta : api.ipImg + this.state.ptc[index].respuesta ) : Imagen.noDisponible}}></Image>
                                             </TouchableOpacity>
                                           </Left>
                                           <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
@@ -1779,7 +1815,7 @@ export default class Activity extends Component {
                       <Text style={styles.textDescFoto}>Documento Vencido</Text>
                       <ListItem thumbnail style={{marginLeft:0}}>
                         <Left>
-                          <TouchableOpacity onPress={() => this.verImagen(true)}>
+                          <TouchableOpacity onPress={() => this.verImagen(true,-1)}>
                             <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isLoadActividad ? this.state.imgVencido : Imagen.noDisponible}}></Image>
                           </TouchableOpacity>
                         </Left>
@@ -1790,7 +1826,7 @@ export default class Activity extends Component {
                       <Text style={styles.textDescFoto}>Documento Renovado</Text>
                       <ListItem thumbnail style={{marginLeft:0}}>
                         <Left>
-                          <TouchableOpacity onPress={() => this.verImagen(false)}>
+                          <TouchableOpacity onPress={() => this.verImagen(false,-1)}>
                             <Image ref={component => this._img2 = component} style={{width: 50, height: 50}} source={{uri: this.state.isLoadActividad ? this.state.imgRenovado : Imagen.noDisponible}}></Image>
                           </TouchableOpacity>
                         </Left>
@@ -1833,7 +1869,7 @@ export default class Activity extends Component {
                       <Text style={styles.textDescFoto}>Foto de la condicion locativa</Text>
                       <ListItem thumbnail style={{marginLeft:0}}>
                         <Left>
-                          <TouchableOpacity onPress={() => this.verImagen(true)}>
+                          <TouchableOpacity onPress={() => this.verImagen(true,-1)}>
                             <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isLoadActividad ? this.state.imgVencido : Imagen.noDisponible}}></Image>
                           </TouchableOpacity>
                         </Left>
@@ -1853,7 +1889,7 @@ export default class Activity extends Component {
               null
           }
           {
-            (items.nombre_tabla === 'documentacion_legal' || items.nombre_tabla === 'condiciones_locativas') ?
+            (items.nombre_tabla === 'documentacion_legal' || items.nombre_tabla === 'condiciones_locativas' || items.nombre_tabla === 'actividades_ptc') ?
               <Overlay
                 visible={this.state.isVisible2}
                 closeOnTouchOutside 
