@@ -69,6 +69,13 @@ export default class Activity extends Component {
       ano_actual:'0',
       ano_anterior:'0',
       estrategia:'',
+      base:'0',
+      gastos:'0',
+      diferencia:'0',
+      sobrante:'0',
+      faltante:'0',
+      horario:{dias_habiles:{apertura:'',cierre:''},domingos_feriados:{apertura:'',cierre:'',primer_turno:'',segundo_turno:'',tercer_turno:''}},
+      domicilios:{mes_anterior:'0',mes_actual:'0',dia_actual:'1',venta_proyeccion:'0',num_mensajeros:'0',prom_domicilio_mensajero:'0'},
       facturas_autorizadas:'',
       fecha_resolucion: new Date(),
       numero_ultima_factura:'',
@@ -531,7 +538,8 @@ export default class Activity extends Component {
     /**
      * Seleccionar el radioButton que se obtuvo de la base de datos
      */
-    if(items.calificacion_pv === 'Puntual' && items.nombre_tabla === 'apertura')
+
+    /*if(items.calificacion_pv === 'Puntual' && items.nombre_tabla === 'apertura')
     {
       this.SetChecked(5,'Puntual');
     }
@@ -590,6 +598,12 @@ export default class Activity extends Component {
     else if(items.calificacion_pv === null || items.calificacion_pv === 'noalificado')
     {
       this.SetChecked(5,'Completo');
+    }*/
+    if(items.calificacion_pv === 'nocalificado' || items.calificacion_pv === null){
+      this.SetChecked(5,items.calificacion_pv);
+    }
+    else{
+      this.SetChecked(items.calificacion_pv,items.calificacion_pv);
     }
     var array = [];
     var array2 = [];
@@ -615,7 +629,11 @@ export default class Activity extends Component {
       });
     }
 
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    //Actualizar State #FF0000
+    var horario = items.nombre_tabla === 'apertura' ? ((items.horario !== '' && items.horario !== null) ? JSON.parse(items.horario) : {dias_habiles:{apertura:'',cierre:''},domingos_feriados:{apertura:'',cierre:'',primer_turno:'',segundo_turno:'',tercer_turno:''}}) : ''
+    var domicilios = this.state.domicilios;
+    items.nombre_tabla === 'domicilios' ? (domicilios.mes_anterior =items.mes_anterior?items.mes_anterior:'0', domicilios.venta_proyeccion = items.venta_domicilios_proyeccion?items.venta_domicilios_proyeccion:'0', domicilios.num_mensajeros = items.numero_mensajeros_planta?items.numero_mensajeros_planta:'0', domicilios.prom_domicilio_mensajero = items.pro_domicilio_mensajero?items.pro_domicilio_mensajero:'0') : null
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -717,7 +735,7 @@ export default class Activity extends Component {
     var totalTl = new Date().getTime();
     totalTime = totalTl - totalTimeInit;
     var diferencia = 0;
-    diferencia = this.state.ano_actual - this.state.ano_anterior;
+    diferencia = items.nombre_tabla === 'evolucion_clientes' ?(this.state.ano_actual - this.state.ano_anterior) : this.state.diferencia;
     var arr = this.state.ptc;
     /** Motivo de Ausencia */
     if(this.state.ausencia){
@@ -746,7 +764,16 @@ export default class Activity extends Component {
         laboratorios_realizados: JSON.stringify(this.state.PRODUCTS2),
         ano_actual:this.state.ano_actual,
         ano_anterior:this.state.ano_anterior,
+        base:this.state.base,
+        gastos:this.state.gastos,
+        sobrante:this.state.sobrante,
+        faltante:this.state.faltante,
         diferencia:Math.abs(diferencia),
+        horario: JSON.stringify(this.state.horario),
+        mes_anterior: this.state.domicilios.mes_anterior,
+        venta_domicilios_proyeccion: this.state.domicilios.venta_proyeccion,
+        numero_mensajeros_planta: this.state.domicilios.num_mensajeros,
+        pro_domicilio_mensajero: this.state.domicilios.prom_domicilio_mensajero,
         implementar_estrategia:this.state.estrategia,
         fecha_resolucion:this.state.fecha_resolucion,
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
@@ -1228,6 +1255,16 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Puntual'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={3} value={'Tarde'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Muy Tarde'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Horario días Hábiles: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Apertura" defaultValue={this.state.horario.dias_habiles.apertura} onChangeText={text => {var hr = this.state.horario; hr.dias_habiles.apertura = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cierre" defaultValue={this.state.horario.dias_habiles.cierre} onChangeText={text => {var hr = this.state.horario; hr.dias_habiles.cierre = text; this.setState({horario: hr})}}></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Domingos y Feriados: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Apertura" defaultValue={this.state.horario.domingos_feriados.apertura} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.apertura = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cierre" defaultValue={this.state.horario.domingos_feriados.cierre} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.cierre = text; this.setState({horario: hr})} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Turnos Domingos y Feriados: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Primer Turno" defaultValue={this.state.horario.domingos_feriados.primer_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.primer_turno = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Segundo Turno" defaultValue={this.state.horario.domingos_feriados.segundo_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.segundo_turno = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Tercer Turno" defaultValue={this.state.horario.domingos_feriados.tercer_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.tercer_turno = text; this.setState({horario: hr})} }></Input>
                     </View>
                   :
                     null
@@ -1515,12 +1552,20 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//TODO: cambiar o borrar
-                  items.nombre_tabla === 'formulas_despachos' ?
+                {
+                  items.nombre_tabla === 'arqueo_caja' ?
                     <View>
-                      <Text style={styles.textInfo}>Se debe revisar estén descargadas del sistema todas las fórmulas y pendientes:</Text>
+                      <Text style={styles.textInfo}>Arqueo de caja:</Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Base: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Base" defaultValue={this.state.base} onChangeText={text => {var value = (text-this.state.gastos-this.state.diferencia); this.setState({base: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Gastos: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Gastos" defaultValue={this.state.gastos} onChangeText={text => {var value = (this.state.base-text-this.state.diferencia); this.setState({gastos: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Saldo en efectivo: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Saldo en efectivo" defaultValue={this.state.diferencia} onChangeText={text => {var value = (this.state.base-this.state.gastos-text); this.setState({diferencia: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Sobrante: {this.state.sobrante}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Faltante: {this.state.faltante}</Text>
                     </View>
                   :
                     null
@@ -1701,17 +1746,28 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//TODO: cambiar o borrar
-                  items.nombre_tabla === 'presupuesto_pedido' ?
+                {//FIXME: arreglar proyeccion
+                  items.nombre_tabla === 'domicilios' ?
                     <View>
-                      <Text style={styles.textInfo}>Revisar metodología utilizada para revisar el pedido: </Text>
+                      <Text style={styles.textInfo}>Revisar domicilios: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes anterior: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.mes_anterior} onChangeText={text => {var dom = this.state.domicilios; dom.mes_anterior = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes actual: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={this.state.domicilios.mes_actual} onChangeText={text => {var dom = this.state.domicilios; dom.mes_actual = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Días transcurridos: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Día actual" defaultValue={this.state.domicilios.dia_actual} onChangeText={text => {var dom = this.state.domicilios; dom.dia_actual = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Venta Domicilios Proyección: {this.state.domicilios.venta_proyeccion}</Text>
+                      
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}># mensajeros de planta: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.num_mensajeros} onChangeText={text => {var dom = this.state.domicilios; dom.num_mensajeros = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Promedio Domicilio/Mensajero: {this.state.domicilios.prom_domicilio_mensajero}</Text>
                     </View>
                   :
                     null
                 }
-                {
+                {//FIXME: terminar
                   items.nombre_tabla === 'remisiones' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar remisiones grabadas a la fecha: </Text>
@@ -1721,7 +1777,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {
+                {//TODO: cambiar o borrar
                   items.nombre_tabla === 'revision_completa_inventario' ?
                     <View>
                       <Text style={styles.textInfo}>Revision completa de los inventarios: </Text>
@@ -1731,7 +1787,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {
+                {//FIXME: terminar
                   items.nombre_tabla === 'seguimiento_vendedores' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>

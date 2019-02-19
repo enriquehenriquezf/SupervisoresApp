@@ -31,10 +31,8 @@ export default StyleSheet.create({
     },
     observaciones:{
         borderColor: COLOR.azulTransparente,
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        borderLeftWidth: 0,
-        borderRightWidth: 0,
+        borderRadius:10,
+        borderWidth: 1,
         marginLeft: 20,
         marginRight: 20,
         marginBottom: 5,

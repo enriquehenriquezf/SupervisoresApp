@@ -99,6 +99,16 @@ export default class Home extends Component {
               numero_consecutivo: element.numero_consecutivo,
               ano_actual: element.ano_actual,
               ano_anterior: element.ano_anterior,
+              base:element.base,
+              gastos:element.gastos,
+              diferencia:element.diferencia,
+              sobrante:element.sobrante,
+              faltante:element.faltante,
+              horario: element.horario,
+              mes_anterior: element.mes_anterior,
+              venta_domicilios_proyeccion: element.venta_proyeccion,
+              numero_mensajeros_planta: element.num_mensajeros,
+              pro_domicilio_mensajero: element.prom_domicilio_mensajero,
               implementar_estrategia: element.implementar_estrategia,
               fecha_resolucion:element.fecha_resolucion,
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,
@@ -200,7 +210,7 @@ export default class Home extends Component {
   }
   _renderContent(item) {
     return(
-      item.content.map((element,index) =>{
+      item.content.map((element,index) =>{//.filter((element,index) => index < 4).map((element,index))
         return (
           <ListItem key={index} button underlayColor={COLOR.azulTransparente} onPress={() => itemPress(2,hand, element)} style={styles.SinBorde}>
             <Left >
