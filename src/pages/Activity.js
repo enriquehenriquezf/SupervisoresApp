@@ -76,6 +76,12 @@ export default class Activity extends Component {
       faltante:'0',
       horario:{dias_habiles:{apertura:'',cierre:''},domingos_feriados:{apertura:'',cierre:'',primer_turno:'',segundo_turno:'',tercer_turno:''}},
       domicilios:{mes_anterior:'0',mes_actual:'0',dia_actual:'1',venta_proyeccion:'0',num_mensajeros:'0',prom_domicilio_mensajero:'0'},
+      remisiones:{numero_remisiones:'',consecutivos:''},
+      mercadeo:{promociones_separata:5,desc_escalonados:5,tienda_virtual:5,puntos_saludables:5,close_up:5},
+      bodega:{valor_pedido:'',valor_despacho:'',diferencia:'',nivel_servicio:'',revisa_pedidos_antes_enviarlos:'',utiliza_libreta_faltantes:''},
+      mercancia:{valor_actual:'',dias_inventario:'',inv_optimo:'',valor_dev_cierre_mes:'',dev_vencimiento_m_estado:''},
+      correspondencia:'',
+      acciones_tomadas:'',
       facturas_autorizadas:'',
       fecha_resolucion: new Date(),
       numero_ultima_factura:'',
@@ -632,8 +638,18 @@ export default class Activity extends Component {
     //Actualizar State #FF0000
     var horario = items.nombre_tabla === 'apertura' ? ((items.horario !== '' && items.horario !== null) ? JSON.parse(items.horario) : {dias_habiles:{apertura:'',cierre:''},domingos_feriados:{apertura:'',cierre:'',primer_turno:'',segundo_turno:'',tercer_turno:''}}) : ''
     var domicilios = this.state.domicilios;
-    items.nombre_tabla === 'domicilios' ? (domicilios.mes_anterior =items.mes_anterior?items.mes_anterior:'0', domicilios.venta_proyeccion = items.venta_domicilios_proyeccion?items.venta_domicilios_proyeccion:'0', domicilios.num_mensajeros = items.numero_mensajeros_planta?items.numero_mensajeros_planta:'0', domicilios.prom_domicilio_mensajero = items.pro_domicilio_mensajero?items.pro_domicilio_mensajero:'0') : null
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    items.nombre_tabla === 'domicilios' ? (domicilios.mes_anterior =items.mes_anterior?items.mes_anterior:'0', domicilios.venta_proyeccion = items.venta_domicilios_proyeccion?items.venta_domicilios_proyeccion:'0', domicilios.num_mensajeros = items.numero_mensajeros_planta?items.numero_mensajeros_planta:'0', domicilios.prom_domicilio_mensajero = items.pro_domicilio_mensajero?items.pro_domicilio_mensajero:'0', domicilios.mes_actual = items.mes_actual?items.mes_actual:'0', domicilios.dia_actual = items.dias_transcurridos?items.dias_transcurridos:'0') : null
+    var remisiones = this.state.remisiones;
+    items.nombre_tabla === 'remisiones' ? (remisiones.consecutivos = items.consecutivos? items.consecutivos:'0', remisiones.numero_remisiones = items.numero_remisiones?items.numero_remisiones:'0') : null
+    var mercadeo = this.state.mercadeo;
+    items.nombre_tabla === 'programa_mercadeo' ? (mercadeo.promociones_separata = items.promociones_separata?items.promociones_separata:5,mercadeo.desc_escalonados = items.desc_escalonados?items.desc_escalonados:5,mercadeo.tienda_virtual = items.tienda_virtual?items.tienda_virtual:5,mercadeo.puntos_saludables = items.puntos_saludables?items.puntos_saludables:5,mercadeo.close_up = items.close_up?items.close_up:5) : null
+    var bodega = this.state.bodega;
+    items.nombre_tabla === 'servicio_bodega' ? (bodega.valor_pedido = items.valor_pedido?items.valor_pedido:'', bodega.valor_despacho = items.valor_despacho?items.valor_despacho:'', bodega.diferencia = items.diferencia?items.diferencia:'', bodega.nivel_servicio = items.nivel_servicio?items.nivel_servicio:'', bodega.revisa_pedidos_antes_enviarlos = items.revisa_pedidos_antes_enviarlos?items.revisa_pedidos_antes_enviarlos:'', bodega.utiliza_libreta_faltantes = items.utiliza_libreta_faltantes?items.utiliza_libreta_faltantes:'') : null
+    var mercancia = this.state.mercancia;
+    items.nombre_tabla === 'inventario_mercancia' ? (mercancia.valor_actual = items.valor_actual?items.valor_actual:'',mercancia.dias_inventario = items.dias_inventario?items.dias_inventario:'',mercancia.inv_optimo = items.inv_optimo?items.inv_optimo:'',mercancia.valor_dev_cierre_mes = items.valor_dev_cierre_mes?items.valor_dev_cierre_mes:'',mercancia.dev_vencimiento_m_estado = items.dev_vencimiento_m_estado?items.dev_vencimiento_m_estado:'') : null
+    items.productos_cero ? array = JSON.parse(items.productos_cero) : items.productos_cero = []
+    items.productos_cero_rotante_90_dias ? array2 = JSON.parse(items.productos_cero_rotante_90_dias) : items.productos_cero_rotante_90_dias = []
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -715,6 +731,31 @@ export default class Activity extends Component {
       }
       //console.log(arr);
     }
+    else if(calificacion_pv === 'Si  ' || calificacion_pv === 'No  '){
+      var mercadeo = this.state.mercadeo;
+      mercadeo.promociones_separata = i;
+      this.setState({ mercadeo: mercadeo});
+    }
+    else if(calificacion_pv === 'Si   ' || calificacion_pv === 'No   '){
+      var mercadeo = this.state.mercadeo;
+      mercadeo.desc_escalonados = i;
+      this.setState({ mercadeo: mercadeo});
+    }
+    else if(calificacion_pv === 'Si    ' || calificacion_pv === 'No    '){
+      var mercadeo = this.state.mercadeo;
+      mercadeo.tienda_virtual = i;
+      this.setState({ mercadeo: mercadeo});
+    }
+    else if(calificacion_pv === 'Si     ' || calificacion_pv === 'No     '){
+      var mercadeo = this.state.mercadeo;
+      mercadeo.puntos_saludables = i;
+      this.setState({ mercadeo: mercadeo});
+    }
+    else if(calificacion_pv === 'Si      ' || calificacion_pv === 'No      '){
+      var mercadeo = this.state.mercadeo;
+      mercadeo.close_up = i;
+      this.setState({ mercadeo: mercadeo});
+    }
     else{
       this.setState({ checked: i, calificacion_pv: calificacion_pv });
     }
@@ -774,6 +815,30 @@ export default class Activity extends Component {
         venta_domicilios_proyeccion: this.state.domicilios.venta_proyeccion,
         numero_mensajeros_planta: this.state.domicilios.num_mensajeros,
         pro_domicilio_mensajero: this.state.domicilios.prom_domicilio_mensajero,
+        mes_actual: this.state.domicilios.mes_actual,
+        dias_transcurridos: this.state.domicilios.dia_actual,
+        consecutivos: this.state.remisiones.consecutivos,
+        numero_remisiones: this.state.remisiones.numero_remisiones,        
+        promociones_separata: this.state.mercadeo.promociones_separata,
+        desc_escalonados: this.state.mercadeo.desc_escalonados,
+        tienda_virtual: this.state.mercadeo.tienda_virtual,
+        puntos_saludables: this.state.mercadeo.puntos_saludables,
+        close_up: this.state.mercadeo.close_up,
+        correspondencia:this.state.correspondencia,
+        valor_pedido:this.state.bodega.valor_pedido,
+        valor_despacho:this.state.bodega.valor_despacho,
+        diferencia:this.state.bodega.diferencia,
+        nivel_servicio:this.state.bodega.nivel_servicio,
+        revisa_pedidos_antes_enviarlos:this.state.bodega.revisa_pedidos_antes_enviarlos,
+        utiliza_libreta_faltantes:this.state.bodega.utiliza_libreta_faltantes,
+        valor_actual:this.state.mercancia.valor_actual,
+        dias_inventario:this.state.mercancia.dias_inventario,
+        inv_optimo:this.state.mercancia.inv_optimo,
+        valor_dev_cierre_mes:this.state.mercancia.valor_dev_cierre_mes,
+        dev_vencimiento_m_estado:this.state.mercancia.dev_vencimiento_m_estado,     
+        productos_cero: JSON.stringify(this.state.PRODUCTS),
+        productos_cero_rotante_90_dias: JSON.stringify(this.state.PRODUCTS2),
+        acciones_tomadas: this.state.acciones_tomadas,
         implementar_estrategia:this.state.estrategia,
         fecha_resolucion:this.state.fecha_resolucion,
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
@@ -1608,33 +1673,61 @@ export default class Activity extends Component {
                   :
                     null
                 }              
-                {//TODO: cambiar o borrar
-                  items.nombre_tabla === 'evaluacion_pedidos' ?
+                {
+                  items.nombre_tabla === 'programa_mercadeo' ?
                     <View>
-                      <Text style={styles.textInfo}>Pedidos realizados vs Remision: </Text>
+                      <Text style={styles.textInfo}>El personal connoce los programas de mercadeo: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
-                      <Input placeholder="Número revisión"></Input>
+
+                      <Text style={styles.textInfo}>Promociones en separata: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Si  '} checked={parseInt(this.state.mercadeo.promociones_separata)}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'No  '} checked={parseInt(this.state.mercadeo.promociones_separata)}></RadioButton>
+                      <Text style={styles.textInfo}>Descuento escalonados: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Si   '} checked={parseInt(this.state.mercadeo.desc_escalonados)}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'No   '} checked={parseInt(this.state.mercadeo.desc_escalonados)}></RadioButton>
+                      <Text style={styles.textInfo}>Tienda Virtual: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Si    '} checked={parseInt(this.state.mercadeo.tienda_virtual)}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'No    '} checked={parseInt(this.state.mercadeo.tienda_virtual)}></RadioButton>
+                      <Text style={styles.textInfo}>Puntos saludables: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Si     '} checked={parseInt(this.state.mercadeo.puntos_saludables)}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'No     '} checked={parseInt(this.state.mercadeo.puntos_saludables)}></RadioButton>
+                      <Text style={styles.textInfo}>Close up: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Si      '} checked={parseInt(this.state.mercadeo.close_up)}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'No      '} checked={parseInt(this.state.mercadeo.close_up)}></RadioButton>
                     </View>
                   :
                     null
                 }
-                {//TODO: cambiar o borrar
-                  items.nombre_tabla === 'excesos' ?
+                {
+                  items.nombre_tabla === 'envio_correspondencia' ?
                     <View>
-                      <Text style={styles.textInfo}>Revisar pedidos y excesos: </Text>
+                      <Text style={styles.textInfo}>Envio de correspondencia a oficina: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Corespondencia: </Text>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Correspondencia" defaultValue={this.state.correspondencia} onChangeText={text => {this.setState({correspondencia:text })} }></Input>
                     </View>
                   :
                     null
                 }
-                {//TODO: cambiar o borrar
-                  items.nombre_tabla === 'libro_agendaclientes' ?
+                {
+                  items.nombre_tabla === 'servicio_bodega' ?
                     <View>
-                      <Text style={styles.textInfo}>Revisar agenda de clientes: </Text>
-                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
-                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={styles.textInfo}>Se consulto y transfirio de otros PDV los FALTANTES relacionados en la libreta? </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Si       '} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'No       '} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Pedido: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.bodega.valor_pedido} onChangeText={text => {var data = this.state.bodega; data.valor_pedido = text; data.diferencia = text-data.valor_despacho; this.setState({bodega:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Despacho: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.bodega.valor_despacho} onChangeText={text => {var data = this.state.bodega; data.valor_despacho = text; data.diferencia = data.valor_pedido-text; this.setState({bodega:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Diferencia: {this.state.bodega.diferencia}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Nivel Servicio: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.bodega.nivel_servicio} onChangeText={text => {var data = this.state.bodega; data.nivel_servicio = text; this.setState({bodega:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>El adm. del PDV Revisa los pedidos antes de enviarlo: </Text>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.bodega.revisa_pedidos_antes_enviarlos} onChangeText={text => {var data = this.state.bodega; data.revisa_pedidos_antes_enviarlos = text; this.setState({bodega:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Utiliza libreta de FALTANTES: </Text>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.bodega.utiliza_libreta_faltantes} onChangeText={text => {var data = this.state.bodega; data.utiliza_libreta_faltantes = text; this.setState({bodega:data })} }></Input>
                     </View>
                   :
                     null
@@ -1746,49 +1839,179 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//FIXME: arreglar proyeccion
+                {
                   items.nombre_tabla === 'domicilios' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar domicilios: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes anterior: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.mes_anterior} onChangeText={text => {var dom = this.state.domicilios; dom.mes_anterior = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.mes_anterior} onChangeText={text => {var dom = this.state.domicilios; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={this.state.domicilios.mes_actual} onChangeText={text => {var dom = this.state.domicilios; dom.mes_actual = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={this.state.domicilios.mes_actual} onChangeText={text => {var dom = this.state.domicilios; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Días transcurridos: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Día actual" defaultValue={this.state.domicilios.dia_actual} onChangeText={text => {var dom = this.state.domicilios; dom.dia_actual = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Día actual" defaultValue={this.state.domicilios.dia_actual} onChangeText={text => {var dom = this.state.domicilios; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Venta Domicilios Proyección: {this.state.domicilios.venta_proyeccion}</Text>
                       
                       <Text style={[styles.textDocumento,{marginLeft:20}]}># mensajeros de planta: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.num_mensajeros} onChangeText={text => {var dom = this.state.domicilios; dom.num_mensajeros = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+dom.mes_actual); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.num_mensajeros} onChangeText={text => {var dom = this.state.domicilios; dom.num_mensajeros = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/text); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Promedio Domicilio/Mensajero: {this.state.domicilios.prom_domicilio_mensajero}</Text>
                     </View>
                   :
                     null
                 }
-                {//FIXME: terminar
+                {
                   items.nombre_tabla === 'remisiones' ?
                     <View>
                       <Text style={styles.textInfo}>Revisar remisiones grabadas a la fecha: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Consecutivos: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.remisiones.consecutivos} onChangeText={text => {var rem = this.state.remisiones; rem.consecutivos = text; this.setState({remisiones:rem })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de remisiones: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.remisiones.numero_remisiones} onChangeText={text => {var rem = this.state.remisiones; rem.numero_remisiones = text; this.setState({remisiones:rem })} }></Input>
                     </View>
                   :
                     null
                 }
-                {//TODO: cambiar o borrar
-                  items.nombre_tabla === 'revision_completa_inventario' ?
+                {
+                  items.nombre_tabla === 'inventario_mercancia' ?
                     <View>
                       <Text style={styles.textInfo}>Revision completa de los inventarios: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Actual: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_actual} onChangeText={text => {var data = this.state.mercancia; data.valor_actual = text; this.setState({mercancia:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Días Inventario: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.mercancia.dias_inventario} onChangeText={text => {var data = this.state.mercancia; data.dias_inventario = text; this.setState({mercancia:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Inventario Optimo: </Text>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.mercancia.inv_optimo} onChangeText={text => {var data = this.state.mercancia; data.inv_optimo = text; this.setState({mercancia:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor dev. Cierre de Mes: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_dev_cierre_mes} onChangeText={text => {var data = this.state.mercancia; data.valor_dev_cierre_mes = text; this.setState({mercancia:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Dev. vencimiento M. estado: </Text>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.mercancia.dev_vencimiento_m_estado} onChangeText={text => {var data = this.state.mercancia; data.dev_vencimiento_m_estado = text; this.setState({mercancia:data })} }></Input>
+                    </View>
+                  :
+                    null
+                }
+                {//FIXME: salen 2 autocompletar
+                  items.nombre_tabla === 'gimed' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión Gimed: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos Cero (0) en el inventario: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={prods}
+                        defaultValue={query}
+                        onChangeText={text => this.BuscarProducto(text,'4301')}//4301 - dk GIMED
+                        placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <List dataArray={this.state.PRODUCTS}
+                        renderRow={(item) =>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:1, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS: array, updated:true}, () => {this.forceUpdate();})}}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                          </View>
+                        }>
+                      </List>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos Cero (0) rotación últimos 90 días: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={prods}
+                        defaultValue={query}
+                        onChangeText={text => this.BuscarProducto(text,'4301')}//4301 - dk GIMED
+                        placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS2: [...this.state.PRODUCTS2, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <List dataArray={this.state.PRODUCTS2}
+                        renderRow={(item) =>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:1, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS2]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS2: array, updated:true}, () => {this.forceUpdate();})}}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                          </View>
+                        }>
+                      </List>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Acciones tomadas: </Text>
+                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.acciones_tomadas} onChangeText={text => {this.setState({acciones_tomadas:text })} }></Input>
+                    </View>
+                  :
+                    null
+                }                
+                {//TODO: terminar
+                  items.nombre_tabla === 'examen_gimed' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                     </View>
                   :
                     null
                 }
-                {//FIXME: terminar
-                  items.nombre_tabla === 'seguimiento_vendedores' ?
+                {//TODO: terminar
+                  items.nombre_tabla === 'julienne' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                    </View>
+                  :
+                    null
+                }
+                {//TODO: terminar
+                  items.nombre_tabla === 'productos_bonificados' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                    </View>
+                  :
+                    null
+                }
+                {//TODO: terminar
+                  items.nombre_tabla === 'uso_institucional' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                    </View>
+                  :
+                    null
+                }
+                {//TODO: terminar
+                  items.nombre_tabla === 'relacion_servicios_publicos' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                    </View>
+                  :
+                    null
+                }
+                {//TODO: terminar
+                  items.nombre_tabla === 'relacion_vendedores' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
