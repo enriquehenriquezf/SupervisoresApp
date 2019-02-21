@@ -635,7 +635,6 @@ export default class Activity extends Component {
       });
     }
 
-    //Actualizar State #FF0000
     var horario = items.nombre_tabla === 'apertura' ? ((items.horario !== '' && items.horario !== null) ? JSON.parse(items.horario) : {dias_habiles:{apertura:'',cierre:''},domingos_feriados:{apertura:'',cierre:'',primer_turno:'',segundo_turno:'',tercer_turno:''}}) : ''
     var domicilios = this.state.domicilios;
     items.nombre_tabla === 'domicilios' ? (domicilios.mes_anterior =items.mes_anterior?items.mes_anterior:'0', domicilios.venta_proyeccion = items.venta_domicilios_proyeccion?items.venta_domicilios_proyeccion:'0', domicilios.num_mensajeros = items.numero_mensajeros_planta?items.numero_mensajeros_planta:'0', domicilios.prom_domicilio_mensajero = items.pro_domicilio_mensajero?items.pro_domicilio_mensajero:'0', domicilios.mes_actual = items.mes_actual?items.mes_actual:'0', domicilios.dia_actual = items.dias_transcurridos?items.dias_transcurridos:'0') : null
@@ -649,7 +648,10 @@ export default class Activity extends Component {
     items.nombre_tabla === 'inventario_mercancia' ? (mercancia.valor_actual = items.valor_actual?items.valor_actual:'',mercancia.dias_inventario = items.dias_inventario?items.dias_inventario:'',mercancia.inv_optimo = items.inv_optimo?items.inv_optimo:'',mercancia.valor_dev_cierre_mes = items.valor_dev_cierre_mes?items.valor_dev_cierre_mes:'',mercancia.dev_vencimiento_m_estado = items.dev_vencimiento_m_estado?items.dev_vencimiento_m_estado:'') : null
     items.productos_cero ? array = JSON.parse(items.productos_cero) : items.productos_cero = []
     items.productos_cero_rotante_90_dias ? array2 = JSON.parse(items.productos_cero_rotante_90_dias) : items.productos_cero_rotante_90_dias = []
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    items.productos_no_rotan ? array = JSON.parse(items.productos_no_rotan) : items.productos_no_rotan = []
+    items.proximos_vencer ? array2 = JSON.parse(items.proximos_vencer) : items.proximos_vencer = []
+    //Actualizar State #FF0000    
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -837,8 +839,10 @@ export default class Activity extends Component {
         valor_dev_cierre_mes:this.state.mercancia.valor_dev_cierre_mes,
         dev_vencimiento_m_estado:this.state.mercancia.dev_vencimiento_m_estado,     
         productos_cero: JSON.stringify(this.state.PRODUCTS),
-        productos_cero_rotante_90_dias: JSON.stringify(this.state.PRODUCTS2),
-        acciones_tomadas: this.state.acciones_tomadas,
+        productos_cero_rotante_90_dias: JSON.stringify(this.state.PRODUCTS2),  
+        acciones_tomadas: this.state.acciones_tomadas,   
+        productos_no_rotan: JSON.stringify(this.state.PRODUCTS),     
+        proximos_vencer: JSON.stringify(this.state.PRODUCTS2),
         implementar_estrategia:this.state.estrategia,
         fecha_resolucion:this.state.fecha_resolucion,
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
@@ -1056,7 +1060,9 @@ export default class Activity extends Component {
     let prods = [];
     var that = this;
     let {query2} = this.state;
-    query2[index] = query;
+    if(index !== -1){
+      query2[index] = query;
+    }
     var array = [...this.state.productos2];
     let {productos2} = this.state;
     if(query !== ''){
@@ -1082,8 +1088,10 @@ export default class Activity extends Component {
             prods.push({nombre_comercial:element.nombre_comercial, laboratorio_id: element.laboratorio_id, codigo: element.codigo});
           });
           //console.log(prods)
-          array[index] = {...array[index], prods: prods};
-          that.setState({productos: prods, query: query, query2, productos2: array});
+          if(index !== -1){
+            array[index] = {...array[index], prods: prods};
+            that.setState({productos: prods, query: query, query2, productos2: array});
+          }else{that.setState({productos: prods, query3: query, query2, productos2: array});}
         }
         else
         {
@@ -1278,6 +1286,7 @@ export default class Activity extends Component {
     
     const { query,query3 } = this.state;
     const prods = this.findProduct(query);
+    const prods2 = this.findProduct(query3);
     const labs = this.state.laboratorios;
 
     return (
@@ -1438,7 +1447,7 @@ export default class Activity extends Component {
                         autoCapitalize="none"
                         data={prods}
                         defaultValue={query}
-                        onChangeText={text => this.BuscarProducto(text,'')}
+                        onChangeText={text => this.BuscarProducto(text,'',0)}
                         placeholder="Producto a buscar"
                         inputContainerStyle={styles.autocompletar}
                         listStyle={styles.autocompletarLista}
@@ -1475,7 +1484,7 @@ export default class Activity extends Component {
                         autoCapitalize="none"
                         data={prods}
                         defaultValue={query}
-                        onChangeText={text => this.BuscarProducto(text,'')}
+                        onChangeText={text => this.BuscarProducto(text,'',0)}
                         placeholder="Producto a buscar"
                         inputContainerStyle={styles.autocompletar}
                         listStyle={styles.autocompletarLista}
@@ -1538,7 +1547,7 @@ export default class Activity extends Component {
                                       autoCapitalize="none"
                                       data={prods}
                                       defaultValue={query}
-                                      onChangeText={text => this.BuscarProducto(text,'')}
+                                      onChangeText={text => this.BuscarProducto(text,'',0)}
                                       placeholder="Producto a buscar"
                                       inputContainerStyle={styles.autocompletar}
                                       listStyle={styles.autocompletarLista}
@@ -1743,7 +1752,7 @@ export default class Activity extends Component {
                         autoCapitalize="none"
                         data={prods}
                         defaultValue={query}
-                        onChangeText={text => this.BuscarProducto(text,'')}
+                        onChangeText={text => this.BuscarProducto(text,'',0)}
                         placeholder="Producto a buscar"
                         inputContainerStyle={styles.autocompletar}
                         listStyle={styles.autocompletarLista}
@@ -1894,7 +1903,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//FIXME: salen 2 autocompletar
+                {
                   items.nombre_tabla === 'gimed' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión Gimed: </Text>
@@ -1905,7 +1914,7 @@ export default class Activity extends Component {
                         autoCapitalize="none"
                         data={prods}
                         defaultValue={query}
-                        onChangeText={text => this.BuscarProducto(text,'4301')}//4301 - dk GIMED
+                        onChangeText={text => this.BuscarProducto(text,'4301',0)}//4301 - dk GIMED
                         placeholder="Producto a buscar"
                         inputContainerStyle={styles.autocompletar}
                         listStyle={styles.autocompletarLista}
@@ -1930,14 +1939,14 @@ export default class Activity extends Component {
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos Cero (0) rotación últimos 90 días: </Text>
                       <Autocomplete
                         autoCapitalize="none"
-                        data={prods}
-                        defaultValue={query}
-                        onChangeText={text => this.BuscarProducto(text,'4301')}//4301 - dk GIMED
+                        data={prods2}
+                        defaultValue={query3}
+                        onChangeText={text => this.BuscarProducto(text,'4301',-1)}//4301 - dk GIMED
                         placeholder="Producto a buscar"
                         inputContainerStyle={styles.autocompletar}
                         listStyle={styles.autocompletarLista}
                         renderItem={item => (
-                          <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS2: [...this.state.PRODUCTS2, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
+                          <TouchableOpacity onPress={() => {this.setState({ query3: '', PRODUCTS2: [...this.state.PRODUCTS2, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
                             <Text style={styles.producto}>{item.nombre_comercial}</Text>
                           </TouchableOpacity>
                         )}
@@ -1980,22 +1989,127 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//TODO: terminar
+                {//FIXME: modificar que solo pueda ver los productos bonificados + fecha de vencimiento abajo
                   items.nombre_tabla === 'productos_bonificados' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos que no rotan en 90 dias: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={prods}
+                        defaultValue={query}
+                        onChangeText={text => this.BuscarProducto(text,'',0)}
+                        placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <List dataArray={this.state.PRODUCTS}
+                        renderRow={(item) =>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:1, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS: array, updated:true}, () => {this.forceUpdate();})}}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                          </View>
+                        }>
+                      </List>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos proximos a vencer: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={prods2}
+                        defaultValue={query3}
+                        onChangeText={text => this.BuscarProducto(text,'',-1)}
+                        placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {this.setState({ query3: '', PRODUCTS2: [...this.state.PRODUCTS2, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id,fecha_vencimiento:new Date()}] })} }>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <List dataArray={this.state.PRODUCTS2}
+                        renderRow={(item) =>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:1, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS2]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS2: array, updated:true}, () => {this.forceUpdate();})}}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', borderBottomWidth:1}}>
+                              <View style={{flex:5, justifyContent:'flex-start'}}>
+                                <Text style={[styles.textInfo,{margin:0,marginLeft: 5}]}>Fecha de Vencimiento: </Text>
+                              </View>
+                              <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
+                                <DatePicker
+                                  defaultDate={new Date(item.fecha_vencimiento)}
+                                  minimumDate={new Date(2019, 0, 1)}
+                                  locale={"es"}
+                                  timeZoneOffsetInMinutes={undefined}
+                                  modalTransparent={false}
+                                  animationType={"fade"}
+                                  androidMode={"default"}
+                                  placeHolderText={new Date(item.fecha_vencimiento).toJSON().substr(0,10) === new Date().toJSON().substr(0,10) ? "Seleccionar Fecha" : undefined}
+                                  textStyle={{ color: "green" }}
+                                  placeHolderTextStyle={{ color: "#d3d3d3" }}
+                                  onDateChange={newDate => {var array = [...this.state.PRODUCTS2]; var index = array.indexOf(item); if (index !== -1){array[index] = {...array[index], fecha_vencimiento: newDate}; this.setState({chosenDate: newDate, PRODUCTS2: array}); this.forceUpdate();}}}
+                                  disabled={false}
+                              />
+                              </View>
+                            </View>
+                          </View>
+                        }>
+                      </List>
                     </View>
                   :
                     null
                 }
-                {//TODO: terminar
+                {//FIXME: cambiar productos a solo institucionales
                   items.nombre_tabla === 'uso_institucional' ?
                     <View>
-                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
+                      <Text style={styles.textInfo}>Revisión de productos de uso institucional: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos de uso institucional: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={prods}
+                        defaultValue={query}
+                        onChangeText={text => this.BuscarProducto(text,'',0)}
+                        placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <List dataArray={this.state.PRODUCTS}
+                        renderRow={(item) =>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:1, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS: array, updated:true}, () => {this.forceUpdate();})}}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                            <View style={{flex:1, justifyContent:'center'}}>
+                              <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array[ind] = {...array[ind], cant: value}; this.setState({PRODUCTS: array}, () => {this.forceUpdate(); })} }/>
+                            </View>
+                          </View>
+                        }>
+                      </List>
                     </View>
                   :
                     null

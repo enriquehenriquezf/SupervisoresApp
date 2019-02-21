@@ -116,6 +116,8 @@ export default class Home extends Component {
               productos_cero: element.productos_cero,
               productos_cero_rotante_90_dias: element.productos_cero_rotante_90_dias,    
               acciones_tomadas: element.acciones_tomadas,
+              productos_no_rotan: element.productos_no_rotan,
+              proximos_vencer: element.proximos_vencer,
               implementar_estrategia: element.implementar_estrategia,
               fecha_resolucion:element.fecha_resolucion,
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,
