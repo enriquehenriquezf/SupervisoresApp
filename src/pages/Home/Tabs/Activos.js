@@ -135,6 +135,10 @@ export default class Home extends Component {
               acciones_tomadas: element.acciones_tomadas,
               productos_no_rotan: element.productos_no_rotan,
               proximos_vencer: element.proximos_vencer,
+              venta_mes_anterior: element.venta_mes_anterior,
+              proyeccion_mes_actual: element.proyeccion_mes_actual,
+              relacion_faltantes: element.relacion_faltantes, 
+              consumo: element.consumo, 
               implementar_estrategia: element.implementar_estrategia,
               fecha_resolucion:element.fecha_resolucion,
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,
@@ -226,8 +230,9 @@ export default class Home extends Component {
 
   _renderHeader(item, expanded) {
     return (
-      <View style={{flexDirection: "row",justifyContent: "space-between",alignItems: "center", padding:10}}>
+      <View style={{flexDirection: "row",justifyContent: "space-between",alignItems: "center", padding:10, backgroundColor:'rgba(0,161,228,.05)',marginTop:2}}>
         <Text style={[styles.sucursalText,{paddingLeft:10}]}>{item.title.sucursal}</Text>
+        <Text style={[styles.sucursalText,{fontSize:18, textAlign:'right', justifyContent:'flex-end',alignSelf:'flex-end'}]}>{item.content.length}</Text>
         {expanded
           ? <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-up" />
           : <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-down" />}
@@ -310,7 +315,7 @@ export default class Home extends Component {
             </ListItem>
           }>
         </List> */}
-        <Accordion dataArray={this.state.actividades} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}}/>
+        <Accordion dataArray={this.state.actividades} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}} animation={false}/>
       </Content>
     );
   }

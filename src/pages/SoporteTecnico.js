@@ -84,7 +84,7 @@ export default class Stats extends Component {
             toastr.showToast('Error con el servidor','danger');
           }
           else{
-            //toastr.showToast('Credenciales incorrectas','danger');
+            toastr.showToast(JSON.parse(response._bodyInit),'warning');
           }
         }
         return response.json();

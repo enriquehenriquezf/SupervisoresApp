@@ -59,8 +59,11 @@ export default StyleSheet.create({
     },
     textDocumento:{
         margin: 5,
+        marginTop:25,
+        marginBottom:15,
+        marginLeft:20,
         fontFamily:'BebasKai',
-        color:COLOR.azul
+        color:COLOR.verde
     },
     textDescFoto:{
         color:COLOR.azul,

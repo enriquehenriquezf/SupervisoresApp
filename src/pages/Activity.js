@@ -13,6 +13,7 @@ import {Imagen} from '../components/Imagenes';
 import { RadioButton } from '../components/RadioButton';
 import SideBar from './SideBar';
 import { COLOR } from '../components/Colores';
+import { logError } from '../components/logError';
 
 var BUTTONS = ["SINIESTRO","VISITAS DE ENTIDADES PÚBLICAS","REQUERIMIENTO GERENCIAL", "AUSENCIA ADMINISTRADOR", "TRABAJO ESPECIAL"];
 let items = null;
@@ -80,6 +81,9 @@ export default class Activity extends Component {
       mercadeo:{promociones_separata:5,desc_escalonados:5,tienda_virtual:5,puntos_saludables:5,close_up:5},
       bodega:{valor_pedido:'',valor_despacho:'',diferencia:'',nivel_servicio:'',revisa_pedidos_antes_enviarlos:'',utiliza_libreta_faltantes:''},
       mercancia:{valor_actual:'',dias_inventario:'',inv_optimo:'',valor_dev_cierre_mes:'',dev_vencimiento_m_estado:''},
+      julienne:{mes_anterior:'0',mes_actual:'0',dia_actual:'1',venta_proyeccion:'0'},
+      servicios_publicos:{agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}},
+      examen:[],
       correspondencia:'',
       acciones_tomadas:'',
       facturas_autorizadas:'',
@@ -544,7 +548,7 @@ export default class Activity extends Component {
     /**
      * Seleccionar el radioButton que se obtuvo de la base de datos
      */
-
+    
     /*if(items.calificacion_pv === 'Puntual' && items.nombre_tabla === 'apertura')
     {
       this.SetChecked(5,'Puntual');
@@ -650,8 +654,12 @@ export default class Activity extends Component {
     items.productos_cero_rotante_90_dias ? array2 = JSON.parse(items.productos_cero_rotante_90_dias) : items.productos_cero_rotante_90_dias = []
     items.productos_no_rotan ? array = JSON.parse(items.productos_no_rotan) : items.productos_no_rotan = []
     items.proximos_vencer ? array2 = JSON.parse(items.proximos_vencer) : items.proximos_vencer = []
+    var julienne = this.state.julienne;
+    items.nombre_tabla === 'julienne' ? (julienne.mes_anterior =items.venta_mes_anterior?items.venta_mes_anterior:'0', julienne.venta_proyeccion = items.proyeccion_mes_actual?items.proyeccion_mes_actual:'0', julienne.mes_actual = items.mes_actual?items.mes_actual:'0', julienne.dia_actual = items.dias_transcurridos?items.dias_transcurridos:'1') : null
+    items.relacion_faltantes ? array = JSON.parse(items.relacion_faltantes) : items.relacion_faltantes = []
+    var servicios_publicos = items.nombre_tabla === 'relacion_servicios_publicos' ? ((items.consumo !== '' && items.consumo !== null) ? JSON.parse(items.consumo) : {agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}}) : ''
     //Actualizar State #FF0000    
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -766,6 +774,7 @@ export default class Activity extends Component {
   /**
    * Enviar calificaciones de la actividad a la base de datos
    * @param {function} handler ir al layout de home luego de enviar los datos.
+   * #00ff00
    */
   async FinishActivity(handler)
   {
@@ -778,7 +787,11 @@ export default class Activity extends Component {
     var totalTl = new Date().getTime();
     totalTime = totalTl - totalTimeInit;
     var diferencia = 0;
+    var mes_actual;
+    var dias_transcurridos;
     diferencia = items.nombre_tabla === 'evolucion_clientes' ?(this.state.ano_actual - this.state.ano_anterior) : this.state.diferencia;
+    mes_actual = items.nombre_tabla === 'domicilios' ? this.state.domicilios.mes_actual : this.state.julienne.mes_actual;
+    dias_transcurridos = items.nombre_tabla === 'domicilios' ? this.state.domicilios.dia_actual : this.state.julienne.dia_actual;
     var arr = this.state.ptc;
     /** Motivo de Ausencia */
     if(this.state.ausencia){
@@ -817,8 +830,8 @@ export default class Activity extends Component {
         venta_domicilios_proyeccion: this.state.domicilios.venta_proyeccion,
         numero_mensajeros_planta: this.state.domicilios.num_mensajeros,
         pro_domicilio_mensajero: this.state.domicilios.prom_domicilio_mensajero,
-        mes_actual: this.state.domicilios.mes_actual,
-        dias_transcurridos: this.state.domicilios.dia_actual,
+        mes_actual: mes_actual,
+        dias_transcurridos: dias_transcurridos,
         consecutivos: this.state.remisiones.consecutivos,
         numero_remisiones: this.state.remisiones.numero_remisiones,        
         promociones_separata: this.state.mercadeo.promociones_separata,
@@ -843,6 +856,10 @@ export default class Activity extends Component {
         acciones_tomadas: this.state.acciones_tomadas,   
         productos_no_rotan: JSON.stringify(this.state.PRODUCTS),     
         proximos_vencer: JSON.stringify(this.state.PRODUCTS2),
+        venta_mes_anterior: this.state.julienne.mes_anterior,
+        proyeccion_mes_actual: this.state.julienne.venta_proyeccion,
+        relacion_faltantes: JSON.stringify(this.state.PRODUCTS), 
+        consumo: JSON.stringify(this.state.servicios_publicos),
         implementar_estrategia:this.state.estrategia,
         fecha_resolucion:this.state.fecha_resolucion,
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
@@ -867,6 +884,9 @@ export default class Activity extends Component {
         console.log(response);
         if(response.status === 500){
           toastr.showToast('Error con el servidor','danger');
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
         }
         else if(response.status === 401){
           toastr.showToast('Su sesión expiró','danger');
@@ -1979,17 +1999,54 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//TODO: terminar
+                {
                   items.nombre_tabla === 'julienne' ?
                     <View>
-                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
+                      <Text style={styles.textInfo}>Revisión de las ventas de Julienne: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
-                    </View>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes anterior: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.julienne.mes_anterior} onChangeText={text => {var dom = this.state.julienne; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes actual: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.julienne.mes_actual} onChangeText={text => {console.log(this.state.julienne); var dom = this.state.julienne; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Días transcurridos: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Día actual" defaultValue={''+this.state.julienne.dia_actual} onChangeText={text => {var dom = this.state.julienne; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Proyección de ventas: {this.state.julienne.venta_proyeccion}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos faltantes: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={prods}
+                        defaultValue={query}
+                        onChangeText={text => this.BuscarProducto(text,'',0)}
+                        placeholder="Producto a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
+                            <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                      <List dataArray={this.state.PRODUCTS}
+                        renderRow={(item) =>
+                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{flex:2, justifyContent:'flex-start'}}>
+                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS: array, updated:true}, () => {this.forceUpdate();})}}>
+                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                              </ListItem>
+                            </View>
+                            <View style={{flex:1, justifyContent:'center'}}>
+                              <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array[ind] = {...array[ind], cant: value}; this.setState({PRODUCTS: array}, () => {this.forceUpdate(); })} }/>
+                            </View>
+                          </View>
+                        }>
+                      </List>
+                      </View>
                   :
                     null
                 }
-                {//FIXME: modificar que solo pueda ver los productos bonificados + fecha de vencimiento abajo
+                {//FIXME: modificar que solo pueda ver los productos bonificados
                   items.nombre_tabla === 'productos_bonificados' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
@@ -2039,16 +2096,18 @@ export default class Activity extends Component {
                       />
                       <List dataArray={this.state.PRODUCTS2}
                         renderRow={(item) =>
-                          <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
-                            <View style={{flex:1, justifyContent:'flex-start'}}>
-                              <ListItem button onPress={() => {var array = [...this.state.PRODUCTS2]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS2: array, updated:true}, () => {this.forceUpdate();})}}>
-                                <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                                <Text style={styles.productosList}>{item.nombre_comercial}</Text>
-                              </ListItem>
+                          <View>
+                            <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', borderBottomWidth:0}}>
+                              <View style={{flex:1, justifyContent:'flex-start', borderBottomWidth:0}}>
+                                <ListItem style={{borderBottomWidth:0}} button onPress={() => {var array = [...this.state.PRODUCTS2]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS2: array, updated:true}, () => {this.forceUpdate();})}}>
+                                  <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                  <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                                </ListItem>
+                              </View>                              
                             </View>
                             <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', borderBottomWidth:1}}>
                               <View style={{flex:5, justifyContent:'flex-start'}}>
-                                <Text style={[styles.textInfo,{margin:0,marginLeft: 5}]}>Fecha de Vencimiento: </Text>
+                                <Text style={[styles.textInfo,{margin:0,marginLeft: 20}]}>Fecha de Vencimiento: </Text>
                               </View>
                               <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
                                 <DatePicker
@@ -2117,9 +2176,29 @@ export default class Activity extends Component {
                 {//TODO: terminar
                   items.nombre_tabla === 'relacion_servicios_publicos' ?
                     <View>
-                      <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
+                      <Text style={styles.textInfo}>Relación del consumo de los últimos 2 meses: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={styles.textInfo}>Agua: </Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.agua.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.agua.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Text style={styles.textInfo}>Luz: </Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.luz.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.luz.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Text style={styles.textInfo}>Telefono: </Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Text style={styles.textInfo}>Internet: </Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.internet.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
+                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.internet.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
                     </View>
                   :
                     null
