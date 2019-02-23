@@ -139,6 +139,7 @@ export default class Home extends Component {
               proyeccion_mes_actual: element.proyeccion_mes_actual,
               relacion_faltantes: element.relacion_faltantes, 
               consumo: element.consumo, 
+              examen:element.examen,
               implementar_estrategia: element.implementar_estrategia,
               fecha_resolucion:element.fecha_resolucion,
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,
@@ -232,10 +233,12 @@ export default class Home extends Component {
     return (
       <View style={{flexDirection: "row",justifyContent: "space-between",alignItems: "center", padding:10, backgroundColor:'rgba(0,161,228,.05)',marginTop:2}}>
         <Text style={[styles.sucursalText,{paddingLeft:10}]}>{item.title.sucursal}</Text>
-        <Text style={[styles.sucursalText,{fontSize:18, textAlign:'right', justifyContent:'flex-end',alignSelf:'flex-end'}]}>{item.content.length}</Text>
-        {expanded
-          ? <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-up" />
-          : <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-down" />}
+        <View style={{flexDirection: "row"}}>
+          <Text style={[styles.sucursalText,{fontSize:18, textAlign:'right', marginRight:5}]}>{item.content.length}</Text>
+          {expanded
+            ? <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-up" />
+            : <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-down" />}
+        </View>
       </View>
     );
   }

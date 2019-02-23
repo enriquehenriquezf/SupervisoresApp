@@ -66,6 +66,7 @@ export default StyleSheet.create({
         color:COLOR.verde
     },
     textDescFoto:{
+        marginTop:15,
         color:COLOR.azul,
         textAlign:'justify',
         fontFamily:'BebasNeueBold'
@@ -103,5 +104,17 @@ export default StyleSheet.create({
     iconoBoton:{
         height:21,
         width:21
-    }
+    },
+    input:{
+        fontFamily:'BebasKai',
+        paddingLeft:15,
+        borderWidth:1,
+        borderRadius:10,
+        borderColor:COLOR.azul,
+        marginLeft:20,
+        marginRight:20,
+        marginTop:5,
+        marginBottom:5,
+        height:40
+    },
 });

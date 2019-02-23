@@ -122,6 +122,7 @@ export default class Home extends Component {
               proyeccion_mes_actual: element.proyeccion_mes_actual,
               relacion_faltantes: element.relacion_faltantes, 
               consumo: element.consumo, 
+              examen:element.examen,
               implementar_estrategia: element.implementar_estrategia,
               fecha_resolucion:element.fecha_resolucion,
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,

@@ -48,6 +48,7 @@ export default class Activity extends Component {
       isVisible2: false,
       isVisibleActividad: false,
       isVisibleActividad2: false,
+      isVisibleActividad3: false,
       isLoadActividad: false,
       ausencia: false,
       motivo: '',
@@ -522,6 +523,16 @@ export default class Activity extends Component {
   }
 
   /**
+   * Modificar los datos de examen gimed
+   */
+  UpdateDataExamenGimed(){
+    var examen = this.state.examen;
+    examen[this.state.selected].resultados = this.state.checked2;
+    examen[this.state.selected].productos_consultados = this.state.PRODUCTS;
+    this.setState({PRODUCTS: [], isVisibleActividad3:false,disable:false});
+  }
+
+  /**
    * Verificar que los permisos de GPS sean concedidos.
    */
   _getLocationAsync = async() => {    
@@ -658,8 +669,21 @@ export default class Activity extends Component {
     items.nombre_tabla === 'julienne' ? (julienne.mes_anterior =items.venta_mes_anterior?items.venta_mes_anterior:'0', julienne.venta_proyeccion = items.proyeccion_mes_actual?items.proyeccion_mes_actual:'0', julienne.mes_actual = items.mes_actual?items.mes_actual:'0', julienne.dia_actual = items.dias_transcurridos?items.dias_transcurridos:'1') : null
     items.relacion_faltantes ? array = JSON.parse(items.relacion_faltantes) : items.relacion_faltantes = []
     var servicios_publicos = items.nombre_tabla === 'relacion_servicios_publicos' ? ((items.consumo !== '' && items.consumo !== null) ? JSON.parse(items.consumo) : {agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}}) : ''
+    var examen = items.examen ? JSON.parse(items.examen) : [];
+    if(!items.examen && items.nombre_tabla === 'examen_gimed'){for(let i = 0; i < 4; i++){examen.push({id_vendedor:i,vendedor:'nombre '+i,productos_consultados:[],resultados:''});}}
+    if(items.nombre_tabla === 'examen_gimed'){
+      /**
+       * items de la lista de vendedores para el examen gimed
+       */
+      Lista = examen.map((data,index) => {
+        return(
+          <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.vendedor} value={index}/>
+        )
+      })
+      this.setState({lista:Lista});
+    }
     //Actualizar State #FF0000    
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,examen:examen,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -718,11 +742,15 @@ export default class Activity extends Component {
    */
   SetChecked(i,calificacion_pv)
   {
+    var mercadeo = this.state.mercadeo;
     if(calificacion_pv === 'Si' || calificacion_pv === 'No' || calificacion_pv === 'Bueno' || calificacion_pv === 'Malo'){
       var docs = this.state.documentos;
       docs.estado_documento = calificacion_pv;
       docs.estado_condicion = calificacion_pv;
       this.setState({ checked2: i, documentos: docs });
+    }
+    else if(calificacion_pv === 'Favorable' || calificacion_pv === 'Desfavorable'){
+      this.setState({ checked2: i});
     }
     else if(calificacion_pv === 'Si ' || calificacion_pv === 'No '){
       var arr = this.state.ptc;
@@ -742,27 +770,22 @@ export default class Activity extends Component {
       //console.log(arr);
     }
     else if(calificacion_pv === 'Si  ' || calificacion_pv === 'No  '){
-      var mercadeo = this.state.mercadeo;
       mercadeo.promociones_separata = i;
       this.setState({ mercadeo: mercadeo});
     }
     else if(calificacion_pv === 'Si   ' || calificacion_pv === 'No   '){
-      var mercadeo = this.state.mercadeo;
       mercadeo.desc_escalonados = i;
       this.setState({ mercadeo: mercadeo});
     }
     else if(calificacion_pv === 'Si    ' || calificacion_pv === 'No    '){
-      var mercadeo = this.state.mercadeo;
       mercadeo.tienda_virtual = i;
       this.setState({ mercadeo: mercadeo});
     }
     else if(calificacion_pv === 'Si     ' || calificacion_pv === 'No     '){
-      var mercadeo = this.state.mercadeo;
       mercadeo.puntos_saludables = i;
       this.setState({ mercadeo: mercadeo});
     }
     else if(calificacion_pv === 'Si      ' || calificacion_pv === 'No      '){
-      var mercadeo = this.state.mercadeo;
       mercadeo.close_up = i;
       this.setState({ mercadeo: mercadeo});
     }
@@ -860,6 +883,7 @@ export default class Activity extends Component {
         proyeccion_mes_actual: this.state.julienne.venta_proyeccion,
         relacion_faltantes: JSON.stringify(this.state.PRODUCTS), 
         consumo: JSON.stringify(this.state.servicios_publicos),
+        examen: JSON.stringify(this.state.examen),
         implementar_estrategia:this.state.estrategia,
         fecha_resolucion:this.state.fecha_resolucion,
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
@@ -1350,15 +1374,15 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={3} value={'Tarde'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Muy Tarde'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Horario días Hábiles: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Apertura" defaultValue={this.state.horario.dias_habiles.apertura} onChangeText={text => {var hr = this.state.horario; hr.dias_habiles.apertura = text; this.setState({horario: hr})} }></Input>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cierre" defaultValue={this.state.horario.dias_habiles.cierre} onChangeText={text => {var hr = this.state.horario; hr.dias_habiles.cierre = text; this.setState({horario: hr})}}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Apertura" defaultValue={this.state.horario.dias_habiles.apertura} onChangeText={text => {var hr = this.state.horario; hr.dias_habiles.apertura = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cierre" defaultValue={this.state.horario.dias_habiles.cierre} onChangeText={text => {var hr = this.state.horario; hr.dias_habiles.cierre = text; this.setState({horario: hr})}}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Domingos y Feriados: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Apertura" defaultValue={this.state.horario.domingos_feriados.apertura} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.apertura = text; this.setState({horario: hr})} }></Input>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cierre" defaultValue={this.state.horario.domingos_feriados.cierre} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.cierre = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Apertura" defaultValue={this.state.horario.domingos_feriados.apertura} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.apertura = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cierre" defaultValue={this.state.horario.domingos_feriados.cierre} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.cierre = text; this.setState({horario: hr})} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Turnos Domingos y Feriados: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Primer Turno" defaultValue={this.state.horario.domingos_feriados.primer_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.primer_turno = text; this.setState({horario: hr})} }></Input>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Segundo Turno" defaultValue={this.state.horario.domingos_feriados.segundo_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.segundo_turno = text; this.setState({horario: hr})} }></Input>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Tercer Turno" defaultValue={this.state.horario.domingos_feriados.tercer_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.tercer_turno = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Primer Turno" defaultValue={this.state.horario.domingos_feriados.primer_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.primer_turno = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Segundo Turno" defaultValue={this.state.horario.domingos_feriados.segundo_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.segundo_turno = text; this.setState({horario: hr})} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Tercer Turno" defaultValue={this.state.horario.domingos_feriados.tercer_turno} onChangeText={text => {var hr = this.state.horario; hr.domingos_feriados.tercer_turno = text; this.setState({horario: hr})} }></Input>
                     </View>
                   :
                     null
@@ -1445,6 +1469,7 @@ export default class Activity extends Component {
                           textStyle={styles.picker}
                           mode="dropdown"
                           selectedValue={this.state.selected}
+                          style={{ width: undefined,marginLeft:15, marginRight:15 }}
                           itemStyle={styles.picker}
                           itemTextStyle={{textTransform:'lowercase'}}
                           onValueChange={value => this.setState({selected:value})}
@@ -1529,7 +1554,7 @@ export default class Activity extends Component {
                           </View>
                         }>
                       </List>                  
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Número Consecutivo" defaultValue={this.state.numero_consecutivo} onChangeText={text => this.setState({numero_consecutivo: text})}></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Número Consecutivo" defaultValue={this.state.numero_consecutivo} onChangeText={text => this.setState({numero_consecutivo: text})}></Input>
                     </View>
                   :
                     null
@@ -1549,7 +1574,7 @@ export default class Activity extends Component {
                             data.tipo === 2 ?
                               <View key={index}>
                                 <Text style={styles.textInfo}>{data.titulo}: </Text>
-                                <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholderTextColor={COLOR.gris} placeholder={data.titulo} defaultValue={data.respuesta} onChangeText={text => {let array = this.state.ptc; array[index].respuesta = text; this.setState({ptc: array})} }></Input>
+                                <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholderTextColor={COLOR.gris} placeholder={data.titulo} defaultValue={data.respuesta} onChangeText={text => {let array = this.state.ptc; array[index].respuesta = text; this.setState({ptc: array})} }></Input>
                               </View>
                             : 
                               data.tipo === 3 ?
@@ -1653,11 +1678,11 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Base: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Base" defaultValue={this.state.base} onChangeText={text => {var value = (text-this.state.gastos-this.state.diferencia); this.setState({base: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Base" defaultValue={this.state.base} onChangeText={text => {var value = (text-this.state.gastos-this.state.diferencia); this.setState({base: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Gastos: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Gastos" defaultValue={this.state.gastos} onChangeText={text => {var value = (this.state.base-text-this.state.diferencia); this.setState({gastos: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Gastos" defaultValue={this.state.gastos} onChangeText={text => {var value = (this.state.base-text-this.state.diferencia); this.setState({gastos: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Saldo en efectivo: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Saldo en efectivo" defaultValue={this.state.diferencia} onChangeText={text => {var value = (this.state.base-this.state.gastos-text); this.setState({diferencia: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Saldo en efectivo" defaultValue={this.state.diferencia} onChangeText={text => {var value = (this.state.base-this.state.gastos-text); this.setState({diferencia: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Sobrante: {this.state.sobrante}</Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Faltante: {this.state.faltante}</Text>
                     </View>
@@ -1671,11 +1696,11 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()-1}: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_anterior} onChangeText={text => this.setState({ano_anterior: text})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_anterior} onChangeText={text => this.setState({ano_anterior: text})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()}: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_actual} onChangeText={text => this.setState({ano_actual: text})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_actual} onChangeText={text => this.setState({ano_actual: text})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Estrategias a implementar para aumentar clientes: </Text>
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Estrategias" defaultValue={this.state.estrategia} onChangeText={text => this.setState({estrategia: text})}></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Estrategias" defaultValue={this.state.estrategia} onChangeText={text => this.setState({estrategia: text})}></Input>
                     </View>
                   :
                     null
@@ -1691,6 +1716,7 @@ export default class Activity extends Component {
                           textStyle={styles.picker}
                           mode="dropdown"
                           selectedValue={this.state.selected}
+                          style={{ width: undefined,marginLeft:15, marginRight:15 }}
                           itemStyle={styles.picker}
                           itemTextStyle={{textTransform:'lowercase'}}
                           onValueChange={value => this.setState({selected:value})}
@@ -1735,7 +1761,7 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Corespondencia: </Text>
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Correspondencia" defaultValue={this.state.correspondencia} onChangeText={text => {this.setState({correspondencia:text })} }></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Correspondencia" defaultValue={this.state.correspondencia} onChangeText={text => {this.setState({correspondencia:text })} }></Input>
                     </View>
                   :
                     null
@@ -1747,16 +1773,16 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Si       '} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'No       '} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Pedido: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.bodega.valor_pedido} onChangeText={text => {var data = this.state.bodega; data.valor_pedido = text; data.diferencia = text-data.valor_despacho; this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.bodega.valor_pedido} onChangeText={text => {var data = this.state.bodega; data.valor_pedido = text; data.diferencia = text-data.valor_despacho; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Despacho: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.bodega.valor_despacho} onChangeText={text => {var data = this.state.bodega; data.valor_despacho = text; data.diferencia = data.valor_pedido-text; this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.bodega.valor_despacho} onChangeText={text => {var data = this.state.bodega; data.valor_despacho = text; data.diferencia = data.valor_pedido-text; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Diferencia: {this.state.bodega.diferencia}</Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Nivel Servicio: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.bodega.nivel_servicio} onChangeText={text => {var data = this.state.bodega; data.nivel_servicio = text; this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.bodega.nivel_servicio} onChangeText={text => {var data = this.state.bodega; data.nivel_servicio = text; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>El adm. del PDV Revisa los pedidos antes de enviarlo: </Text>
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.bodega.revisa_pedidos_antes_enviarlos} onChangeText={text => {var data = this.state.bodega; data.revisa_pedidos_antes_enviarlos = text; this.setState({bodega:data })} }></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.bodega.revisa_pedidos_antes_enviarlos} onChangeText={text => {var data = this.state.bodega; data.revisa_pedidos_antes_enviarlos = text; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Utiliza libreta de FALTANTES: </Text>
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.bodega.utiliza_libreta_faltantes} onChangeText={text => {var data = this.state.bodega; data.utiliza_libreta_faltantes = text; this.setState({bodega:data })} }></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.bodega.utiliza_libreta_faltantes} onChangeText={text => {var data = this.state.bodega; data.utiliza_libreta_faltantes = text; this.setState({bodega:data })} }></Input>
                     </View>
                   :
                     null
@@ -1846,7 +1872,7 @@ export default class Activity extends Component {
                           disabled={false}
                       />
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de facturas autorizadas: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="# de facturas" defaultValue={this.state.facturas_autorizadas} onChangeText={text => this.setState({facturas_autorizadas: text})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="# de facturas" defaultValue={this.state.facturas_autorizadas} onChangeText={text => this.setState({facturas_autorizadas: text})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha de la última factura: </Text>
                       <DatePicker
                           defaultDate={items.fecha_ultima_factura !== null? new Date(items.fecha_ultima_factura) : this.state.fecha_ultima_factura}
@@ -1863,7 +1889,7 @@ export default class Activity extends Component {
                           disabled={false}
                       />
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de la última factura: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="# de factura" defaultValue={this.state.numero_ultima_factura} onChangeText={text => this.setState({numero_ultima_factura: text})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="# de factura" defaultValue={this.state.numero_ultima_factura} onChangeText={text => this.setState({numero_ultima_factura: text})}></Input>
                     </View>
                   :
                     null
@@ -1875,15 +1901,15 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes anterior: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.mes_anterior} onChangeText={text => {var dom = this.state.domicilios; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.domicilios.mes_anterior} onChangeText={text => {var dom = this.state.domicilios; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={this.state.domicilios.mes_actual} onChangeText={text => {var dom = this.state.domicilios; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={this.state.domicilios.mes_actual} onChangeText={text => {var dom = this.state.domicilios; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Días transcurridos: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Día actual" defaultValue={this.state.domicilios.dia_actual} onChangeText={text => {var dom = this.state.domicilios; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Día actual" defaultValue={this.state.domicilios.dia_actual} onChangeText={text => {var dom = this.state.domicilios; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Venta Domicilios Proyección: {this.state.domicilios.venta_proyeccion}</Text>
                       
                       <Text style={[styles.textDocumento,{marginLeft:20}]}># mensajeros de planta: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={this.state.domicilios.num_mensajeros} onChangeText={text => {var dom = this.state.domicilios; dom.num_mensajeros = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/text); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.domicilios.num_mensajeros} onChangeText={text => {var dom = this.state.domicilios; dom.num_mensajeros = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/text); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Promedio Domicilio/Mensajero: {this.state.domicilios.prom_domicilio_mensajero}</Text>
                     </View>
                   :
@@ -1896,9 +1922,9 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Consecutivos: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.remisiones.consecutivos} onChangeText={text => {var rem = this.state.remisiones; rem.consecutivos = text; this.setState({remisiones:rem })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.remisiones.consecutivos} onChangeText={text => {var rem = this.state.remisiones; rem.consecutivos = text; this.setState({remisiones:rem })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Número de remisiones: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.remisiones.numero_remisiones} onChangeText={text => {var rem = this.state.remisiones; rem.numero_remisiones = text; this.setState({remisiones:rem })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.remisiones.numero_remisiones} onChangeText={text => {var rem = this.state.remisiones; rem.numero_remisiones = text; this.setState({remisiones:rem })} }></Input>
                     </View>
                   :
                     null
@@ -1910,15 +1936,15 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_actual} onChangeText={text => {var data = this.state.mercancia; data.valor_actual = text; this.setState({mercancia:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_actual} onChangeText={text => {var data = this.state.mercancia; data.valor_actual = text; this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Días Inventario: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.mercancia.dias_inventario} onChangeText={text => {var data = this.state.mercancia; data.dias_inventario = text; this.setState({mercancia:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.mercancia.dias_inventario} onChangeText={text => {var data = this.state.mercancia; data.dias_inventario = text; this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Inventario Optimo: </Text>
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.mercancia.inv_optimo} onChangeText={text => {var data = this.state.mercancia; data.inv_optimo = text; this.setState({mercancia:data })} }></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.mercancia.inv_optimo} onChangeText={text => {var data = this.state.mercancia; data.inv_optimo = text; this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor dev. Cierre de Mes: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_dev_cierre_mes} onChangeText={text => {var data = this.state.mercancia; data.valor_dev_cierre_mes = text; this.setState({mercancia:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_dev_cierre_mes} onChangeText={text => {var data = this.state.mercancia; data.valor_dev_cierre_mes = text; this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Dev. vencimiento M. estado: </Text>
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.mercancia.dev_vencimiento_m_estado} onChangeText={text => {var data = this.state.mercancia; data.dev_vencimiento_m_estado = text; this.setState({mercancia:data })} }></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.mercancia.dev_vencimiento_m_estado} onChangeText={text => {var data = this.state.mercancia; data.dev_vencimiento_m_estado = text; this.setState({mercancia:data })} }></Input>
                     </View>
                   :
                     null
@@ -1984,17 +2010,29 @@ export default class Activity extends Component {
                         }>
                       </List>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Acciones tomadas: </Text>
-                      <Input style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Respuesta" defaultValue={''+this.state.acciones_tomadas} onChangeText={text => {this.setState({acciones_tomadas:text })} }></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.acciones_tomadas} onChangeText={text => {this.setState({acciones_tomadas:text })} }></Input>
                     </View>
                   :
                     null
                 }                
-                {//TODO: terminar
+                {//FIXME: faltan datos de vendedores
                   items.nombre_tabla === 'examen_gimed' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Picker
+                        textStyle={styles.picker}
+                        mode="dropdown"
+                        selectedValue={this.state.selected}
+                        style={{ width: undefined,marginLeft:15, marginRight:15}}
+                        itemStyle={styles.picker}
+                        itemTextStyle={{textTransform:'lowercase'}}
+                        onValueChange={value => this.setState({selected:value})}
+                      >                      
+                        {this.state.lista}
+                      </Picker>
+                      <Button iconLeft regular block info style={[styles.boton, styles.actualizar]} onPress={() => {var products = this.state.examen[this.state.selected].productos_consultados?this.state.examen[this.state.selected].productos_consultados:[]; var res = this.state.examen[this.state.selected].resultados?this.state.examen[this.state.selected].resultados : 5;  this.setState({PRODUCTS:products,checked2:res, isVisibleActividad3:true});} }><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text style={styles.textButton}>Modificar Datos</Text></Button>
                     </View>
                   :
                     null
@@ -2006,11 +2044,11 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes anterior: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.julienne.mes_anterior} onChangeText={text => {var dom = this.state.julienne; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.julienne.mes_anterior} onChangeText={text => {var dom = this.state.julienne; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.julienne.mes_actual} onChangeText={text => {console.log(this.state.julienne); var dom = this.state.julienne; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.julienne.mes_actual} onChangeText={text => {console.log(this.state.julienne); var dom = this.state.julienne; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Días transcurridos: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Día actual" defaultValue={''+this.state.julienne.dia_actual} onChangeText={text => {var dom = this.state.julienne; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Día actual" defaultValue={''+this.state.julienne.dia_actual} onChangeText={text => {var dom = this.state.julienne; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Proyección de ventas: {this.state.julienne.venta_proyeccion}</Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos faltantes: </Text>
                       <Autocomplete
@@ -2173,7 +2211,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//TODO: terminar
+                {
                   items.nombre_tabla === 'relacion_servicios_publicos' ?
                     <View>
                       <Text style={styles.textInfo}>Relación del consumo de los últimos 2 meses: </Text>
@@ -2181,24 +2219,24 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={styles.textInfo}>Agua: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.agua.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.agua.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.agua.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.agua.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
                       <Text style={styles.textInfo}>Luz: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.luz.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.luz.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.luz.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.luz.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
                       <Text style={styles.textInfo}>Telefono: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
                       <Text style={styles.textInfo}>Internet: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.internet.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.internet.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={{fontFamily:'BebasKai', paddingLeft:20}} placeholder="valor" defaultValue={''+this.state.servicios_publicos.internet.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.internet.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
                     </View>
                   :
                     null
@@ -2224,7 +2262,7 @@ export default class Activity extends Component {
                           placeholder="Motivo de ausencia"
                           placeholderStyle={{ color: "#bfc6ea" }}
                           placeholderIconColor="#007aff"
-                          style={{ width: undefined }}
+                          style={{ width: undefined,marginLeft:15, marginRight:15, color:COLOR.rojo }}
                           itemStyle={styles.picker}
                           itemTextStyle={styles.picker}
                           selectedValue={this.state.motivo}
@@ -2279,9 +2317,9 @@ export default class Activity extends Component {
                 !this.state.isLoadActividad && this.state.isVisibleActividad?
                   <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
                 :
-                  <View>
+                  <View style={{justifyContent:'space-between', width:"100%"}}>
                     <ScrollView>
-                      <Text style={styles.textDocumento}>{this.state.isLoadActividad ? this.state.documentos.documento : ''}</Text>
+                      <Text style={[styles.textDocumento,{marginTop:0,marginLeft:0}]}>{this.state.isLoadActividad ? this.state.documentos.documento : ''}</Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Si'} checked={this.state.checked2}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'No'} checked={this.state.checked2}></RadioButton>
                       <Text style={styles.textDescFoto}>Documento Vencido</Text>
@@ -2307,9 +2345,9 @@ export default class Activity extends Component {
                         </Body>
                       </ListItem>
                       <Form>
-                        <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
+                        <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
                       </Form>
-                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.UpdateData()}}><Text> Actualizar </Text></Button>
+                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.UpdateData()}}><Text> Actualizar </Text></Button>
                     </ScrollView>
                   </View>
                 }
@@ -2333,9 +2371,9 @@ export default class Activity extends Component {
                 !this.state.isLoadActividad && this.state.isVisibleActividad2?
                   <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
                 :
-                  <View>
+                  <View style={{justifyContent:'space-between', width:"100%"}}>
                     <ScrollView>
-                      <Text style={styles.textDocumento}>{this.state.isLoadActividad ? this.state.documentos.condicion : ''}</Text>
+                      <Text style={[styles.textDocumento,{marginTop:0,marginLeft:0}]}>{this.state.isLoadActividad ? this.state.documentos.condicion : ''}</Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Bueno'} checked={this.state.checked2}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Malo'} checked={this.state.checked2}></RadioButton>
                       <Text style={styles.textDescFoto}>Foto de la condicion locativa</Text>
@@ -2350,12 +2388,60 @@ export default class Activity extends Component {
                         </Body>
                       </ListItem>
                       <Form>
-                        <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
+                        <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
                       </Form>
-                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.UpdateDataCondicion()}}><Text> Actualizar </Text></Button>
+                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.UpdateDataCondicion()}}><Text> Actualizar </Text></Button>
                     </ScrollView>
                   </View>
                 }
+              </Overlay>
+            :
+              null
+          }
+          {
+            items.nombre_tabla === 'examen_gimed' ?
+              <Overlay
+                visible={this.state.isVisibleActividad3}
+                animationType="zoomIn"
+                onClose={() => this.setState({isVisibleActividad3: false})}
+                containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+                childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+              >
+                <View style={{justifyContent:'space-between', width:"100%"}}>
+                  <ScrollView>
+                    <Text style={[styles.textDocumento,{marginLeft:0,marginTop:0}]}>{this.state.isVisibleActividad3 && this.state.examen[this.state.selected].vendedor}</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={5} value={'Favorable'} checked={this.state.checked2}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'Desfavorable'} checked={this.state.checked2}></RadioButton>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Productos consultados:</Text>
+                    <Autocomplete
+                      autoCapitalize="none"
+                      data={prods}
+                      defaultValue={query}
+                      onChangeText={text => this.BuscarProducto(text,'4301',0)}//4301 - dk GIMED
+                      placeholder="Producto a buscar"
+                      inputContainerStyle={[styles.autocompletar,{marginLeft:0,marginRight:0}]}
+                      listStyle={styles.autocompletarLista}
+                      renderItem={item => (
+                        <TouchableOpacity onPress={() => {this.setState({ query: '', PRODUCTS: [...this.state.PRODUCTS, {nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}] })} }>
+                          <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                    <List dataArray={this.state.PRODUCTS}
+                      renderRow={(item) =>
+                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                          <View style={{flex:1, justifyContent:'flex-start'}}>
+                            <ListItem button onPress={() => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS: array, updated:true}, () => {this.forceUpdate();})}}>
+                              <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                              <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                            </ListItem>
+                          </View>
+                        </View>
+                      }>
+                    </List>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.UpdateDataExamenGimed()}}><Text> Actualizar </Text></Button>
+                  </ScrollView>
+                </View>
               </Overlay>
             :
               null
