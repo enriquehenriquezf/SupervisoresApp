@@ -273,15 +273,17 @@ export default class Login extends Component {
           containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
           childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10,padding:10,paddingTop:20,paddingBottom:20}}
         >
-          <ScrollView>
-            {
-              //FIXME: arreglar scroll
-            }
-            <Text style={{fontFamily:'BebasKai', paddingHorizontal:20}}>{this.state.politicas}</Text>
-            <Button onPress={() => {this.setState({isVisiblePrivacidad: false, privacidad:'2'})}}>
-              <Text>Aceptar</Text>
-            </Button>
-          </ScrollView>
+          <View style={{justifyContent:'space-between', width:"100%"}}>
+            <ScrollView>
+              {
+                //FIXME: arreglar scroll
+              }
+              <Text style={{fontFamily:'BebasKai', paddingHorizontal:20}}>{this.state.politicas}</Text>
+              <Button style={{backgroundColor:COLOR.verde}} onPress={() => {this.setState({isVisiblePrivacidad: false, privacidad:'2'})}}>
+                <Text>Aceptar</Text>
+              </Button>
+            </ScrollView>
+          </View>
         </Overlay>
       </Container>
     );

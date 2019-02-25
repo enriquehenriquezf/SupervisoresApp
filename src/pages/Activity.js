@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, H2, Card, Input, Picker, DatePicker, Drawer } from 'native-base';
+import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, H2, Card, Input,CheckBox, Picker, DatePicker, Drawer } from 'native-base';
 import {toastr} from '../components/Toast';
 import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity,FlatList, ScrollView, Keyboard} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
@@ -85,6 +85,8 @@ export default class Activity extends Component {
       julienne:{mes_anterior:'0',mes_actual:'0',dia_actual:'1',venta_proyeccion:'0'},
       servicios_publicos:{agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}},
       examen:[],
+      relacion_vendedores:[],
+      aplica_proceso_ideal_venta:1,
       correspondencia:'',
       acciones_tomadas:'',
       facturas_autorizadas:'',
@@ -682,8 +684,23 @@ export default class Activity extends Component {
       })
       this.setState({lista:Lista});
     }
+    var relacion_vendedores = items.relacion_vendedores ? JSON.parse(items.relacion_vendedores) : [];
+    var aplica_proceso_ideal_venta = items.aplica_proceso_ideal_venta ? items.aplica_proceso_ideal_venta : 1;
+    if(!items.relacion_vendedores && items.nombre_tabla === 'relacion_vendedores'){for (let i = 0; i < 4; i++){ relacion_vendedores.push({id_vendedor:i,vendedor:'nombre '+i,proyeccion_venta_general:'',gimed_vs_venta_general:'',ordinario_vs_venta_general:'',conoce_indicados:1,agenda_los_clientes:false,cuantos_clientes_activos:'',presentacion_personal:1,porta_carnet:1,conoce_objetivos:1,no_cumple_cuotas:false,diagnostico:'',toma_de_deciciones:''}); }}
+    if(items.nombre_tabla === 'relacion_vendedores'){
+      /**
+       * items de la lista de vendedores para la relacion vendedores
+       */
+      Lista = relacion_vendedores.map((data,index) => {
+        return(
+          <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.vendedor} value={index}/>
+        )
+      })
+      this.setState({lista:Lista});
+    }
+
     //Actualizar State #FF0000    
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,examen:examen,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,examen:examen,relacion_vendedores:relacion_vendedores,aplica_proceso_ideal_venta:aplica_proceso_ideal_venta,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -743,6 +760,7 @@ export default class Activity extends Component {
   SetChecked(i,calificacion_pv)
   {
     var mercadeo = this.state.mercadeo;
+    var data = this.state.relacion_vendedores;
     if(calificacion_pv === 'Si' || calificacion_pv === 'No' || calificacion_pv === 'Bueno' || calificacion_pv === 'Malo'){
       var docs = this.state.documentos;
       docs.estado_documento = calificacion_pv;
@@ -751,6 +769,25 @@ export default class Activity extends Component {
     }
     else if(calificacion_pv === 'Favorable' || calificacion_pv === 'Desfavorable'){
       this.setState({ checked2: i});
+    }
+    else if(calificacion_pv === ' Si' || calificacion_pv === ' No'){
+      data[this.state.selected].conoce_objetivos = i;
+      this.setState({ relacion_vendedores: data});
+    }
+    else if(calificacion_pv === ' Buena' || calificacion_pv === ' Mala'){
+      data[this.state.selected].presentacion_personal = i;
+      this.setState({ relacion_vendedores: data});
+    }
+    else if(calificacion_pv === ' Si ' || calificacion_pv === ' No '){
+      data[this.state.selected].conoce_indicados = i;
+      this.setState({ relacion_vendedores: data});
+    }
+    else if(calificacion_pv === ' Si  ' || calificacion_pv === ' No  '){
+      data[this.state.selected].porta_carnet = i;
+      this.setState({ relacion_vendedores: data});
+    }
+    else if(calificacion_pv === ' Si   ' || calificacion_pv === ' No   '){
+      this.setState({ aplica_proceso_ideal_venta: i});
     }
     else if(calificacion_pv === 'Si ' || calificacion_pv === 'No '){
       var arr = this.state.ptc;
@@ -884,6 +921,8 @@ export default class Activity extends Component {
         relacion_faltantes: JSON.stringify(this.state.PRODUCTS), 
         consumo: JSON.stringify(this.state.servicios_publicos),
         examen: JSON.stringify(this.state.examen),
+        relacion_vendedores: JSON.stringify(this.state.relacion_vendedores),
+        aplica_proceso_ideal_venta:this.state.aplica_proceso_ideal_venta,
         implementar_estrategia:this.state.estrategia,
         fecha_resolucion:this.state.fecha_resolucion,
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
@@ -2247,6 +2286,21 @@ export default class Activity extends Component {
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Picker
+                        textStyle={styles.picker}
+                        mode="dropdown"
+                        selectedValue={this.state.selected}
+                        style={{ width: undefined,marginLeft:15, marginRight:15}}
+                        itemStyle={styles.picker}
+                        itemTextStyle={{textTransform:'lowercase'}}
+                        onValueChange={value => this.setState({selected:value})}
+                      >                      
+                        {this.state.lista}
+                      </Picker>
+                      <Button iconLeft regular block info style={[styles.boton, styles.actualizar]} onPress={() => {this.setState({isVisibleActividad3:true});} }><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text style={styles.textButton}>Modificar Datos</Text></Button>
+                      <Text style={[styles.textInfo]}>Aplican el proceso ideal de venta:</Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={' Si   '} checked={this.state.aplica_proceso_ideal_venta}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={' No   '} checked={this.state.aplica_proceso_ideal_venta}></RadioButton>   
                     </View>
                   :
                     null
@@ -2440,6 +2494,65 @@ export default class Activity extends Component {
                       }>
                     </List>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.UpdateDataExamenGimed()}}><Text> Actualizar </Text></Button>
+                  </ScrollView>
+                </View>
+              </Overlay>
+            :
+              null
+          }
+          {
+            items.nombre_tabla === 'relacion_vendedores' ?
+              <Overlay
+                visible={this.state.isVisibleActividad3}
+                animationType="zoomIn"
+                onClose={() => this.setState({isVisibleActividad3: false})}
+                containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+                childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+              >
+                <View style={{justifyContent:'space-between', width:"100%"}}>
+                  <ScrollView>
+                    <Text style={[styles.textDocumento,{marginLeft:0,marginTop:0}]}>{this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].vendedor}</Text>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Conoce sus objetivos y proyecciones de VENTA a la fecha:</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={5} value={' Si'} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_objetivos}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={' No'} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_objetivos}></RadioButton>                    
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Proyección Venta General: </Text>
+                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.isVisibleActividad3?this.state.relacion_vendedores[this.state.selected].proyeccion_venta_general : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].proyeccion_venta_general = text; this.setState({relacion_vendedores:data })} }></Input>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>% GIMED / Venta General: </Text>
+                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={this.state.isVisibleActividad3?this.state.relacion_vendedores[this.state.selected].gimed_vs_venta_general : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].gimed_vs_venta_general = text; this.setState({relacion_vendedores:data })} }></Input>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>% Ordinario / Venta General: </Text>
+                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.isVisibleActividad3?this.state.relacion_vendedores[this.state.selected].ordinario_vs_venta_general : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].ordinario_vs_venta_general = text; this.setState({relacion_vendedores:data })} }></Input>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Conoce los indicados:</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={5} value={' Si '} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_indicados}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={' No '} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_indicados}></RadioButton>
+                    <ListItem style={{marginLeft:0,paddingTop:0,paddingBottom:0,paddingRight:0, borderBottomWidth:0}} onPress={() => {var data = this.state.relacion_vendedores; data[this.state.selected].agenda_los_clientes = !data[this.state.selected].agenda_los_clientes; this.setState({relacion_vendedores:data})}}>
+                      <CheckBox checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].agenda_los_clientes} color={COLOR.verde} onPress={() => {var data = this.state.relacion_vendedores; data[this.state.selected].agenda_los_clientes = !data[this.state.selected].agenda_los_clientes; this.setState({relacion_vendedores:data})}}/>
+                      <Body>
+                        <Text style={[styles.textDescFoto,{marginBottom:10}]}>Tiene agendados los clientes:</Text>
+                      </Body>
+                    </ListItem>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Cuantos Activos: </Text>
+                    <Input editable={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].agenda_los_clientes} keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={this.state.isVisibleActividad3? this.state.relacion_vendedores[this.state.selected].cuantos_clientes_activos : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].cuantos_clientes_activos = text; this.setState({relacion_vendedores:data })} }></Input>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Presentación Personal:</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={5} value={' Buena'} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].presentacion_personal}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={' Mala'} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].presentacion_personal}></RadioButton>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Porta el carnet personal:</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={5} value={' Si  '} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].porta_carnet}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={' No  '} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].porta_carnet}></RadioButton>
+                    <ListItem style={{marginLeft:0,paddingTop:0,paddingBottom:0,paddingRight:0, borderBottomWidth:0}} onPress={() => {var data = this.state.relacion_vendedores; data[this.state.selected].no_cumple_cuotas = !data[this.state.selected].no_cumple_cuotas; this.setState({relacion_vendedores:data})}}>
+                      <CheckBox checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].no_cumple_cuotas} color={COLOR.verde} onPress={() => {var data = this.state.relacion_vendedores; data[this.state.selected].no_cumple_cuotas = !data[this.state.selected].no_cumple_cuotas; this.setState({relacion_vendedores:data})}}/>
+                      <Body>
+                        <Text style={[styles.textDescFoto,{marginBottom:10}]}>Tiene más de tres meses sin cumplir cuotas:</Text>
+                      </Body>
+                    </ListItem>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Diagnostico o causas del bajo rendimiento:</Text>
+                    <Form>
+                      <Textarea disabled={this.state.isVisibleActividad3 && !this.state.relacion_vendedores[this.state.selected].no_cumple_cuotas} bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad3 ? this.state.relacion_vendedores[this.state.selected].diagnostico : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.relacion_vendedores; data[this.state.selected].diagnostico = text; this.setState({relacion_vendedores: data})}} />
+                    </Form>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Trabajo de recuperación, Seguimiento y toma de deciciones:</Text>
+                    <Form>
+                      <Textarea disabled={this.state.isVisibleActividad3 && !this.state.relacion_vendedores[this.state.selected].no_cumple_cuotas} bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad3 ? this.state.relacion_vendedores[this.state.selected].toma_de_deciciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.relacion_vendedores; data[this.state.selected].diagnostico = text; this.setState({relacion_vendedores: data})}} />
+                    </Form>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.setState({isVisibleActividad3:false,disable:false})}}><Text> Actualizar </Text></Button>
                   </ScrollView>
                 </View>
               </Overlay>

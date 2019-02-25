@@ -140,6 +140,8 @@ export default class Home extends Component {
               relacion_faltantes: element.relacion_faltantes, 
               consumo: element.consumo, 
               examen:element.examen,
+              relacion_vendedores:element.relacion_vendedores,
+              aplica_proceso_ideal_venta:element.aplica_proceso_ideal_venta,
               implementar_estrategia: element.implementar_estrategia,
               fecha_resolucion:element.fecha_resolucion,
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,
