@@ -29,6 +29,7 @@ let TIEMPOAUSENCIA = 1800000;// más de media hora ausente     ( > 1800000 )
 let items2 = [];
 let Lista = null;
 let closingKeyboard;
+let vendedores = [];
 export default class Activity extends Component {
   constructor(props) {
     super(props);
@@ -99,6 +100,7 @@ export default class Activity extends Component {
     };
     let token = this.props.token;
     items = this.props.data;
+    if(items.nombre_tabla === 'examen_gimed' || items.nombre_tabla === 'relacion_vendedores'){this.getEmpleados();}
     time = 0;
     totalTime = 0;
     totalTimeInit = new Date().getTime();
@@ -130,8 +132,8 @@ export default class Activity extends Component {
     else if(items.nombre_tabla === 'condiciones_locativas'){this.ListarCondiciones();}
     //this._retrieveDataInit();
     this._retrieveData();
+    this.setState({loading: false});
     //this._retrieveDataAusente();
-    this.setState({ loading: false });
   }
 
   /**
@@ -155,6 +157,68 @@ export default class Activity extends Component {
         var token2 = JSON.parse(response._bodyInit)
         //console.log(token2["message"]);
         info = token2["message"].descripcion;
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+  /**
+   * Obtener los empleados de la sucursal
+   */
+  getEmpleados = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var that = this;
+    await fetch(api.ipEmpleadosSucursal, {
+      method: 'POST',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/json',
+          'Accept':'application/json'
+      },      
+      body: JSON.stringify({id_sucursal:items.id_sucursal,nombre:''})
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        var token2 = JSON.parse(response._bodyInit)
+        vendedores = token2.data;
+        // that.setState({vendedores: token2.data});
+        var examen = items.examen ? JSON.parse(items.examen) : [];
+        var relacion_vendedores = items.relacion_vendedores ? JSON.parse(items.relacion_vendedores) : [];
+        var aplica_proceso_ideal_venta = items.aplica_proceso_ideal_venta ? items.aplica_proceso_ideal_venta : 1;
+        
+        console.log(vendedores)
+        // console.log(this.state.vendedores)
+        if(!items.examen && items.nombre_tabla === 'examen_gimed'){for(let i = 0; i < vendedores.length; i++){examen.push({id_vendedor:vendedores[i].dk_empleado,vendedor:vendedores[i].nombre + ' ' + vendedores[i].apellido,cargo:vendedores[i].cargo, productos_consultados:[],resultados:''});}}
+        if(items.nombre_tabla === 'examen_gimed'){
+          /**
+           * items de la lista de vendedores para el examen gimed
+           */
+          Lista = examen.map((data,index) => {
+            return(
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.vendedor} value={index}/>
+            )
+          })
+          that.setState({lista:Lista,examen:examen,relacion_vendedores:relacion_vendedores,aplica_proceso_ideal_venta:aplica_proceso_ideal_venta});
+        }
+        if(!items.relacion_vendedores && items.nombre_tabla === 'relacion_vendedores'){for (let i = 0; i < vendedores.length; i++){ relacion_vendedores.push({id_vendedor:vendedores[i].dk_empleado,vendedor:vendedores[i].nombre + ' ' + vendedores[i].apellido,cargo:vendedores[i].cargo, proyeccion_venta_general:'',gimed_vs_venta_general:'',ordinario_vs_venta_general:'',conoce_indicados:1,agenda_los_clientes:false,cuantos_clientes_activos:'',presentacion_personal:1,porta_carnet:1,conoce_objetivos:1,no_cumple_cuotas:false,diagnostico:'',toma_de_deciciones:''}); }}
+        if(items.nombre_tabla === 'relacion_vendedores'){
+          /**
+           * items de la lista de vendedores para la relacion vendedores
+           */
+          Lista = relacion_vendedores.map((data,index) => {
+            return(
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.vendedor} value={index}/>
+            )
+          })
+          that.setState({lista:Lista,examen:examen,relacion_vendedores:relacion_vendedores,aplica_proceso_ideal_venta:aplica_proceso_ideal_venta});
+        }
+        
+        //console.log(vendedores);
+        //console.log(token2.data);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
@@ -553,81 +617,22 @@ export default class Activity extends Component {
     }
 }
 
-  componentDidMount()
+  async componentDidMount()
   {
     console.log(items);
     /** Agregar el metodo handleBackPress al evento de presionar el boton "Back" de android */
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+
     /**
      * Seleccionar el radioButton que se obtuvo de la base de datos
      */
-    
-    /*if(items.calificacion_pv === 'Puntual' && items.nombre_tabla === 'apertura')
-    {
-      this.SetChecked(5,'Puntual');
-    }
-    else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && items.nombre_tabla === 'apertura')
-    {
-      this.SetChecked(5,'Puntual');
-    }
-    else if(items.calificacion_pv === 'Tarde')
-    {
-      this.SetChecked(3,'Tarde');
-    }
-    else if(items.calificacion_pv === 'Muy Tarde')
-    {
-      this.SetChecked(1,'Muy Tarde');
-    }
-    else if(items.calificacion_pv === 'Completo')
-    {
-      this.SetChecked(5,'Completo');
-    }
-    else if(items.calificacion_pv === 'Al día' && (items.nombre_tabla === 'libros_faltantes' || items.nombre_tabla === 'ingreso_sucursal'))
-    {
-      this.SetChecked(5,'Al día');
-    }
-    else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && (items.nombre_tabla === 'libros_faltantes' || items.nombre_tabla === 'ingreso_sucursal'))
-    {
-      this.SetChecked(5,'Al día');
-    }
-    else if(items.calificacion_pv === 'Pendiente')
-    {
-      this.SetChecked(1,'Pendiente');
-    }
-    else if(items.calificacion_pv === 'Excelentes' && items.nombre_tabla === 'condiciones_locativas')
-    {
-      this.SetChecked(5,'Excelentes');
-    }
-    else if((items.calificacion_pv === null || items.calificacion_pv === 'noalificado') && items.nombre_tabla === 'condiciones_locativas')
-    {
-      this.SetChecked(5,'Excelentes');
-    }
-    else if(items.calificacion_pv === 'Buenas')
-    {
-      this.SetChecked(4,'Buenas');
-    }
-    else if(items.calificacion_pv === 'Regulares')
-    {
-      this.SetChecked(3,'Regulares');
-    }
-    else if(items.calificacion_pv === 'Malas')
-    {
-      this.SetChecked(2,'Malas');
-    }
-    else if(items.calificacion_pv === 'Pesimas')
-    {
-      this.SetChecked(1,'Pesimas');
-    }    
-    else if(items.calificacion_pv === null || items.calificacion_pv === 'noalificado')
-    {
-      this.SetChecked(5,'Completo');
-    }*/
     if(items.calificacion_pv === 'nocalificado' || items.calificacion_pv === null){
       this.SetChecked(5,items.calificacion_pv);
     }
     else{
       this.SetChecked(items.calificacion_pv,items.calificacion_pv);
     }
+
     var array = [];
     var array2 = [];
     var array3 = [];
@@ -671,36 +676,9 @@ export default class Activity extends Component {
     items.nombre_tabla === 'julienne' ? (julienne.mes_anterior =items.venta_mes_anterior?items.venta_mes_anterior:'0', julienne.venta_proyeccion = items.proyeccion_mes_actual?items.proyeccion_mes_actual:'0', julienne.mes_actual = items.mes_actual?items.mes_actual:'0', julienne.dia_actual = items.dias_transcurridos?items.dias_transcurridos:'1') : null
     items.relacion_faltantes ? array = JSON.parse(items.relacion_faltantes) : items.relacion_faltantes = []
     var servicios_publicos = items.nombre_tabla === 'relacion_servicios_publicos' ? ((items.consumo !== '' && items.consumo !== null) ? JSON.parse(items.consumo) : {agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}}) : ''
-    var examen = items.examen ? JSON.parse(items.examen) : [];
-    if(!items.examen && items.nombre_tabla === 'examen_gimed'){for(let i = 0; i < 4; i++){examen.push({id_vendedor:i,vendedor:'nombre '+i,productos_consultados:[],resultados:''});}}
-    if(items.nombre_tabla === 'examen_gimed'){
-      /**
-       * items de la lista de vendedores para el examen gimed
-       */
-      Lista = examen.map((data,index) => {
-        return(
-          <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.vendedor} value={index}/>
-        )
-      })
-      this.setState({lista:Lista});
-    }
-    var relacion_vendedores = items.relacion_vendedores ? JSON.parse(items.relacion_vendedores) : [];
-    var aplica_proceso_ideal_venta = items.aplica_proceso_ideal_venta ? items.aplica_proceso_ideal_venta : 1;
-    if(!items.relacion_vendedores && items.nombre_tabla === 'relacion_vendedores'){for (let i = 0; i < 4; i++){ relacion_vendedores.push({id_vendedor:i,vendedor:'nombre '+i,proyeccion_venta_general:'',gimed_vs_venta_general:'',ordinario_vs_venta_general:'',conoce_indicados:1,agenda_los_clientes:false,cuantos_clientes_activos:'',presentacion_personal:1,porta_carnet:1,conoce_objetivos:1,no_cumple_cuotas:false,diagnostico:'',toma_de_deciciones:''}); }}
-    if(items.nombre_tabla === 'relacion_vendedores'){
-      /**
-       * items de la lista de vendedores para la relacion vendedores
-       */
-      Lista = relacion_vendedores.map((data,index) => {
-        return(
-          <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.vendedor} value={index}/>
-        )
-      })
-      this.setState({lista:Lista});
-    }
-
+    
     //Actualizar State #FF0000    
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,examen:examen,relacion_vendedores:relacion_vendedores,aplica_proceso_ideal_venta:aplica_proceso_ideal_venta,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -2054,7 +2032,7 @@ export default class Activity extends Component {
                   :
                     null
                 }                
-                {//FIXME: faltan datos de vendedores
+                {
                   items.nombre_tabla === 'examen_gimed' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>
@@ -2280,7 +2258,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//TODO: terminar
+                {
                   items.nombre_tabla === 'relacion_vendedores' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión del desempeño de cada vendedor: </Text>

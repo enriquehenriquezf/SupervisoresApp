@@ -12,7 +12,7 @@ import Overlay from 'react-native-modal-overlay';
 let fail = 0;
 let swChange = false;
 export default class Login extends Component {
-  // email de prueba: ne.ko@hotmail.es    pass de prueba: 123456
+  // email de prueba: programador6@binar10.co    pass de prueba: 123456
   constructor(props) {
     super(props);
     this.state = {
@@ -25,7 +25,10 @@ export default class Login extends Component {
       privacidad:'0',
       tutorial:'0',
       isVisiblePrivacidad:false,
-      politicas: 'El Responsable del Tratamiento, adopta las medidas necesarias para garantizar la seguridad, integridad y confidencialidad de los datos conforme a lo dispuesto en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, de 27 de abril de 2016,  relativo  a  la  protección  de  las  personas  físicas  en  lo  que  respecta  al  tratamiento  de  datos  personales  y  a  la  libre circulación de los mismos. Si  bien  el  Responsable,  realiza  copias  de  seguridad  de  los  contenidos  alojados  en  sus  servidores,  sin  embargo  no  se responsabiliza de la pérdida o el borrado accidental de los datos por parte de los Usuarios. De igual manera, no garantiza la  reposición  total  de  los  datos  borrados  por  los  Usuarios,  ya  que los  citados  datos  podrían  haber  sido  suprimidos  y/o modificados durante el periodo de tiempo transcurrido desde la última copia de seguridad. Los  servicios  facilitados  o  prestados  a  través  de  la  Aplicación, excepto  los  servicios  específicos  de  backup,  no  incluyen  la reposición de los contenidos conservados en las copias de seguridad realizadas por el Responsable del Tratamiento, cuando esta  pérdida  sea  imputable  al  usuario;  en  este  caso,  se  determinará  una  tarifa  acorde  a  la  complejidad  y  volumen  de  la recuperación,  siempre  previa  aceptación  del  usuario.  La  reposición  de  datos  borrados  sólo  está  incluida  en  el  precio  del servicio cuando la pérdida del contenido sea debida a causas atribuibles al Responsable.',
+      politicas: ['El Responsable del Tratamiento, adopta las medidas necesarias para garantizar la seguridad, integridad y confidencialidad de los datos conforme a lo dispuesto en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, de 27 de abril de 2016,  relativo  a  la  protección  de  las  personas  físicas  en  lo  que  respecta  al  tratamiento  de  datos  personales  y  a  la  libre circulación de los mismos.',
+                  'Si  bien  el  Responsable,  realiza  copias  de  seguridad  de  los  contenidos  alojados  en  sus  servidores,  sin  embargo  no  se responsabiliza de la pérdida o el borrado accidental de los datos por parte de los Usuarios. De igual manera, no garantiza la  reposición  total  de  los  datos  borrados  por  los  Usuarios,  ya  que los  citados  datos  podrían  haber  sido  suprimidos  y/o modificados durante el periodo de tiempo transcurrido desde la última copia de seguridad.',
+                  'Los  servicios  facilitados  o  prestados  a  través  de  la  Aplicación, excepto  los  servicios  específicos  de  backup,  no  incluyen  la reposición de los contenidos conservados en las copias de seguridad realizadas por el Responsable del Tratamiento, cuando esta  pérdida  sea  imputable  al  usuario;  en  este  caso,  se  determinará  una  tarifa  acorde  a  la  complejidad  y  volumen  de  la recuperación,  siempre  previa  aceptación  del  usuario.  La  reposición  de  datos  borrados  sólo  está  incluida  en  el  precio  del servicio cuando la pérdida del contenido sea debida a causas atribuibles al Responsable.'
+                ],
       showToast: false
     };
     this._OnLogin = this._OnLogin.bind(this);
@@ -168,9 +171,11 @@ export default class Login extends Component {
         //console.log(value);
         var state = 'true';
         var priv = false;
+        var privacidad = '0';
         if(value[2][1] !== null){if(value[2][1] === 'false'){state='false'}}
         if(value[3][1] !== '2' || value[3][1] === null){priv = true}
-        this.setState({ email: value[0][1] , password: value[1][1], estado: state, privacidad:value[3][1],tutorial:value[4][1], isVisiblePrivacidad:priv});
+        if(value[3][1] !== null){privacidad = value[3][1]}
+        this.setState({ email: value[0][1] , password: value[1][1], estado: state, privacidad:privacidad,tutorial:value[4][1], isVisiblePrivacidad:priv});
       }
       else{
         this.setState({privacidad:'0', tutorial:'0', isVisiblePrivacidad:true})
@@ -274,15 +279,15 @@ export default class Login extends Component {
           childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10,padding:10,paddingTop:20,paddingBottom:20}}
         >
           <View style={{justifyContent:'space-between', width:"100%"}}>
-            <ScrollView>
-              {
-                //FIXME: arreglar scroll
-              }
-              <Text style={{fontFamily:'BebasKai', paddingHorizontal:20}}>{this.state.politicas}</Text>
-              <Button style={{backgroundColor:COLOR.verde}} onPress={() => {this.setState({isVisiblePrivacidad: false, privacidad:'2'})}}>
-                <Text>Aceptar</Text>
+            <Text style={{fontFamily:'BebasKai', paddingHorizontal:20, height:'90%'}}>{this.state.politicas[this.state.privacidad]}</Text>
+            <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+              <Button disabled={this.state.privacidad !== '2'} style={{backgroundColor:this.state.privacidad === '2'?COLOR.verde:COLOR.gris,alignSelf:'center'}} onPress={() => {this.setState({isVisiblePrivacidad: false, privacidad:'2'})}}>
+                <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Aceptar</Text>
               </Button>
-            </ScrollView>
+              <Button disabled={this.state.privacidad >= '2'} style={{backgroundColor:this.state.privacidad < '2'?COLOR.verde:COLOR.gris,alignSelf:'flex-end'}} onPress={() => {var priv = parseInt(this.state.privacidad); this.setState({privacidad:(priv+1).toString()})}}>
+                <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Siguiente</Text>
+              </Button>
+            </View>
           </View>
         </Overlay>
       </Container>
