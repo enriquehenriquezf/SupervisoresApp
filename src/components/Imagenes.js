@@ -25,4 +25,6 @@ export const Imagen = {
     uncheck: require('../../assets/Icons/icono-supppp-02.png'),
     equis: require('../../assets/Icons/icono-supppp-03.png'),
     profileBorder: require('../../assets/Icons/icono-sup-01.png'),
+    tuto1: require('../../assets/Images/tuto1.png'),
+    tuto2: require('../../assets/Images/tuto2.png'),
 }

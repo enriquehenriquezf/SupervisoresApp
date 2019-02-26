@@ -8,8 +8,8 @@ export const logError = {
      * @param {String} auth token de autenticación
      */
     sendError: (header,body,auth) => {
-        console.log(header);
-        console.log(body);
+        console.log(JSON.parse(header));
+        console.log(JSON.parse(body));
         fetch(api.ipLogErrors, {
             method: 'POST',
             headers: {

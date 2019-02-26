@@ -2212,7 +2212,7 @@ export default class Activity extends Component {
                       <List dataArray={this.state.PRODUCTS}
                         renderRow={(item) =>
                           <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
-                            <View style={{flex:1, justifyContent:'flex-start'}}>
+                            <View style={{flex:2, justifyContent:'flex-start'}}>
                               <ListItem button onPress={() => {var array = [...this.state.PRODUCTS]; var ind = array.indexOf(item); array.splice(ind,1); this.setState({PRODUCTS: array, updated:true}, () => {this.forceUpdate();})}}>
                                 <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
                                 <Text style={styles.productosList}>{item.nombre_comercial}</Text>

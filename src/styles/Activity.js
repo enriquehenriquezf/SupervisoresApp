@@ -83,6 +83,7 @@ export default StyleSheet.create({
     },
     productosList:{
         marginLeft:3,
+        paddingLeft:5,
         fontFamily:'BebasKai',
         color:COLOR.azul
     },
