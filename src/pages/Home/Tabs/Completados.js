@@ -127,6 +127,7 @@ export default class Home extends Component {
               relacion_vendedores:element.relacion_vendedores,
               aplica_proceso_ideal_venta:element.aplica_proceso_ideal_venta,
               implementar_estrategia: element.implementar_estrategia,
+              compromiso:element.compromiso,
               fecha_resolucion:element.fecha_resolucion,
               numero_facturas_autorizadas:element.numero_facturas_autorizadas,
               fecha_ultima_factura:element.fecha_ultima_factura,

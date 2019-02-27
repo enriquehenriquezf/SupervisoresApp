@@ -89,6 +89,7 @@ export default class Activity extends Component {
       relacion_vendedores:[],
       aplica_proceso_ideal_venta:1,
       correspondencia:'',
+      compromiso:'',
       acciones_tomadas:'',
       facturas_autorizadas:'',
       fecha_resolucion: new Date(),
@@ -678,7 +679,7 @@ export default class Activity extends Component {
     var servicios_publicos = items.nombre_tabla === 'relacion_servicios_publicos' ? ((items.consumo !== '' && items.consumo !== null) ? JSON.parse(items.consumo) : {agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}}) : ''
     
     //Actualizar State #FF0000    
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,compromiso:items.compromiso?items.compromiso:'',fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -902,6 +903,7 @@ export default class Activity extends Component {
         relacion_vendedores: JSON.stringify(this.state.relacion_vendedores),
         aplica_proceso_ideal_venta:this.state.aplica_proceso_ideal_venta,
         implementar_estrategia:this.state.estrategia,
+        compromiso:this.state.compromiso,
         fecha_resolucion:this.state.fecha_resolucion,
         numero_facturas_autorizadas:this.state.facturas_autorizadas,
         fecha_ultima_factura:this.state.fecha_ultima_factura,
@@ -1707,6 +1709,16 @@ export default class Activity extends Component {
                     null
                 }
                 {
+                  items.nombre_tabla === 'compromisos' ?
+                    <View>
+                      <Text style={styles.textInfo}>Compromisos de la sucursal:</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Compromiso: </Text>
+                      <Input style={[styles.input,{height:60}]} multiline={true} placeholderTextColor={COLOR.gris} placeholder="Compromisos" defaultValue={this.state.compromiso} onChangeText={text => {this.setState({compromiso: text})} }></Input>
+                    </View>
+                  :
+                    null
+                }
+                {
                   items.nombre_tabla === 'evolucion_clientes' ?
                     <View>
                       <Text style={styles.textInfo}>Captación de clientes: </Text>
@@ -2310,7 +2322,7 @@ export default class Activity extends Component {
                     :
                       null
                   }
-                  <Textarea rowSpan={2} bordered placeholder="Observaciones" defaultValue={items.observacion} style={styles.observaciones} onChangeText={(text) => this.setState({observacion: text})} />
+                  <Textarea rowSpan={2} bordered placeholder="Observaciones" defaultValue={items.observacion} style={[styles.observaciones,{height:80}]} onChangeText={(text) => this.setState({observacion: text})} />
                 </Form>
               </Card>
               {
