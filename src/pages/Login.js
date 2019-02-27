@@ -1,8 +1,8 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Header, Left, Body, Right, Content, Form, Item, Input,Text, Button, Icon, Spinner, CheckBox, ListItem } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image } from 'react-native';
+import { Container, Body, Content, Form, Item, Input,Text, Button, Spinner, CheckBox, ListItem } from 'native-base';
+import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image,AppState, Alert } from 'react-native';
 import styles from '../styles/Login';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
@@ -11,6 +11,7 @@ import Overlay from 'react-native-modal-overlay';
 
 let fail = 0;
 let swChange = false;
+let consola = '';
 export default class Login extends Component {
   // email de prueba: programador6@binar10.co    pass de prueba: 123456
   constructor(props) {
@@ -31,11 +32,84 @@ export default class Login extends Component {
                   'Los  servicios  facilitados  o  prestados  a  través  de  la  Aplicación, excepto  los  servicios  específicos  de  backup,  no  incluyen  la reposición de los contenidos conservados en las copias de seguridad realizadas por el Responsable del Tratamiento, cuando esta  pérdida  sea  imputable  al  usuario;  en  este  caso,  se  determinará  una  tarifa  acorde  a  la  complejidad  y  volumen  de  la recuperación,  siempre  previa  aceptación  del  usuario.  La  reposición  de  datos  borrados  sólo  está  incluida  en  el  precio  del servicio cuando la pérdida del contenido sea debida a causas atribuibles al Responsable.'
                 ],
       tuto: [Imagen.tuto1,Imagen.tuto2,Imagen.tuto1],
+      showReloadDialog: false,
       showToast: false
     };
     this._OnLogin = this._OnLogin.bind(this);
     this.ChangePass = this.ChangePass.bind(this);
     let token = null;
+  }
+
+  /**
+   * Verificar que se subió una nueva versión
+   */
+  _checkUpdates = async () => {
+    if (this._checking_update !== true) {
+      console.log('Checking for an update...');
+      //toastr.showToast('Buscando una actualización...','warning');
+      consola += 'Buscando una actualización... \n'
+      this._checking_update = true;
+      try {
+        const update = await Expo.Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          console.log('An update was found, downloading...');
+          //toastr.showToast('Actualización encontrada, Descargando...','success');
+          consola += 'Actualización encontrada, Descargando... \n'
+          await Expo.Updates.fetchUpdateAsync();
+          this.setState({
+            showReloadDialog: true,
+          });
+        } else {
+          console.log('No updates were found');
+          //toastr.showToast('No hay actualización disponible','warning');
+          consola += 'No hay actualización disponible \n'
+        }
+      } catch (e) {
+        console.log('Error while trying to check for updates', e);
+        //toastr.showToast('Error buscando actualizaciones: ' + e,'danger');
+        consola += 'Error buscando actualizaciones:' + e + '\n'
+      }
+      delete this._checking_update;
+    } else {
+      console.log('Currently checking for an update');
+      //toastr.showToast('Actualmente se está buscando una actualización','warning');
+      consola += 'Actualmente se está buscando una actualización \n'
+    }
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'active') {
+      this._checkUpdates();
+    }
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange);
+    // fresh start check
+    this._checkUpdates();
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const {showReloadDialog,} = this.state;
+    if (showReloadDialog === true && showReloadDialog !== prevState.showReloadDialog) {
+      Alert.alert(
+        'Update',
+        'Nueva actualización encontrada, debe reiniciar la aplicación.',
+        [
+          {
+            text: 'Aceptar',
+            onPress: () => {
+              Updates.reloadFromCache();
+            }
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   }
 
   async componentWillMount() {
@@ -109,7 +183,6 @@ export default class Login extends Component {
           var porcentajes = JSON.parse(response._bodyInit);
           var general = (porcentajes.porcentaje_general.actividades_completas / porcentajes.porcentaje_general.todas_las_actividades) * 100;
           that._storeDataPorcentajes(Math.floor(general),porcentajes);
-          //TODO: hacer tutorial de la app
           if(that.state.tutorial < '2'){that.setState({isVisibleTutorial:true})}
           else{handler(1,token);}
           //console.log(Math.floor(general));
@@ -274,6 +347,8 @@ export default class Login extends Component {
                   </Body>
                 </ListItem>        
               </Form>
+              <Text style={{alignSelf:'center', fontSize:12, marginTop:50}}>v {Expo.Constants.manifest.version} BETA</Text>
+              {/* <Text style={{alignSelf:'center', fontSize:12, marginTop:50}}>{consola}</Text> */}
             </View>
           </Content>
         </KeyboardAvoidingView>

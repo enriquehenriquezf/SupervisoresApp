@@ -63,6 +63,7 @@ export default StyleSheet.create({
     checkbox2:{
         backgroundColor: 'rgba(255,255,255,0)',
         borderColor: 'rgba(255,255,255,0)',
+        justifyContent:'center',
         marginLeft: 80,
         marginRight: 20,
         paddingTop:-5,
