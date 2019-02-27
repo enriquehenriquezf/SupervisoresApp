@@ -23,6 +23,7 @@ export default class Profile extends Component {
     super(props);
     this.state = {
       loading: true,
+      loading2:false,
       isVisibleTutorial:false,
       tutorial:'0',
       tuto: [Imagen.tuto1,Imagen.tuto2,Imagen.tuto1],
@@ -120,6 +121,8 @@ export default class Profile extends Component {
    */
   ChangePass(handler)
   {
+    this.setState({loading2:true});
+    var that = this;
     fetch(api.ipChangePassword, {
       method: 'POST',
       headers: {
@@ -133,11 +136,13 @@ export default class Profile extends Component {
         if(response.ok === true)
         {
           toastr.showToast(JSON.parse(response._bodyInit),'success');
+          that.setState({loading2:false})
           handler(6,token,items);
         }
         else
         {
           console.log(response);
+          that.setState({loading2:false})
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }
@@ -148,6 +153,7 @@ export default class Profile extends Component {
         //return response.json();
       }).catch(function(error){
         console.log(error);
+        that.setState({loading2:false})
       });
   }
 
@@ -328,6 +334,16 @@ export default class Profile extends Component {
                   </Button>
                 </View>
               </View>
+            </Overlay>
+            <Overlay
+              visible={this.state.loading2}
+              closeOnTouchOutside={false}
+              onClose={() => this.setState({loading2: true})}
+              animationType="zoomIn"
+              containerStyle={{backgroundColor: "rgba(0, 0, 0, .3)", width:"auto",height:"auto"}}
+              childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
+            >
+              {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>}
             </Overlay>
         </Container>
       </Drawer>

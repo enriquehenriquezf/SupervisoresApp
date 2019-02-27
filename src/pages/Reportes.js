@@ -23,6 +23,7 @@ export default class Reportes extends Component {
     this.state = {
         archivo: {},
         loading: true,
+        loading2:false,
         refreshing: false,
         showToast: false,
         estado:true,
@@ -259,6 +260,7 @@ export default class Reportes extends Component {
    * Crear reporte con asunto, observaciones e imagen
    */
   async CrearReporte(){
+    this.setState({loading2:true});
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let file1 = '';
@@ -292,14 +294,16 @@ export default class Reportes extends Component {
       {
         toastr.showToast(token2["message"],'success');
         that.getReportes();
-        that.setState({isVisibleReporte:false,isLoadReporte:false,disable:false});
+        that.setState({loading2:false,isVisibleReporte:false,isLoadReporte:false,disable:false});
       }
       else{
         toastr.showToast(token2["message"],'warning'); 
+        that.setState({loading2:false,isVisibleReporte:false,isLoadReporte:false,disable:false});
         console.log(response);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
+      that.setState({loading2:false,isVisibleReporte:false,isLoadReporte:false,disable:false});
       console.log(error);
     });
   }
@@ -357,6 +361,7 @@ export default class Reportes extends Component {
    * Enviar mensaje al coordinador en un reporte especifico
    */
   async EnviarMensaje(){
+    this.setState({loading2:true});
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     let that = this;
@@ -377,14 +382,16 @@ export default class Reportes extends Component {
       if(response.ok === true)
       {
         toastr.showToast(token2["message"],'success');
-        that.setState({isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
+        that.setState({loading2:false,isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
       }
       else{
         toastr.showToast(token2["message"],'warning'); 
+        that.setState({loading2:false,isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
         console.log(response);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
+        that.setState({loading2:false,isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
       console.log(error);
     });
   }
@@ -724,6 +731,16 @@ export default class Reportes extends Component {
                   <Text onPress={() => this.setState({isVisible2: false})} style={{color: 'white', textAlign:'right', alignSelf:'flex-end'}}>X</Text>
                   <Image style={{height: 500, width:280}} source={{uri: imgOverlay}}></Image>
                 </View>
+            </Overlay>
+            <Overlay
+              visible={this.state.loading2}
+              closeOnTouchOutside={false}
+              onClose={() => this.setState({loading2: true})}
+              animationType="zoomIn"
+              containerStyle={{backgroundColor: "rgba(0, 0, 0, .3)", width:"auto",height:"auto"}}
+              childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
+            >
+              {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>}
             </Overlay>
         </Container>
       </Drawer>

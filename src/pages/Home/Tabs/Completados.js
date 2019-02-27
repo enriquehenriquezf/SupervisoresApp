@@ -148,6 +148,7 @@ export default class Home extends Component {
             items.push(item);
             i = i + 1;       j = j + 1;   
           });
+          //items.sort(function(a,b){return a.name > b.name});
           //console.log(items)
       }
       else

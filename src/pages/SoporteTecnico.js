@@ -8,6 +8,7 @@ import {api} from '../services/api'
 import {View, BackHandler,Image,KeyboardAvoidingView} from 'react-native';
 import SideBar from './SideBar';
 import { Imagen } from '../components/Imagenes';
+import Overlay from 'react-native-modal-overlay';
 
 let items = null;
 export default class Stats extends Component {
@@ -15,6 +16,7 @@ export default class Stats extends Component {
     super(props);
     this.state = {
       loading: true,
+      loading2:false,
       asunto:'',
       mensaje:'',
       showToast: false
@@ -54,6 +56,7 @@ export default class Stats extends Component {
    * Enviar mensaje de algun error encontrado en la app
    */
   async EnviarBug(){
+    this.setState({loading2:true});
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     var that = this;
@@ -74,12 +77,13 @@ export default class Stats extends Component {
         {
           var resp = JSON.parse(response._bodyInit);
           //console.log(resp)
-          that.setState({disable:false});
+          that.setState({loading2:false,disable:false});
           toastr.showToast(JSON.parse(response._bodyInit),'success');
         }
         else
         {
           console.log(response);
+          that.setState({loading2:false,disable:false});
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }
@@ -90,6 +94,7 @@ export default class Stats extends Component {
         return response.json();
       }).catch(function(error){
         console.log(error);
+        that.setState({loading2:false,disable:false});
         toastr.showToast('Verifique su conexión a internet','warning');
         if(error.toString().includes('Network request failed')){toastr.showToast('Contactese con el administrador','warning');}
     });
@@ -145,6 +150,16 @@ export default class Stats extends Component {
                 </View>
             </Content>
           </KeyboardAvoidingView>
+          <Overlay
+            visible={this.state.loading2}
+            closeOnTouchOutside={false}
+            onClose={() => this.setState({loading2: true})}
+            animationType="zoomIn"
+            containerStyle={{backgroundColor: "rgba(0, 0, 0, .3)", width:"auto",height:"auto"}}
+            childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
+          >
+            {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>}
+          </Overlay>
         </Container>
       </Drawer>
     );

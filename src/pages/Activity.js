@@ -37,6 +37,7 @@ export default class Activity extends Component {
       archivo: {},
       archivo2: {},
       loading: true,
+      loading2: false,
       checked: 5 ,
       checked2: 5 ,
       calificacion_pv: 'Completo',
@@ -159,6 +160,12 @@ export default class Activity extends Component {
         //console.log(token2["message"]);
         info = token2["message"].descripcion;
       }
+      else{
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
+      }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
       console.log(error);
@@ -221,6 +228,12 @@ export default class Activity extends Component {
         //console.log(vendedores);
         //console.log(token2.data);
       }
+      else{        
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
+      }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
       console.log(error);
@@ -275,6 +288,10 @@ export default class Activity extends Component {
       }
       else{        
         console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
@@ -347,6 +364,10 @@ export default class Activity extends Component {
       }
       else{        
         console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
@@ -358,6 +379,7 @@ export default class Activity extends Component {
    * Actualizar datos del documento
    */
   UpdateData = async() => {
+    this.setState({loading2:true});
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     /** Imagenes de documentacion legal */
@@ -406,14 +428,20 @@ export default class Activity extends Component {
       if(response.ok === true)
       {
         var token2 = JSON.parse(response._bodyInit);
-        that.setState({isVisibleActividad:false,isLoadActividad:false,disable:false});
+        that.setState({loading2:false,isVisibleActividad:false,isLoadActividad:false,disable:false});
         toastr.showToast(token2["message"],'success');
       }
       else{        
         console.log(response);
+        that.setState({loading2:false,isVisibleActividad:false,isLoadActividad:false,disable:false});
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
+      that.setState({loading2:false,isVisibleActividad:false,isLoadActividad:false,disable:false});
       console.log(error);
     });
   }
@@ -464,6 +492,10 @@ export default class Activity extends Component {
       }
       else{        
         console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
@@ -528,6 +560,10 @@ export default class Activity extends Component {
       }
       else{        
         console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
@@ -539,6 +575,7 @@ export default class Activity extends Component {
    * Actualizar datos de la condicion locativa
    */
   UpdateDataCondicion = async() => {
+    this.setState({loading2:true});
     let bodyInit = JSON.parse(token._bodyInit);
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
     /** Imagenes de condiciones locativas */
@@ -577,14 +614,20 @@ export default class Activity extends Component {
         //var conds = that.state.lista;
         //conds[that.state.selected].props.color = '#5cb85c'
         var token2 = JSON.parse(response._bodyInit);
-        that.setState({isVisibleActividad2:false,isLoadActividad:false,disable:false});
+        that.setState({loading2:false,isVisibleActividad2:false,isLoadActividad:false,disable:false});
         toastr.showToast(token2["message"],'success');
       }
       else{        
         console.log(response);
+        that.setState({loading2:false,isVisibleActividad2:false,isLoadActividad:false,disable:false});
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
       }
     }).catch(function(error){
       //toastr.showToast('Su sesión expiró','danger');
+      that.setState({loading2:false,isVisibleActividad2:false,isLoadActividad:false,disable:false});
       console.log(error);
     });
   }
@@ -817,6 +860,8 @@ export default class Activity extends Component {
    */
   async FinishActivity(handler)
   {
+    this.setState({loading2:true});
+    var that = this;
     let bodyInit = JSON.parse(token._bodyInit);
     let handler2 = this.props.handler2;
     const auth = bodyInit.token_type + " " + bodyInit.access_token;
@@ -920,11 +965,13 @@ export default class Activity extends Component {
       if(response.ok === true && response.status === 200)
       {
         toastr.showToast(newToken[message],'success');
+        that.setState({loading2:false});
         handler(1,token,[]);
       }
       else
       {
         console.log(response);
+        that.setState({loading2:false});
         if(response.status === 500){
           toastr.showToast('Error con el servidor','danger');
           var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
@@ -941,6 +988,7 @@ export default class Activity extends Component {
       }
     }).catch(function(error){
       toastr.showToast('Su sesión expiró','danger');
+      that.setState({loading2:false});
       handler2(-1,token,[]);
       console.log(error);
     });
@@ -1159,6 +1207,10 @@ export default class Activity extends Component {
         else
         {
           console.log(response);
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }
@@ -1215,6 +1267,10 @@ export default class Activity extends Component {
         else
         {
           console.log(response);
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }
@@ -2567,7 +2623,16 @@ export default class Activity extends Component {
             :
               null
           }
-
+          <Overlay
+            visible={this.state.loading2}
+            closeOnTouchOutside={false}
+            onClose={() => this.setState({loading2: true})}
+            animationType="zoomIn"
+            containerStyle={{backgroundColor: "rgba(0, 0, 0, .3)", width:"auto",height:"auto"}}
+            childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
+          >
+            {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>}
+          </Overlay>
         </Container>
       </Drawer>
     );
