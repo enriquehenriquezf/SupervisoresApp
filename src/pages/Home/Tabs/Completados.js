@@ -6,6 +6,7 @@ import {View, RefreshControl, AsyncStorage} from 'react-native';
 import styles from '../../../styles/Home';
 import {api} from '../../../services/api';
 import { COLOR } from '../../../components/Colores';
+import { logError } from '../../../components/logError';
 
 let items = [];
 let sucursalActual = null;
@@ -155,6 +156,10 @@ export default class Home extends Component {
       {
         console.log(response);
         if(response.status === 500){
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           toastr.showToast('Error con el servidor','danger');
         }
         else if(response.status === 401){

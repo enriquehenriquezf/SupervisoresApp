@@ -12,6 +12,7 @@ import SideBar from './SideBar';
 import { UserInfo } from '../components/UserInfo';
 import { COLOR } from '../components/Colores';
 import { Imagen } from '../components/Imagenes';
+import { logError } from '../components/logError';
 
 let items = null;
 let user = [];
@@ -161,6 +162,10 @@ export default class Reportes extends Component {
       else
       {
         console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
         if(response.status === 500){
           toastr.showToast('Error con el servidor','danger');
         }
@@ -232,6 +237,10 @@ export default class Reportes extends Component {
       else
       {
         console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
         if(response.status === 500){
           toastr.showToast('Error con el servidor','danger');
         }
@@ -297,6 +306,10 @@ export default class Reportes extends Component {
         that.setState({loading2:false,isVisibleReporte:false,isLoadReporte:false,disable:false});
       }
       else{
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
         toastr.showToast(token2["message"],'warning'); 
         that.setState({loading2:false,isVisibleReporte:false,isLoadReporte:false,disable:false});
         console.log(response);
@@ -347,6 +360,10 @@ export default class Reportes extends Component {
         //toastr.showToast(token2["detalle"],'success');
       }
       else{
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
         toastr.showToast(token2["message"],'warning'); 
         console.log(response);
       }
@@ -385,6 +402,10 @@ export default class Reportes extends Component {
         that.setState({loading2:false,isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
       }
       else{
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
         toastr.showToast(token2["message"],'warning'); 
         that.setState({loading2:false,isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
         console.log(response);
@@ -428,6 +449,10 @@ export default class Reportes extends Component {
         //toastr.showToast(token2["message"],'success');
       }
       else{
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
         toastr.showToast(token2["message"],'warning'); 
         console.log(response);
       }

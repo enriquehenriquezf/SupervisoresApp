@@ -9,6 +9,7 @@ import {View, BackHandler,Image,KeyboardAvoidingView} from 'react-native';
 import SideBar from './SideBar';
 import { Imagen } from '../components/Imagenes';
 import Overlay from 'react-native-modal-overlay';
+import { logError } from '../components/logError';
 
 let items = null;
 export default class Stats extends Component {
@@ -83,6 +84,10 @@ export default class Stats extends Component {
         else
         {
           console.log(response);
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           that.setState({loading2:false,disable:false});
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');

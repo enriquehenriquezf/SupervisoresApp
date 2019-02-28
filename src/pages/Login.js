@@ -8,6 +8,7 @@ import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
 import { COLOR } from '../components/Colores';
 import Overlay from 'react-native-modal-overlay';
+import { logError } from '../components/logError';
 
 let fail = 0;
 let swChange = false;
@@ -146,6 +147,10 @@ export default class Login extends Component {
       {
         console.log(response);
         if(response.status === 500){
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           toastr.showToast('Error con el servidor','danger');
         }
         else{
@@ -190,6 +195,10 @@ export default class Login extends Component {
         else
         {
           console.log(response);
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }
@@ -296,6 +305,10 @@ export default class Login extends Component {
         else
         {
           console.log(response);
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
           }

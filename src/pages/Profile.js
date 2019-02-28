@@ -10,6 +10,7 @@ import {View, BackHandler, Image} from 'react-native';
 import SideBar from './SideBar';
 import { COLOR } from '../components/Colores';
 import Overlay from 'react-native-modal-overlay';
+import { logError } from '../components/logError';
 
 /*var BUTTONS = [
   { text: "Activo", icon: "checkmark-circle", iconColor: "#5cb85c" },
@@ -142,6 +143,10 @@ export default class Profile extends Component {
         else
         {
           console.log(response);
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           that.setState({loading2:false})
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
@@ -309,7 +314,7 @@ export default class Profile extends Component {
                       <Text style={styles.text}>{items.telefono}</Text>
                   </Item>
                   <Button info regular block style={styles.boton} onPress={() => this.ChangePass(this.props.handler2)}><Text style={styles.textoBoton}> Cambiar Contraseña </Text></Button>
-                  <Button info regular block style={[styles.boton,{backgroundColor:COLOR.completado50}]} onPress={() => this.setState({tutorial:'0',isVisibleTutorial:true})}><Text style={styles.textoBoton}> Ver Tutorial </Text></Button>
+                  <Button info regular block style={[styles.boton,{backgroundColor:COLOR.amarillo}]} onPress={() => this.setState({tutorial:'0',isVisibleTutorial:true})}><Text style={styles.textoBoton}> Ver Tutorial </Text></Button>
               </View>
             </Content>
             <Overlay

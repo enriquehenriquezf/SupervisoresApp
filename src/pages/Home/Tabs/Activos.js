@@ -6,6 +6,7 @@ import {View, RefreshControl, AsyncStorage} from 'react-native';
 import styles from '../../../styles/Home';
 import {api} from '../../../services/api';
 import { COLOR } from '../../../components/Colores';
+import { logError } from '../../../components/logError';
 
 let items = [];
 let sucursalActual = null;
@@ -177,6 +178,10 @@ export default class Home extends Component {
       {
         console.log(response);
         if(response.status === 500){
+          var newToken = JSON.parse(response._bodyInit);
+          var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+          var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+          logError.sendError(header,body,auth);
           toastr.showToast('Error con el servidor','danger');
         }
         else if(response.status === 401){
@@ -234,17 +239,24 @@ export default class Home extends Component {
   }
 
   _renderHeader(item, expanded) {
-    return (
-      <View style={{flexDirection: "row",justifyContent: "space-between",alignItems: "center", padding:10, backgroundColor:'rgba(0,161,228,.05)',marginTop:2}}>
-        <Text style={[styles.sucursalText,{paddingLeft:10}]}>{item.title.sucursal}</Text>
-        <View style={{flexDirection: "row"}}>
-          <Text style={[styles.sucursalText,{fontSize:18, textAlign:'right', marginRight:5}]}>{item.content.length}</Text>
-          {expanded
-            ? <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-up" />
-            : <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-down" />}
-        </View>
-      </View>
-    );
+    {
+      return (
+        item.title.hasOwnProperty('sucursal') ? 
+          <View style={{flexDirection: "row",justifyContent: "space-between",alignItems: "center", padding:10, backgroundColor:'rgba(0,161,228,.02)',marginTop:2}}>
+            <Text style={[styles.sucursalText,{paddingLeft:10}]}>{item.title.sucursal}</Text>
+            <View style={{flexDirection: "row"}}>
+              <Text style={[styles.sucursalText,{fontSize:18, textAlign:'right', marginRight:5}]}>{item.content.length}</Text>
+              {expanded
+                ? <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-up" />
+                : <Icon style={{ fontSize: 18, color: COLOR.azul }} name="arrow-down" />}
+            </View>
+          </View>
+        :
+          <View style={{marginTop:10}}>
+            <Text  style={{fontFamily:'BebasNeueBold',color:COLOR.amarillo,fontSize:24, paddingLeft:20}}>No tienes actividades para el día de hoy</Text>
+          </View>
+      );    
+    }
   }
   _renderContent(item) {
     return(

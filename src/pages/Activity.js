@@ -663,7 +663,7 @@ export default class Activity extends Component {
 
   async componentDidMount()
   {
-    console.log(items);
+    //console.log(items);
     /** Agregar el metodo handleBackPress al evento de presionar el boton "Back" de android */
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
 
@@ -734,16 +734,27 @@ export default class Activity extends Component {
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
         //console.log("Pos:");
-        //console.log(position);
+        console.log(position);
         lat = position.coords.latitude;
         long = position.coords.longitude;
-        if((lat >= items.latitud-RANGO && lat <= items.latitud+RANGO) && (long >= items.longitud-RANGO && long <= items.longitud+RANGO))
-        {
-          toastr.showToast('Se encuentra dentro de ' + items.sucursal,'info');
+        if(position.coords.accuracy > 10 && position.mocked === false)// verificar que no tenga un fake gps
+        {  if((lat >= items.latitud-RANGO && lat <= items.latitud+RANGO) && (long >= items.longitud-RANGO && long <= items.longitud+RANGO))
+          {
+            toastr.showToast('Se encuentra dentro de ' + items.sucursal,'info');
+          }
+          else
+          {
+            toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
+            this.handleBackPress();
+          }
         }
-        else
-        {
-          toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
+        else{
+          toastr.showToast('No puede alterar el GPS, su coordinador será notificado','danger');
+          let bodyInit = JSON.parse(token._bodyInit);
+          const auth = bodyInit.token_type + " " + bodyInit.access_token;
+          var header = JSON.stringify({fakeGPS:true,sucursal:items.sucursal});
+          var body = JSON.stringify(position);
+          logError.sendError(header,body,auth);
           this.handleBackPress();
         }
       },
@@ -755,7 +766,7 @@ export default class Activity extends Component {
         }
         //this.setState({ error: error.message })
       },
-      { enableHighAccuracy: false, timeout: 60000, maximumAge: 1000 },
+      { enableHighAccuracy: true, timeout: 60000, maximumAge: 1000 },
     );
   }
 
