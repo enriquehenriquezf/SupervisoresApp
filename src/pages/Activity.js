@@ -87,6 +87,7 @@ export default class Activity extends Component {
       julienne:{mes_anterior:'0',mes_actual:'0',dia_actual:'1',venta_proyeccion:'0'},
       servicios_publicos:{agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}},
       examen:[],
+      senalizacion:[],
       relacion_vendedores:[],
       aplica_proceso_ideal_venta:1,
       correspondencia:'',
@@ -132,6 +133,7 @@ export default class Activity extends Component {
     this.Descripcion();
     if(items.nombre_tabla === 'documentacion_legal'){this.ListarDocumentacion();}
     else if(items.nombre_tabla === 'condiciones_locativas'){this.ListarCondiciones();}
+    this.ListarSenalizacion();
     //this._retrieveDataInit();
     this._retrieveData();
     this.setState({loading: false});
@@ -171,6 +173,53 @@ export default class Activity extends Component {
       console.log(error);
     });
   }
+
+  /**
+   * Obtener la lista de señalización
+   */
+  ListarSenalizacion = async() => {
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var that = this;
+    await fetch(api.ipSenalizacion, {
+      method: 'GET',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/json',
+          'Accept':'application/json'
+      },      
+      body: ''
+    }).then(function(response) {
+      //console.log(response);
+      if(response.ok === true)
+      {
+        var token2 = JSON.parse(response._bodyInit)
+        var senalizacion = token2;
+        //console.log(senalizacion)
+        if(items.nombre_tabla === 'senalizacion'){
+          /**
+           * items de la lista de vendedores para el examen gimed
+           */
+          Lista = senalizacion.map((data,index) => {
+            return(
+              <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.senalizacion} value={index}/>
+            )
+          })
+          that.setState({lista:Lista, senalizacion: senalizacion});
+        }
+      }
+      else{        
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        logError.sendError(header,body,auth);
+      }
+    }).catch(function(error){
+      //toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
 
   /**
    * Obtener los empleados de la sucursal
@@ -734,7 +783,7 @@ export default class Activity extends Component {
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
         //console.log("Pos:");
-        console.log(position);
+        //console.log(position);
         lat = position.coords.latitude;
         long = position.coords.longitude;
         if(position.coords.accuracy > 10 && position.mocked === false)// verificar que no tenga un fake gps
@@ -2362,6 +2411,28 @@ export default class Activity extends Component {
                   :
                     null
                 }
+                {
+                  items.nombre_tabla === 'senalizacion' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión de la señalización: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Picker
+                        textStyle={styles.picker}
+                        mode="dropdown"
+                        selectedValue={this.state.selected}
+                        style={{ width: undefined,marginLeft:15, marginRight:15}}
+                        itemStyle={styles.picker}
+                        itemTextStyle={{textTransform:'lowercase'}}
+                        onValueChange={value => this.setState({selected:value})}
+                      >                      
+                        {this.state.lista}
+                      </Picker>
+                      <Button iconLeft regular block info style={[styles.boton, styles.actualizar]} onPress={() => {this.setState({isVisibleActividad3:true});} }><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text style={styles.textButton}>Modificar Datos</Text></Button>
+                    </View>
+                  :
+                    null
+                }
                 <Form>
                   {
                     this.state.motivo !== '' ?
@@ -2608,6 +2679,32 @@ export default class Activity extends Component {
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>Trabajo de recuperación, Seguimiento y toma de deciciones:</Text>
                     <Form>
                       <Textarea disabled={this.state.isVisibleActividad3 && !this.state.relacion_vendedores[this.state.selected].no_cumple_cuotas} bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad3 ? this.state.relacion_vendedores[this.state.selected].toma_de_deciciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.relacion_vendedores; data[this.state.selected].diagnostico = text; this.setState({relacion_vendedores: data})}} />
+                    </Form>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.setState({isVisibleActividad3:false,disable:false})}}><Text> Actualizar </Text></Button>
+                  </ScrollView>
+                </View>
+              </Overlay>
+            :
+              null
+          }
+          {
+            items.nombre_tabla === 'senalizacion' ?
+              <Overlay
+                visible={this.state.isVisibleActividad3}
+                animationType="zoomIn"
+                onClose={() => this.setState({isVisibleActividad3: false})}
+                containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
+                childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
+              >
+                <View style={{justifyContent:'space-between', width:"100%"}}>
+                  <ScrollView>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Tiene señalización?</Text>
+                    <RadioButton SetChecked={this.SetChecked} i={5} value={'  Si'} checked={this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].respuesta}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={1} value={'  No'} checked={this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].respuesta}></RadioButton>
+                    <RadioButton SetChecked={this.SetChecked} i={0} value={'  N/A'} checked={this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].respuesta}></RadioButton>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Observaciones:</Text>
+                    <Form>
+                      <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad3 ? this.state.senalizacion[this.state.selected].observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.senalizacion; data[this.state.selected].observaciones = text; this.setState({senalizacion: data})}} />
                     </Form>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.setState({isVisibleActividad3:false,disable:false})}}><Text> Actualizar </Text></Button>
                   </ScrollView>
