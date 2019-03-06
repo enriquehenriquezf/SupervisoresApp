@@ -191,6 +191,7 @@ export default class Activity extends Component {
       body: ''
     }).then(function(response) {
       //console.log(response);
+      var senal = items.senalizacion? JSON.parse(items.senalizacion) : [];
       if(response.ok === true)
       {
         var token2 = JSON.parse(response._bodyInit)
@@ -201,11 +202,13 @@ export default class Activity extends Component {
            * items de la lista de vendedores para el examen gimed
            */
           Lista = senalizacion.map((data,index) => {
+            !items.senalizacion? senal.push({id:data.id,senalizacion:data.senalizacion,respuesta:0,observaciones:''}) : null
             return(
               <Picker.Item key={Math.floor(Math.random() * 1000) + 1} label={data.senalizacion} value={index}/>
             )
           })
-          that.setState({lista:Lista, senalizacion: senalizacion});
+          //console.log(senal)
+          that.setState({lista:Lista, senalizacion: senal});
         }
       }
       else{        
@@ -769,9 +772,15 @@ export default class Activity extends Component {
     items.nombre_tabla === 'julienne' ? (julienne.mes_anterior =items.venta_mes_anterior?items.venta_mes_anterior:'0', julienne.venta_proyeccion = items.proyeccion_mes_actual?items.proyeccion_mes_actual:'0', julienne.mes_actual = items.mes_actual?items.mes_actual:'0', julienne.dia_actual = items.dias_transcurridos?items.dias_transcurridos:'1') : null
     items.relacion_faltantes ? array = JSON.parse(items.relacion_faltantes) : items.relacion_faltantes = []
     var servicios_publicos = items.nombre_tabla === 'relacion_servicios_publicos' ? ((items.consumo !== '' && items.consumo !== null) ? JSON.parse(items.consumo) : {agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}}) : ''
-    
+    if(items.seguro === null && items.contrato === null){
+      imgTemp1 = noDisponible;
+    }
+    else{
+      imgTemp1 = api.ipImg + items.seguro ? items.seguro : items.contrato;
+    }
+
     //Actualizar State #FF0000    
-    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,compromiso:items.compromiso?items.compromiso:'',fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    this.setState({observacion: items.observacion, imgVencido:imgTemp1, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,compromiso:items.compromiso?items.compromiso:'',fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -843,6 +852,7 @@ export default class Activity extends Component {
   {
     var mercadeo = this.state.mercadeo;
     var data = this.state.relacion_vendedores;
+    var data2 = this.state.senalizacion;
     if(calificacion_pv === 'Si' || calificacion_pv === 'No' || calificacion_pv === 'Bueno' || calificacion_pv === 'Malo'){
       var docs = this.state.documentos;
       docs.estado_documento = calificacion_pv;
@@ -851,6 +861,10 @@ export default class Activity extends Component {
     }
     else if(calificacion_pv === 'Favorable' || calificacion_pv === 'Desfavorable'){
       this.setState({ checked2: i});
+    }
+    else if(calificacion_pv === '  Si' || calificacion_pv === '  No' || calificacion_pv === '  N/A'){
+      data2[this.state.selected].respuesta = i;
+      this.setState({ senalizacion: data2});
     }
     else if(calificacion_pv === ' Si' || calificacion_pv === ' No'){
       data[this.state.selected].conoce_objetivos = i;
@@ -937,6 +951,20 @@ export default class Activity extends Component {
     mes_actual = items.nombre_tabla === 'domicilios' ? this.state.domicilios.mes_actual : this.state.julienne.mes_actual;
     dias_transcurridos = items.nombre_tabla === 'domicilios' ? this.state.domicilios.dia_actual : this.state.julienne.dia_actual;
     var arr = this.state.ptc;
+    let file1 = '';
+    if(items.nombre_tabla === 'solicitud_seguro' || items.nombre_tabla === 'contratos_anexos_legalizacion'){
+      if(this.state.archivo.hasOwnProperty('uri')){
+        await Expo.FileSystem.readAsStringAsync(this.state.archivo.uri, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+          file1 = response;
+        });
+      }
+      else{
+        if(items.seguro !== '' && items.seguro !== null){
+          file1 = this.state.imgVencido;
+        }
+      }
+    }
+    //console.log(file1);
     /** Motivo de Ausencia */
     if(this.state.ausencia){
       if(items.motivo_ausencia === 'no ausentado'){
@@ -1005,6 +1033,9 @@ export default class Activity extends Component {
         relacion_faltantes: JSON.stringify(this.state.PRODUCTS), 
         consumo: JSON.stringify(this.state.servicios_publicos),
         examen: JSON.stringify(this.state.examen),
+        senalizacion: JSON.stringify(this.state.senalizacion),
+        seguro: file1,
+        contrato: file1,
         relacion_vendedores: JSON.stringify(this.state.relacion_vendedores),
         aplica_proceso_ideal_venta:this.state.aplica_proceso_ideal_venta,
         implementar_estrategia:this.state.estrategia,
@@ -2433,6 +2464,48 @@ export default class Activity extends Component {
                   :
                     null
                 }
+                {//FIXME: arreglar leer imagen enviada
+                  items.nombre_tabla === 'solicitud_seguro' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión de la solicitud de seguros PDV: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginBottom:8}]}>Foto de la solicitud</Text>
+                      <ListItem thumbnail style={{marginLeft:20, marginRight:20}}>
+                        <Left>
+                          <TouchableOpacity onPress={() => this.verImagen(true,-1)}>
+                            <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: items.seguro ? this.state.imgVencido : Imagen.noDisponible}}></Image>
+                          </TouchableOpacity>
+                        </Left>
+                        <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                        </Body>
+                      </ListItem>
+                    </View>
+                  :
+                    null
+                }
+                {//FIXME: arreglar leer imagen enviada
+                  items.nombre_tabla === 'contratos_anexos_legalizacion' ?
+                    <View>
+                      <Text style={styles.textInfo}>Revisión de contratos y anexos para legalización y trámite: </Text>
+                      <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
+                      <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
+                      <Text style={[styles.textDocumento,{marginBottom:8}]}>Foto del contrato</Text>
+                      <ListItem thumbnail style={{marginLeft:20, marginRight:20}}>
+                        <Left>
+                          <TouchableOpacity onPress={() => this.verImagen(true,-1)}>
+                            <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: items.contrato ? this.state.imgVencido : Imagen.noDisponible}}></Image>
+                          </TouchableOpacity>
+                        </Left>
+                        <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                        </Body>
+                      </ListItem>
+                    </View>
+                  :
+                    null
+                }
                 <Form>
                   {
                     this.state.motivo !== '' ?
@@ -2678,7 +2751,7 @@ export default class Activity extends Component {
                     </Form>
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>Trabajo de recuperación, Seguimiento y toma de deciciones:</Text>
                     <Form>
-                      <Textarea disabled={this.state.isVisibleActividad3 && !this.state.relacion_vendedores[this.state.selected].no_cumple_cuotas} bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad3 ? this.state.relacion_vendedores[this.state.selected].toma_de_deciciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.relacion_vendedores; data[this.state.selected].diagnostico = text; this.setState({relacion_vendedores: data})}} />
+                      <Textarea disabled={this.state.isVisibleActividad3 && !this.state.relacion_vendedores[this.state.selected].no_cumple_cuotas} bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad3 ? this.state.relacion_vendedores[this.state.selected].toma_de_deciciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.relacion_vendedores; data[this.state.selected].toma_de_deciciones = text; this.setState({relacion_vendedores: data})}} />
                     </Form>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.setState({isVisibleActividad3:false,disable:false})}}><Text> Actualizar </Text></Button>
                   </ScrollView>
@@ -2698,13 +2771,13 @@ export default class Activity extends Component {
               >
                 <View style={{justifyContent:'space-between', width:"100%"}}>
                   <ScrollView>
-                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>Tiene señalización?</Text>
+                    <Text style={[styles.textDescFoto,{marginBottom:10}]}>{this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].senalizacion} tiene señalización?</Text>
                     <RadioButton SetChecked={this.SetChecked} i={5} value={'  Si'} checked={this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].respuesta}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={1} value={'  No'} checked={this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].respuesta}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={0} value={'  N/A'} checked={this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].respuesta}></RadioButton>
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>Observaciones:</Text>
                     <Form>
-                      <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad3 ? this.state.senalizacion[this.state.selected].observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.senalizacion; data[this.state.selected].observaciones = text; this.setState({senalizacion: data})}} />
+                      <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isVisibleActividad3 ? this.state.senalizacion[this.state.selected].observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => {var data = this.state.senalizacion; data[this.state.selected].observaciones = text; this.setState({senalizacion: data})}} />
                     </Form>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.setState({isVisibleActividad3:false,disable:false})}}><Text> Actualizar </Text></Button>
                   </ScrollView>
@@ -2714,7 +2787,7 @@ export default class Activity extends Component {
               null
           }
           {
-            (items.nombre_tabla === 'documentacion_legal' || items.nombre_tabla === 'condiciones_locativas' || items.nombre_tabla === 'actividades_ptc') ?
+            (items.nombre_tabla === 'documentacion_legal' || items.nombre_tabla === 'condiciones_locativas' || items.nombre_tabla === 'actividades_ptc' || items.nombre_tabla === 'solicitud_seguro' || items.nombre_tabla === 'contratos_anexos_legalizacion') ?
               <Overlay
                 visible={this.state.isVisible2}
                 closeOnTouchOutside 

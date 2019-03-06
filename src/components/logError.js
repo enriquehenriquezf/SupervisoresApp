@@ -23,26 +23,26 @@ export const logError = {
                 tipo_usuario: 1,
             })
             }).then(function(response) {
-            //console.log(response);
-            newToken = JSON.parse(response._bodyInit);
-            var message = "message";
-            if(response.ok === true && response.status === 200)
-            {
-                //toastr.showToast(newToken[message],'success');
-            }
-            else
-            {
-                console.log(response);
-                if(response.status === 500){
-                    //toastr.showToast('Error con el servidor','danger');
+                //console.log(response);
+                newToken = JSON.parse(response._bodyInit);
+                var message = "message";
+                if(response.ok === true && response.status === 200)
+                {
+                    //toastr.showToast(newToken[message],'success');
                 }
-                else if(response.status === 401){
-                    //toastr.showToast('Su sesión expiró','danger');
+                else
+                {
+                    //console.log(response);
+                    if(response.status === 500){
+                        //toastr.showToast('Error con el servidor','danger');
+                    }
+                    else if(response.status === 401){
+                        //toastr.showToast('Su sesión expiró','danger');
+                    }
+                    else{
+                        //toastr.showToast(newToken[message],'warning');
+                    }
                 }
-                else{
-                    //toastr.showToast(newToken[message],'warning');
-                }
-            }
         }).catch(function(error){
             //toastr.showToast('Su sesión expiró','danger');
             console.log(error);
