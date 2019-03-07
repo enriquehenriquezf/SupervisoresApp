@@ -303,40 +303,6 @@ export default class Home extends Component {
             colors={[COLOR.azul]}
           />
         }>
-        {/* <List dataArray={items}
-          renderRow={(item) =>
-          item.separador === true ?
-            <View>
-              {item.first === true ?
-                  null
-                :
-                  <View style={styles.separadorSucursales}></View>
-              }
-              <ListItem button underlayColor={COLOR.azulTransparente} itemDivider style={styles.ConBorde} onPress={() => toastr.showToast(item.direccion,'info')} >
-                <Text style={styles.sucursalText}>{item.sucursal}</Text>
-              </ListItem>
-            </View>
-          :
-            <ListItem button underlayColor={COLOR.azulTransparente} onPress={() => this._OnItemPress(2,this.props.handler2, item)} style={styles.SinBorde}>
-              <Left >
-                <View style={styles.ActividadBackground}>
-                  <Text style={styles.ActividadText}>{item.name}</Text>
-                </View>
-              </Left>
-              <Right>
-              {
-                item.prioridad === 3 && <View style={[styles.prioridad,{backgroundColor:COLOR.rojo}]}><Text style={styles.ActividadText}>urgente</Text></View>
-              }
-              {                  
-                item.prioridad === 2 && <View style={[styles.prioridad,{backgroundColor:COLOR.amarillo}]}><Text style={styles.ActividadText}>media</Text></View>
-              }
-              {                  
-                item.prioridad === 1 && <View style={[styles.prioridad,{backgroundColor:COLOR.verde}]}><Text style={styles.ActividadText}>normal</Text></View>
-              }
-              </Right>
-            </ListItem>
-          }>
-        </List> */}
         <Accordion dataArray={this.state.actividades} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}} animation={false}/>
       </Content>
     );

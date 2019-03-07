@@ -54,6 +54,18 @@ export default class Reportes extends Component {
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
+
+  /**
+   * Guardar datos de la cantidad de reportes sin leer
+   */
+  _storeData = async (cant) => {
+    try {
+      await AsyncStorage.setItem('CANT_REPORTES',''+cant);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   /**
    * Obtener Estado del supervisor
    */
@@ -158,6 +170,8 @@ export default class Reportes extends Component {
             //console.log(reportes);
           }
         })
+        var cant = logs.filter((element,index) => element.leido === 0).length;
+        that._storeData(cant);
       }
       else
       {

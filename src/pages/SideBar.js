@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, View, TouchableOpacity, Dimensions, AsyncStorage } from "react-native";
-import { Text, Container, Content, Icon} from "native-base";
+import { Text, Container, Content, Badge} from "native-base";
 import styles from '../styles/SideBar';
 import IconStyles from '../styles/Icons';
 import { Imagen } from "../components/Imagenes";
@@ -11,7 +11,8 @@ export default class SideBar extends React.Component {
         this.state = {
             estado: true,
             porcentaje:0,
-            porcentajes:{}
+            porcentajes:{},
+            cant_reportes:'0'
         };
         let token = this.props.token;
         this._retrieveData();
@@ -23,16 +24,18 @@ export default class SideBar extends React.Component {
    */
   _retrieveData = async () => {
     try {
-      const value = await AsyncStorage.multiGet(['ESTADO','PORCENTAJE','PORCENTAJES']);
+      const value = await AsyncStorage.multiGet(['ESTADO','PORCENTAJE','PORCENTAJES','CANT_REPORTES']);
       if (value !== null) {
         var state;
         var porcentaje = 0;
         var porcentajes = {};
+        var cant = '0';
         if(value[0][1] === 'true'){state=true}else{state=false}
         if(value[1][1] !== null){porcentaje = value[1][1]}
         if(value[2][1] !== null){porcentajes = JSON.parse(value[2][1])}
+        if(value[3][1] !== null){cant = value[3][1]}
         //console.log(value[1][1]);
-        this.setState({estado : state, porcentaje: porcentaje, porcentajes:porcentajes});
+        this.setState({estado : state, porcentaje: porcentaje, porcentajes:porcentajes,cant_reportes:cant});
       }
     } catch (error) {
       console.log(error);
@@ -157,6 +160,9 @@ export default class SideBar extends React.Component {
                         <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 8 ? this.props.closeDrawer() : this.props.handler2(8,token,[])}}>
                             <Text style={[styles.text,{fontSize:40,marginLeft:30}]}>Reportes</Text>
                             <Image source={Imagen.reportes} style={{width:"25%",height:"75%",marginRight:30}}></Image>
+                            {this.state.cant_reportes !== '0' && <Badge style={{position:'absolute', left:"95%"}}>
+                                <Text>{this.state.cant_reportes}</Text>
+                            </Badge>}
                         </TouchableOpacity>
                     </View>
                 </View>
