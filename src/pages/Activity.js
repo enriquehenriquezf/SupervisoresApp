@@ -133,10 +133,16 @@ export default class Activity extends Component {
     this.Descripcion();
     if(items.nombre_tabla === 'documentacion_legal'){this.ListarDocumentacion();}
     else if(items.nombre_tabla === 'condiciones_locativas'){this.ListarCondiciones();}
-    this.ListarSenalizacion();
+    else if(items.nombre_tabla === 'senalizacion'){this.ListarSenalizacion();}
+    if((items.seguro === null || items.seguro === undefined) && (items.contrato === null || items.contrato === undefined)){
+      imgTemp1 = Imagen.noDisponible;
+    }
+    else{
+      items.seguro ? imgTemp1 = api.ipImg + items.seguro : imgTemp1 = api.ipImg + items.contrato;
+    }
     //this._retrieveDataInit();
     this._retrieveData();
-    this.setState({loading: false});
+    this.setState({loading: false, imgVencido:imgTemp1});
     //this._retrieveDataAusente();
   }
 
@@ -772,15 +778,10 @@ export default class Activity extends Component {
     items.nombre_tabla === 'julienne' ? (julienne.mes_anterior =items.venta_mes_anterior?items.venta_mes_anterior:'0', julienne.venta_proyeccion = items.proyeccion_mes_actual?items.proyeccion_mes_actual:'0', julienne.mes_actual = items.mes_actual?items.mes_actual:'0', julienne.dia_actual = items.dias_transcurridos?items.dias_transcurridos:'1') : null
     items.relacion_faltantes ? array = JSON.parse(items.relacion_faltantes) : items.relacion_faltantes = []
     var servicios_publicos = items.nombre_tabla === 'relacion_servicios_publicos' ? ((items.consumo !== '' && items.consumo !== null) ? JSON.parse(items.consumo) : {agua:{mes_actual:'',mes_pasado:''},luz:{mes_actual:'',mes_pasado:''},telefono:{mes_actual:'',mes_pasado:''},internet:{mes_actual:'',mes_pasado:''}}) : ''
-    if(items.seguro === null && items.contrato === null){
-      imgTemp1 = noDisponible;
-    }
-    else{
-      imgTemp1 = api.ipImg + items.seguro ? items.seguro : items.contrato;
-    }
+    
 
-    //Actualizar State #FF0000    
-    this.setState({observacion: items.observacion, imgVencido:imgTemp1, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,compromiso:items.compromiso?items.compromiso:'',fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
+    //Actualizar State #FF0000
+    this.setState({observacion: items.observacion, numero_consecutivo: items.numero_consecutivo, ano_actual: items.ano_actual, ano_anterior: items.ano_anterior,base:items.base,gastos:items.gastos,diferencia:items.diferencia,sobrante:items.sobrante,faltante:items.faltante,horario:horario, domicilios:domicilios,remisiones:remisiones,mercadeo:mercadeo,correspondencia:items.correspondencia, bodega:bodega,mercancia:mercancia,servicios_publicos:servicios_publicos,acciones_tomadas:items.acciones_tomadas, estrategia: items.implementar_estrategia,compromiso:items.compromiso?items.compromiso:'',fecha_resolucion: items.fecha_resolucion,facturas_autorizadas: items.numero_facturas_autorizadas,fecha_ultima_factura: items.fecha_ultima_factura,numero_ultima_factura: items.numero_ultima_factura, PRODUCTS: array,LABORATORIES: array2, productos2: array3, PRODUCTS2: array2, ptc: items.nombre_tabla === 'actividades_ptc' ? JSON.parse(items.data) : []});
     
     /**
      * Obtener la geoposicion del dispositivo y verificar que se encuentre dentro del rango de la sucursal.
@@ -2464,7 +2465,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//FIXME: arreglar leer imagen enviada
+                {
                   items.nombre_tabla === 'solicitud_seguro' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión de la solicitud de seguros PDV: </Text>
@@ -2485,7 +2486,7 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//FIXME: arreglar leer imagen enviada
+                {
                   items.nombre_tabla === 'contratos_anexos_legalizacion' ?
                     <View>
                       <Text style={styles.textInfo}>Revisión de contratos y anexos para legalización y trámite: </Text>
