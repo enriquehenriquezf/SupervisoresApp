@@ -133,7 +133,7 @@ export default class Home extends Component {
           if(element.leido === 0){
             //console.log(element);
             Expo.Notifications.dismissAllNotificationsAsync();
-            Expo.Notifications.presentLocalNotificationAsync({title:'Nuevo mensaje en el reporte:',body:element.nombre_plan,ios:{sound:true}}).then(function(response){
+            Expo.Notifications.presentLocalNotificationAsync({title:'Nuevo mensaje en el reporte:',body:element.nombre_plan,ios:{sound:true},android:{icon:api.ipIcons + 'icono192.png'}}).then(function(response){
               //console.log(response)
             })
           }
