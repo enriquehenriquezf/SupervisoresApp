@@ -721,7 +721,7 @@ export default class Activity extends Component {
 
   async componentDidMount()
   {
-    //console.log(items);
+    console.log(items);
     /** Agregar el metodo handleBackPress al evento de presionar el boton "Back" de android */
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
 
@@ -1137,7 +1137,7 @@ export default class Activity extends Component {
 
     var porcentajes = this.state.porcentajes;
     var general = ((porcentajes.porcentaje_general.actividades_completas) / porcentajes.porcentaje_general.todas_las_actividades) * 100;
-    if(items.estado === 'activo' || items.estado ==='Activo'){
+    if(items.estado === 1){
       porcentajes.porcentaje_general.actividades_completas = porcentajes.porcentaje_general.actividades_completas+1;
       general = ((porcentajes.porcentaje_general.actividades_completas) / porcentajes.porcentaje_general.todas_las_actividades) * 100;
     }

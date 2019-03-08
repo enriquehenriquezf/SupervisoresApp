@@ -70,7 +70,7 @@ export default class Home extends Component {
               cod_sucursal: element.cod_sucursal,
               id_sucursal: element.id_sucursal,
               prioridad: element.id_prioridad,
-              estado: element.estado,
+              estado: element.id_estado,
               id_plan_trabajo: element.id_plan_trabajo,
               calificacion_pv: element.calificacion_pv,
               observacion: element.observacion,

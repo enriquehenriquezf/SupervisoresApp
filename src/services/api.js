@@ -39,4 +39,5 @@ export const api = {
  ipLogErrors: baseUrl + "/supervisores_api/public/api/logErrors",
  ipEmpleadosSucursal: baseUrl + "/supervisores_api/public/api/empleadosSucursal", 
  ipSenalizacion: baseUrl + "/supervisores_api/public/api/senalizacion", 
+ ipOcultarReporte: baseUrl + "/supervisores_api/public/api/ocultarReporte", 
 }

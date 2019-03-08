@@ -176,7 +176,7 @@ export default class SideBar extends React.Component {
                     </View>
 
                     <View style={[styles.cuadrado,styles.cerrarSesion]}>
-                        <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => this.props.handler2(-1,token,[])}>
+                        <TouchableOpacity style={{flex:1,justifyContent:'center', alignItems:'center'}} onPress={() => {clearTimeout(localNotification); this.props.handler2(-1,token,[])}}>
                             <Text style={[styles.text,{fontSize:16}]}>Cerrar Sesion</Text>
                             <Image source={Imagen.cerrarSesion} style={{width:"45%",height:"55%"}}></Image>
                         </TouchableOpacity>

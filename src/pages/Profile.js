@@ -12,12 +12,6 @@ import { COLOR } from '../components/Colores';
 import Overlay from 'react-native-modal-overlay';
 import { logError } from '../components/logError';
 
-/*var BUTTONS = [
-  { text: "Activo", icon: "checkmark-circle", iconColor: "#5cb85c" },
-  { text: "Inactivo", icon: "remove-circle", iconColor: "#d9534f" },
-  { text: "Cerrar", icon: "close-circle", iconColor: "#fa213b" }
-];
-var CANCEL_INDEX = 2;*/
 let items = null;
 export default class Profile extends Component {
   constructor(props) {
@@ -163,72 +157,6 @@ export default class Profile extends Component {
   }
 
   /**
-   * Guardar estado del supervisor (Activo/Inactivo)
-   */
-  /*_storeData = async (estado2) => {
-    try {
-      var state = '';
-      this.setState({estado: estado2});
-      var time =  new Date().getTime().toString();
-      if(estado2){
-        state = 'true';
-        await AsyncStorage.multiSet([['ESTADO', state],['TIME_INACTIVO',time]]);
-      }else{
-        state='false';
-        await AsyncStorage.multiSet([['ESTADO', state],['TIME_INACTIVO_INIT',time]]);
-        await AsyncStorage.removeItem('TIME_INACTIVO');
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }*/
-
-  /**
-   * Obtener Estado del supervisor
-   */
-  /*_retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.multiGet(['ESTADO','TIME_INACTIVO','TIME_INACTIVO_INIT']);
-      var state;
-      if (value !== null) {
-        if(value[0][1] === 'true'){state=true}
-        else{state=false}
-        this.setState({estado: state});
-        //console.log('TIME_INACTIVO: ' + value[1][1]);
-        //console.log('TIME_INACTIVO_INIT: ' + value[2][1]);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  /**
-   * Cambia el estado de Activo o Inactivo
-   */
-  /*CambiarEstado(){
-    ActionSheet.show(
-      {
-        options: BUTTONS,
-        cancelButtonIndex: CANCEL_INDEX,
-        title: "Estado"
-      },
-      buttonIndex => {
-        var state;
-        if(buttonIndex !== 2){
-          if(buttonIndex === 0){
-            state = true;
-          }
-          else if(buttonIndex === 1){state = false;}
-          //this.setState({ estado: state });
-          if(this.state.estado !== state){
-            this._storeData(state);
-          }   
-        }
-      }
-    );
-  }*/
-
-  /**
    * cerrar SideBar
    */
   closeDrawer(){
@@ -257,35 +185,13 @@ export default class Profile extends Component {
           <Header hasTabs style={IconStyles.navbar}>
             <Left>
               <Button transparent onPress={() => this.drawer._root.open()}>
-                {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
                 <Image style={IconStyles.menu2} source={Imagen.home}></Image>
               </Button>
-              {/*<Button transparent style={IconStyles.back} onPress={() => this.props.handler2(1,token,[])}>
-                <Icon ios="ios-arrow-back" android="md-arrow-back" style={IconStyles.header}></Icon>
-              </Button>*/}
             </Left>       
             <Body>
               {/*<Title>Perfil</Title>*/}
             </Body>
             <Right>
-              {/*
-                this.state.estado === true ?
-                  <TouchableHighlight onPress={() => this.CambiarEstado()}>
-                    <View style={IconStyles.estado}>
-                      <Icon active ios='ios-checkmark-circle' android='md-checkmark-circle' style={IconStyles.activo}/>
-                      <Title style={IconStyles.StateTitle}>Activo</Title>
-                      <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
-                    </View>
-                  </TouchableHighlight>
-                :
-                  <TouchableHighlight onPress={() => this.CambiarEstado()}>
-                    <View style={IconStyles.estado}>
-                      <Icon active ios='ios-remove-circle' android='md-remove-circle' style={IconStyles.inactivo}/>
-                      <Title style={IconStyles.StateTitle}>Inactivo</Title>
-                      <Icon active ios='ios-arrow-dropdown' android='md-arrow-dropdown' style={IconStyles.dropdown}/>
-                    </View>
-                  </TouchableHighlight>
-              */}
             </Right>
           </Header>
             <Content>

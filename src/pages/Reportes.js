@@ -254,8 +254,8 @@ export default class Reportes extends Component {
         var newToken = JSON.parse(response._bodyInit);
         var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
         var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
-        logError.sendError(header,body,auth);
         if(response.status === 500){
+          logError.sendError(header,body,auth);
           toastr.showToast('Error con el servidor','danger');
         }
         else if(response.status === 401){
@@ -323,7 +323,7 @@ export default class Reportes extends Component {
         var newToken = JSON.parse(response._bodyInit);
         var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
         var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
-        logError.sendError(header,body,auth);
+        if(response.status === 500){logError.sendError(header,body,auth);}
         toastr.showToast(token2["message"],'warning'); 
         that.setState({loading2:false,isVisibleReporte:false,isLoadReporte:false,disable:false});
         console.log(response);
@@ -377,7 +377,48 @@ export default class Reportes extends Component {
         var newToken = JSON.parse(response._bodyInit);
         var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
         var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
-        logError.sendError(header,body,auth);
+        if(response.status === 500){logError.sendError(header,body,auth);}
+        toastr.showToast(token2["message"],'warning'); 
+        console.log(response);
+      }
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+
+  }
+
+  /**
+   * Ocultar el reporte finalizado
+   * @param data datos del reporte seleccionado
+   */
+  async OcultarReporte(data){
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    let that = this;
+    await fetch(api.ipOcultarReporte, {
+      method: 'POST',
+      headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },      
+      body: JSON.stringify({
+        id_reporte: data.id_reporte
+      })
+    }).then(function(response) {
+      console.log(response);
+      var token2 = JSON.parse(response._bodyInit);
+      if(response.ok === true)
+      {
+        that.getReportes();        
+        toastr.showToast(token2,'success');
+      }
+      else{
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        if(response.status === 500){logError.sendError(header,body,auth);}
         toastr.showToast(token2["message"],'warning'); 
         console.log(response);
       }
@@ -419,7 +460,7 @@ export default class Reportes extends Component {
         var newToken = JSON.parse(response._bodyInit);
         var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
         var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
-        logError.sendError(header,body,auth);
+        if(response.status === 500){logError.sendError(header,body,auth);}
         toastr.showToast(token2["message"],'warning'); 
         that.setState({loading2:false,isVisibleDetalleReporte:false,isLoadReporte:false,disable:false});
         console.log(response);
@@ -643,7 +684,9 @@ export default class Reportes extends Component {
                               data.estado_corregido !== 1 && 
                               <View style={{flexDirection:'row'}}>
                                 <View style={[styles.estado,{backgroundColor:'transparent', borderColor:COLOR.rojo, borderWidth:1,marginRight:10}]}>
-                                  <Image style={styles.iconoBoton} source={Imagen.equis}></Image>
+                                  <TouchableOpacity style={{width:"100%", height: "100%", justifyContent:'center',alignItems:'center'}} onPress={() => this.OcultarReporte(data)}>
+                                    <Image style={styles.iconoBoton} source={Imagen.equis}></Image>
+                                  </TouchableOpacity>
                                 </View>
                                 <View style={[styles.estado,{backgroundColor:COLOR.verde}]}>
                                   <Image style={styles.iconoBoton} source={Imagen.check}></Image>

@@ -25,7 +25,19 @@ export default class Home extends Component {
     this._retrieveData = this._retrieveData.bind(this);
     this.closeDrawer = this.closeDrawer.bind(this);
     this._retrieveData();
+    this.LogReportes();
     console.ignoredYellowBox = ['Require cycle:'];
+  }
+
+  /**
+   * Guardar datos de la cantidad de reportes sin leer
+   */
+  _storeData = async (cant) => {
+    try {
+      await AsyncStorage.setItem('CANT_REPORTES',''+cant);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   /**
@@ -95,6 +107,66 @@ export default class Home extends Component {
       this.setState({ loading: false });
     }
     else{this.props.handler2(-1,token,[]);}
+  }
+
+  async LogReportes(){
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    var logs = [];
+    var that = this;
+    await fetch(api.ipLogNotificacionesUsuario, {
+      method: 'GET',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
+      },
+      body: ''
+    }).then(function(response) {
+      //console.log(response);
+      newToken = JSON.parse(response._bodyInit);
+      //console.log(newToken["message"]);
+      if(response.ok === true && response.status === 200)
+      {
+        logs = newToken["message"];
+        logs.forEach(element => {
+          if(element.leido === 0){
+            //console.log(element);
+            Expo.Notifications.dismissAllNotificationsAsync();
+            Expo.Notifications.presentLocalNotificationAsync({title:'Nuevo mensaje en el reporte:',body:element.nombre_plan,ios:{sound:true}}).then(function(response){
+              //console.log(response)
+            })
+          }
+        })
+        var cant = logs.filter((element,index) => element.leido === 0).length;
+        that._storeData(cant);
+      }
+      else
+      {
+        console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        if(response.status === 500){
+          logError.sendError(header,body,auth);
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          // toastr.showToast('Su sesión expiró','danger');
+        }
+        else{
+          //toastr.showToast(newToken[actividades],'warning');
+        }
+      }
+      //return response.json();
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+
+    localNotification = setTimeout(function () {
+      that.LogReportes();
+    }, 60000);
   }
 
   /**

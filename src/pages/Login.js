@@ -198,8 +198,8 @@ export default class Login extends Component {
           var newToken = JSON.parse(response._bodyInit);
           var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
           var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
-          logError.sendError(header,body,auth);
           if(response.status === 500){
+            logError.sendError(header,body,auth);
             toastr.showToast('Error con el servidor','danger');
           }
           else if(401){
