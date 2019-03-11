@@ -796,8 +796,9 @@ export default class Activity extends Component {
         //console.log(position);
         lat = position.coords.latitude;
         long = position.coords.longitude;
-        if(position.coords.accuracy > 10 && position.mocked === false)// verificar que no tenga un fake gps
-        {  if((lat >= items.latitud-RANGO && lat <= items.latitud+RANGO) && (long >= items.longitud-RANGO && long <= items.longitud+RANGO))
+        if(position.mocked === false)// verificar que no tenga un fake gps
+        {
+          if((lat >= items.latitud-RANGO && lat <= items.latitud+RANGO) && (long >= items.longitud-RANGO && long <= items.longitud+RANGO))
           {
             toastr.showToast('Se encuentra dentro de ' + items.sucursal,'info');
           }
@@ -805,6 +806,9 @@ export default class Activity extends Component {
           {
             toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
             this.handleBackPress();
+          }  
+          if(position.coords.accuracy < 2){
+            toastr.showToast('Precisión del GPS muy baja','warning');            
           }
         }
         else{
@@ -949,6 +953,7 @@ export default class Activity extends Component {
     var mes_actual;
     var dias_transcurridos;
     diferencia = items.nombre_tabla === 'evolucion_clientes' ?(this.state.ano_actual - this.state.ano_anterior) : this.state.diferencia;
+    items.nombre_tabla === 'servicio_bodega' ? diferencia = this.state.bodega.diferencia : null
     mes_actual = items.nombre_tabla === 'domicilios' ? this.state.domicilios.mes_actual : this.state.julienne.mes_actual;
     dias_transcurridos = items.nombre_tabla === 'domicilios' ? this.state.domicilios.dia_actual : this.state.julienne.dia_actual;
     var arr = this.state.ptc;
@@ -1015,7 +1020,6 @@ export default class Activity extends Component {
         correspondencia:this.state.correspondencia,
         valor_pedido:this.state.bodega.valor_pedido,
         valor_despacho:this.state.bodega.valor_despacho,
-        diferencia:this.state.bodega.diferencia,
         nivel_servicio:this.state.bodega.nivel_servicio,
         revisa_pedidos_antes_enviarlos:this.state.bodega.revisa_pedidos_antes_enviarlos,
         utiliza_libreta_faltantes:this.state.bodega.utiliza_libreta_faltantes,
@@ -1470,6 +1474,14 @@ export default class Activity extends Component {
   }
 
   /**
+   * Formato de moneda
+   */
+  NumberFormat(value){
+    //console.log(value.split("").reverse().reduce(function(AntValue,CurrentValue,CurrentIndex,array){return  CurrentValue + (CurrentIndex && !(CurrentIndex % 3) ? "." : "") + AntValue}, ""));
+    return value.split("").reverse().reduce(function(AntValue,CurrentValue,CurrentIndex,array){return  CurrentValue + (CurrentIndex && !(CurrentIndex % 3) ? "." : "") + AntValue}, "")
+  }
+
+  /**
    * Cerrar el teclado despues de x tiempo
    * @param x tiempo de espera para cerrar el teclado
    */
@@ -1845,13 +1857,13 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Base: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Base" defaultValue={this.state.base} onChangeText={text => {var value = (text-this.state.gastos-this.state.diferencia); this.setState({base: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Base" defaultValue={this.NumberFormat(this.state.base)} onChangeText={text => {var txt = text.replace(/[.]/g,''); var value = (txt-this.state.gastos-this.state.diferencia); this.setState({base: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Gastos: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Gastos" defaultValue={this.state.gastos} onChangeText={text => {var value = (this.state.base-text-this.state.diferencia); this.setState({gastos: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Gastos" defaultValue={this.NumberFormat(this.state.gastos)} onChangeText={text => {var txt = text.replace(/[.]/g,''); var value = (this.state.base-txt-this.state.diferencia); this.setState({gastos: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Saldo en efectivo: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Saldo en efectivo" defaultValue={this.state.diferencia} onChangeText={text => {var value = (this.state.base-this.state.gastos-text); this.setState({diferencia: text, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Sobrante: {this.state.sobrante}</Text>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Faltante: {this.state.faltante}</Text>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Saldo en efectivo" defaultValue={this.NumberFormat(this.state.diferencia)} onChangeText={text => {var txt = text.replace(/[.]/g,''); var value = (this.state.base-this.state.gastos-txt); this.setState({diferencia: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Sobrante: {this.NumberFormat(''+this.state.sobrante)}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Faltante: {this.NumberFormat(''+this.state.faltante)}</Text>
                     </View>
                   :
                     null
@@ -1873,9 +1885,9 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()-1}: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_anterior} onChangeText={text => this.setState({ano_anterior: text})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.NumberFormat('' + this.state.ano_anterior)} onChangeText={text => this.setState({ano_anterior: text.replace(/[.]/g,'')})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()}: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.state.ano_actual} onChangeText={text => this.setState({ano_actual: text})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.NumberFormat('' + this.state.ano_actual)} onChangeText={text => this.setState({ano_actual: text.replace(/[.]/g,'')})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Estrategias a implementar para aumentar clientes: </Text>
                       <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Estrategias" defaultValue={this.state.estrategia} onChangeText={text => this.setState({estrategia: text})}></Input>
                     </View>
@@ -1943,19 +1955,19 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {
+                {//FIXME: modificar cuando está en null
                   items.nombre_tabla === 'servicio_bodega' ?
                     <View>
                       <Text style={styles.textInfo}>Se consulto y transfirio de otros PDV los FALTANTES relacionados en la libreta? </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Si       '} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'No       '} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Pedido: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.bodega.valor_pedido} onChangeText={text => {var data = this.state.bodega; data.valor_pedido = text; data.diferencia = text-data.valor_despacho; this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.bodega.valor_pedido)} onChangeText={text => {var data = this.state.bodega; data.valor_pedido = text.replace(/[.]/g,''); data.diferencia = text.replace(/[.]/g,'')-data.valor_despacho; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Despacho: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.bodega.valor_despacho} onChangeText={text => {var data = this.state.bodega; data.valor_despacho = text; data.diferencia = data.valor_pedido-text; this.setState({bodega:data })} }></Input>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Diferencia: {this.state.bodega.diferencia}</Text>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.bodega.valor_despacho)} onChangeText={text => {var data = this.state.bodega; data.valor_despacho = text.replace(/[.]/g,''); data.diferencia = data.valor_pedido-text.replace(/[.]/g,''); this.setState({bodega:data })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Diferencia: {this.NumberFormat(this.state.bodega.diferencia)}</Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Nivel Servicio: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.bodega.nivel_servicio} onChangeText={text => {var data = this.state.bodega; data.nivel_servicio = text; this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.bodega.nivel_servicio)} onChangeText={text => {var data = this.state.bodega; data.nivel_servicio = text.replace(/[.]/g,''); this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>El adm. del PDV Revisa los pedidos antes de enviarlo: </Text>
                       <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.bodega.revisa_pedidos_antes_enviarlos} onChangeText={text => {var data = this.state.bodega; data.revisa_pedidos_antes_enviarlos = text; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Utiliza libreta de FALTANTES: </Text>

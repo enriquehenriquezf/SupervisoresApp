@@ -106,7 +106,6 @@ export default class Home extends Component {
               correspondencia:element.correspondencia,
               valor_pedido:element.valor_pedido,
               valor_despacho:element.valor_despacho,
-              diferencia:element.diferencia,
               nivel_servicio:element.nivel_servicio,
               revisa_pedidos_antes_enviarlos:element.revisa_pedidos_antes_enviarlos,
               utiliza_libreta_faltantes:element.utiliza_libreta_faltantes,
