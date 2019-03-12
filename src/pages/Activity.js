@@ -1478,7 +1478,16 @@ export default class Activity extends Component {
    */
   NumberFormat(value){
     //console.log(value.split("").reverse().reduce(function(AntValue,CurrentValue,CurrentIndex,array){return  CurrentValue + (CurrentIndex && !(CurrentIndex % 3) ? "." : "") + AntValue}, ""));
-    return value.split("").reverse().reduce(function(AntValue,CurrentValue,CurrentIndex,array){return  CurrentValue + (CurrentIndex && !(CurrentIndex % 3) ? "." : "") + AntValue}, "")
+    if(value !== null){
+      var val = ''+value;
+      if(val.length > 0){
+        return val.split("").reverse().reduce(function(AntValue,CurrentValue,CurrentIndex,array){return  CurrentValue + (CurrentIndex && !(CurrentIndex % 3) ? "." : "") + AntValue}, "")
+      }
+      else{
+        return val
+      }
+    }
+    else{return ''}
   }
 
   /**
@@ -1857,13 +1866,13 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Base: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Base" defaultValue={this.NumberFormat(this.state.base)} onChangeText={text => {var txt = text.replace(/[.]/g,''); var value = (txt-this.state.gastos-this.state.diferencia); this.setState({base: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Base" defaultValue={this.NumberFormat(this.state.base)} onChangeText={text => {var txt = text.replace(/[.-]/g,''); var value = (txt-this.state.gastos-this.state.diferencia); this.setState({base: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Gastos: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Gastos" defaultValue={this.NumberFormat(this.state.gastos)} onChangeText={text => {var txt = text.replace(/[.]/g,''); var value = (this.state.base-txt-this.state.diferencia); this.setState({gastos: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Gastos" defaultValue={this.NumberFormat(this.state.gastos)} onChangeText={text => {var txt = text.replace(/[.-]/g,''); var value = (this.state.base-txt-this.state.diferencia); this.setState({gastos: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Saldo en efectivo: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Saldo en efectivo" defaultValue={this.NumberFormat(this.state.diferencia)} onChangeText={text => {var txt = text.replace(/[.]/g,''); var value = (this.state.base-this.state.gastos-txt); this.setState({diferencia: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Sobrante: {this.NumberFormat(''+this.state.sobrante)}</Text>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Faltante: {this.NumberFormat(''+this.state.faltante)}</Text>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Saldo en efectivo" defaultValue={this.NumberFormat(this.state.diferencia)} onChangeText={text => {var txt = text.replace(/[.-]/g,''); var value = (this.state.base-this.state.gastos-txt); this.setState({diferencia: txt, sobrante: value > 0 ? 0 : Math.abs(value), faltante: value > 0 ? value : 0 })} }></Input>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Sobrante: {this.NumberFormat(this.state.sobrante)}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Faltante: {this.NumberFormat(this.state.faltante)}</Text>
                     </View>
                   :
                     null
@@ -1885,9 +1894,9 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()-1}: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.NumberFormat('' + this.state.ano_anterior)} onChangeText={text => this.setState({ano_anterior: text.replace(/[.]/g,'')})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.NumberFormat(this.state.ano_anterior)} onChangeText={text => this.setState({ano_anterior: text.replace(/[.-]/g,'')})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Año {new Date().getFullYear()}: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.NumberFormat('' + this.state.ano_actual)} onChangeText={text => this.setState({ano_actual: text.replace(/[.]/g,'')})}></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Cantidad de Clientes" defaultValue={this.NumberFormat(this.state.ano_actual)} onChangeText={text => this.setState({ano_actual: text.replace(/[.-]/g,'')})}></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Estrategias a implementar para aumentar clientes: </Text>
                       <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Estrategias" defaultValue={this.state.estrategia} onChangeText={text => this.setState({estrategia: text})}></Input>
                     </View>
@@ -1955,19 +1964,19 @@ export default class Activity extends Component {
                   :
                     null
                 }
-                {//FIXME: modificar cuando está en null
+                {
                   items.nombre_tabla === 'servicio_bodega' ?
                     <View>
                       <Text style={styles.textInfo}>Se consulto y transfirio de otros PDV los FALTANTES relacionados en la libreta? </Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Si       '} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'No       '} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Pedido: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.bodega.valor_pedido)} onChangeText={text => {var data = this.state.bodega; data.valor_pedido = text.replace(/[.]/g,''); data.diferencia = text.replace(/[.]/g,'')-data.valor_despacho; this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.bodega.valor_pedido)} onChangeText={text => {var data = this.state.bodega; data.valor_pedido = text.replace(/[.-]/g,''); data.diferencia = text.replace(/[.]/g,'')-data.valor_despacho; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Despacho: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.bodega.valor_despacho)} onChangeText={text => {var data = this.state.bodega; data.valor_despacho = text.replace(/[.]/g,''); data.diferencia = data.valor_pedido-text.replace(/[.]/g,''); this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.bodega.valor_despacho)} onChangeText={text => {var data = this.state.bodega; data.valor_despacho = text.replace(/[.-]/g,''); data.diferencia = data.valor_pedido-text.replace(/[.-]/g,''); this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Diferencia: {this.NumberFormat(this.state.bodega.diferencia)}</Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Nivel Servicio: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.bodega.nivel_servicio)} onChangeText={text => {var data = this.state.bodega; data.nivel_servicio = text.replace(/[.]/g,''); this.setState({bodega:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.bodega.nivel_servicio)} onChangeText={text => {var data = this.state.bodega; data.nivel_servicio = text.replace(/[.-]/g,''); this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>El adm. del PDV Revisa los pedidos antes de enviarlo: </Text>
                       <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.bodega.revisa_pedidos_antes_enviarlos} onChangeText={text => {var data = this.state.bodega; data.revisa_pedidos_antes_enviarlos = text; this.setState({bodega:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Utiliza libreta de FALTANTES: </Text>
@@ -2018,7 +2027,7 @@ export default class Activity extends Component {
                               <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
                                 <DatePicker
                                   defaultDate={new Date(item.fecha_vencimiento)}
-                                  minimumDate={new Date(2019, 0, 1)}
+                                  minimumDate={new Date(2017, 0, 1)}
                                   locale={"es"}
                                   timeZoneOffsetInMinutes={undefined}
                                   modalTransparent={false}
@@ -2048,7 +2057,7 @@ export default class Activity extends Component {
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha Resolución: </Text>
                       <DatePicker
                           defaultDate={items.fecha_resolucion !== null? new Date(items.fecha_resolucion) : this.state.fecha_resolucion}
-                          minimumDate={new Date(2019, 0, 1)}
+                          minimumDate={new Date(2017, 0, 1)}
                           locale={"es"}
                           timeZoneOffsetInMinutes={undefined}
                           modalTransparent={false}
@@ -2065,7 +2074,7 @@ export default class Activity extends Component {
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha de la última factura: </Text>
                       <DatePicker
                           defaultDate={items.fecha_ultima_factura !== null? new Date(items.fecha_ultima_factura) : this.state.fecha_ultima_factura}
-                          minimumDate={new Date(2019, 0, 1)}
+                          minimumDate={new Date(2017, 0, 1)}
                           locale={"es"}
                           timeZoneOffsetInMinutes={undefined}
                           modalTransparent={false}
@@ -2090,16 +2099,16 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes anterior: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.domicilios.mes_anterior} onChangeText={text => {var dom = this.state.domicilios; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.NumberFormat(this.state.domicilios.mes_anterior)} onChangeText={text => {var dom = this.state.domicilios; dom.mes_anterior = text.replace(/[.-]/g,''); var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes actual: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={this.state.domicilios.mes_actual} onChangeText={text => {var dom = this.state.domicilios; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={this.NumberFormat(this.state.domicilios.mes_actual)} onChangeText={text => {var dom = this.state.domicilios; dom.mes_actual = text.replace(/[.-]/g,''); var value = Math.floor(text.replace(/[.-]/g,'')/dom.dia_actual*(30-dom.dia_actual)+parseInt(text.replace(/[.-]/g,''))); dom.venta_proyeccion = value; var prom = (dom.mes_actual/dom.num_mensajeros); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Días transcurridos: </Text>
                       <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Día actual" defaultValue={this.state.domicilios.dia_actual} onChangeText={text => {var dom = this.state.domicilios; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({domicilios:dom })} }></Input>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Venta Domicilios Proyección: {this.state.domicilios.venta_proyeccion}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Venta Domicilios Proyección: {this.NumberFormat(this.state.domicilios.venta_proyeccion)}</Text>
                       
                       <Text style={[styles.textDocumento,{marginLeft:20}]}># mensajeros de planta: </Text>
                       <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.domicilios.num_mensajeros} onChangeText={text => {var dom = this.state.domicilios; dom.num_mensajeros = text; var value = (dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; var prom = (dom.mes_actual/text); dom.prom_domicilio_mensajero = prom; this.setState({domicilios:dom })} }></Input>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Promedio Domicilio/Mensajero: {this.state.domicilios.prom_domicilio_mensajero}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Promedio Domicilio/Mensajero: {this.NumberFormat(this.state.domicilios.prom_domicilio_mensajero)}</Text>
                     </View>
                   :
                     null
@@ -2125,13 +2134,13 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor Actual: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_actual} onChangeText={text => {var data = this.state.mercancia; data.valor_actual = text; this.setState({mercancia:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.mercancia.valor_actual)} onChangeText={text => {var data = this.state.mercancia; data.valor_actual = text.replace(/[.-]/g,''); this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Días Inventario: </Text>
                       <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.mercancia.dias_inventario} onChangeText={text => {var data = this.state.mercancia; data.dias_inventario = text; this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Inventario Optimo: </Text>
                       <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.mercancia.inv_optimo} onChangeText={text => {var data = this.state.mercancia; data.inv_optimo = text; this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Valor dev. Cierre de Mes: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.mercancia.valor_dev_cierre_mes} onChangeText={text => {var data = this.state.mercancia; data.valor_dev_cierre_mes = text; this.setState({mercancia:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.mercancia.valor_dev_cierre_mes)} onChangeText={text => {var data = this.state.mercancia; data.valor_dev_cierre_mes = text.replace(/[.-]/g,''); this.setState({mercancia:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Dev. vencimiento M. estado: </Text>
                       <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.mercancia.dev_vencimiento_m_estado} onChangeText={text => {var data = this.state.mercancia; data.dev_vencimiento_m_estado = text; this.setState({mercancia:data })} }></Input>
                     </View>
@@ -2199,7 +2208,7 @@ export default class Activity extends Component {
                         }>
                       </List>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Acciones tomadas: </Text>
-                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.acciones_tomadas} onChangeText={text => {this.setState({acciones_tomadas:text })} }></Input>
+                      <Input style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Respuesta" defaultValue={''+this.state.acciones_tomadas?this.state.acciones_tomadas:''} onChangeText={text => {this.setState({acciones_tomadas:text })} }></Input>
                     </View>
                   :
                     null
@@ -2233,12 +2242,12 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Completo'} checked={this.state.checked}></RadioButton>
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes anterior: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.julienne.mes_anterior} onChangeText={text => {var dom = this.state.julienne; dom.mes_anterior = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.julienne.mes_anterior)} onChangeText={text => {var dom = this.state.julienne; dom.mes_anterior = text.replace(/[.-]/g,''); var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-dom.dia_actual)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Ventas Mes actual: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.julienne.mes_actual} onChangeText={text => {console.log(this.state.julienne); var dom = this.state.julienne; dom.mes_actual = text; var value = Math.floor(text/dom.dia_actual*(30-dom.dia_actual)+parseInt(text)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.julienne.mes_actual)} onChangeText={text => {console.log(this.state.julienne); var dom = this.state.julienne; dom.mes_actual = text.replace(/[.-]/g,''); var value = Math.floor(text.replace(/[.-]/g,'')/dom.dia_actual*(30-dom.dia_actual)+parseInt(text.replace(/[.-]/g,''))); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Días transcurridos: </Text>
                       <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Día actual" defaultValue={''+this.state.julienne.dia_actual} onChangeText={text => {var dom = this.state.julienne; dom.dia_actual = text; var value = Math.floor(dom.mes_actual/dom.dia_actual*(30-text)+parseInt(dom.mes_actual)); dom.venta_proyeccion = value; this.setState({julienne:dom })} }></Input>
-                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Proyección de ventas: {this.state.julienne.venta_proyeccion}</Text>
+                      <Text style={[styles.textDocumento,{marginLeft:20}]}>Proyección de ventas: {this.NumberFormat(this.state.julienne.venta_proyeccion)}</Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Productos faltantes: </Text>
                       <Autocomplete
                         autoCapitalize="none"
@@ -2339,7 +2348,7 @@ export default class Activity extends Component {
                               <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
                                 <DatePicker
                                   defaultDate={new Date(item.fecha_vencimiento)}
-                                  minimumDate={new Date(2019, 0, 1)}
+                                  minimumDate={new Date(2017, 0, 1)}
                                   locale={"es"}
                                   timeZoneOffsetInMinutes={undefined}
                                   modalTransparent={false}
@@ -2408,24 +2417,24 @@ export default class Activity extends Component {
                       <RadioButton SetChecked={this.SetChecked} i={1} value={'Pendiente'} checked={this.state.checked}></RadioButton>
                       <Text style={styles.textInfo}>Agua: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.agua.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.agua.mes_actual)} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_actual = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.agua.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.agua.mes_pasado)} onChangeText={text => {var data = this.state.servicios_publicos; data.agua.mes_pasado = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                       <Text style={styles.textInfo}>Luz: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.luz.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.luz.mes_actual)} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_actual = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.luz.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.luz.mes_pasado)} onChangeText={text => {var data = this.state.servicios_publicos; data.luz.mes_pasado = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                       <Text style={styles.textInfo}>Telefono: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.telefono.mes_actual)} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_actual = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.telefono.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.telefono.mes_pasado)} onChangeText={text => {var data = this.state.servicios_publicos; data.telefono.mes_pasado = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                       <Text style={styles.textInfo}>Internet: </Text>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Actual: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.state.servicios_publicos.internet.mes_actual} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_actual = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.internet.mes_actual)} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_actual = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Mes Anterior: </Text>
-                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.state.servicios_publicos.internet.mes_pasado} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_pasado = text; this.setState({servicios_publicos:data })} }></Input>
+                      <Input keyboardType='numeric' style={styles.input} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={''+this.NumberFormat(this.state.servicios_publicos.internet.mes_pasado)} onChangeText={text => {var data = this.state.servicios_publicos; data.internet.mes_pasado = text.replace(/[.-]/g,''); this.setState({servicios_publicos:data })} }></Input>
                     </View>
                   :
                     null
@@ -2730,11 +2739,11 @@ export default class Activity extends Component {
                     <RadioButton SetChecked={this.SetChecked} i={5} value={' Si'} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_objetivos}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={1} value={' No'} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_objetivos}></RadioButton>                    
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>Proyección Venta General: </Text>
-                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.isVisibleActividad3?this.state.relacion_vendedores[this.state.selected].proyeccion_venta_general : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].proyeccion_venta_general = text; this.setState({relacion_vendedores:data })} }></Input>
+                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.isVisibleActividad3?this.NumberFormat(this.state.relacion_vendedores[this.state.selected].proyeccion_venta_general) : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].proyeccion_venta_general = text.replace(/[.-]/g,''); this.setState({relacion_vendedores:data })} }></Input>
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>% GIMED / Venta General: </Text>
-                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={this.state.isVisibleActividad3?this.state.relacion_vendedores[this.state.selected].gimed_vs_venta_general : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].gimed_vs_venta_general = text; this.setState({relacion_vendedores:data })} }></Input>
+                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="valor" defaultValue={this.state.isVisibleActividad3?this.NumberFormat(this.state.relacion_vendedores[this.state.selected].gimed_vs_venta_general) : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].gimed_vs_venta_general = text.replace(/[.-]/g,''); this.setState({relacion_vendedores:data })} }></Input>
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>% Ordinario / Venta General: </Text>
-                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.isVisibleActividad3?this.state.relacion_vendedores[this.state.selected].ordinario_vs_venta_general : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].ordinario_vs_venta_general = text; this.setState({relacion_vendedores:data })} }></Input>
+                    <Input keyboardType='numeric' style={[styles.input,{marginLeft:0,marginRight:0}]} placeholderTextColor={COLOR.gris} placeholder="Valor" defaultValue={this.state.isVisibleActividad3?this.NumberFormat(this.state.relacion_vendedores[this.state.selected].ordinario_vs_venta_general) : ''} onChangeText={text => {var data = this.state.relacion_vendedores; data[this.state.selected].ordinario_vs_venta_general = text.replace(/[.-]/g,''); this.setState({relacion_vendedores:data })} }></Input>
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>Conoce los indicados:</Text>
                     <RadioButton SetChecked={this.SetChecked} i={5} value={' Si '} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_indicados}></RadioButton>
                     <RadioButton SetChecked={this.SetChecked} i={1} value={' No '} checked={this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].conoce_indicados}></RadioButton>

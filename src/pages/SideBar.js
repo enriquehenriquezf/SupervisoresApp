@@ -170,7 +170,7 @@ export default class SideBar extends React.Component {
                 <View style={styles.twoButtons}>
                     <View style={[styles.rectangulo,styles.servicioTecnico, this.props.layout === 9 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'space-between', flexDirection:'row', alignItems:'center'}} onPress={() => {this.props.layout === 9 ? this.props.closeDrawer() : this.props.handler2(9,token,[])}}>
-                            <Text style={[styles.text, {height:"80%",width:"50%", fontSize:28, marginLeft:20}]}>Servicio Tecnico</Text>
+                            <Text style={[styles.text, {height:"80%",width:"50%", fontSize:28, marginLeft:20}]}>Servicio Técnico</Text>
                             <Image source={Imagen.servicioTecnico} style={{width:"25%",height:"75%",marginRight:20}}></Image>
                         </TouchableOpacity>
                     </View>
