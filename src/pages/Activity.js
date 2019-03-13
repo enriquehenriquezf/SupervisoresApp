@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Title, Content, Text, Icon, Button, Spinner, Textarea, Form,List, ListItem, H2, Card, Input,CheckBox, Picker, DatePicker, Drawer } from 'native-base';
 import {toastr} from '../components/Toast';
-import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity,FlatList, ScrollView, Keyboard} from 'react-native';
+import {View,Platform, BackHandler, KeyboardAvoidingView, AsyncStorage, Image,TouchableOpacity,FlatList, ScrollView, Keyboard, Alert} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
 import NumericInput from 'react-native-numeric-input';
 import Overlay from 'react-native-modal-overlay';
@@ -811,7 +811,7 @@ export default class Activity extends Component {
             toastr.showToast('Precisión del GPS muy baja','warning');            
           }
         }
-        else{
+        else if(position.mocked === true){
           toastr.showToast('No puede alterar el GPS, su coordinador será notificado','danger');
           let bodyInit = JSON.parse(token._bodyInit);
           const auth = bodyInit.token_type + " " + bodyInit.access_token;
@@ -939,6 +939,7 @@ export default class Activity extends Component {
    */
   async FinishActivity(handler)
   {
+    Keyboard.dismiss;
     this.setState({loading2:true});
     var that = this;
     let bodyInit = JSON.parse(token._bodyInit);
@@ -2027,7 +2028,7 @@ export default class Activity extends Component {
                               <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
                                 <DatePicker
                                   defaultDate={new Date(item.fecha_vencimiento)}
-                                  minimumDate={new Date(2017, 0, 1)}
+                                  minimumDate={new Date(2011, 0, 1)}
                                   locale={"es"}
                                   timeZoneOffsetInMinutes={undefined}
                                   modalTransparent={false}
@@ -2057,7 +2058,7 @@ export default class Activity extends Component {
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha Resolución: </Text>
                       <DatePicker
                           defaultDate={items.fecha_resolucion !== null? new Date(items.fecha_resolucion) : this.state.fecha_resolucion}
-                          minimumDate={new Date(2017, 0, 1)}
+                          minimumDate={new Date(2011, 0, 1)}
                           locale={"es"}
                           timeZoneOffsetInMinutes={undefined}
                           modalTransparent={false}
@@ -2074,7 +2075,7 @@ export default class Activity extends Component {
                       <Text style={[styles.textDocumento,{marginLeft:20}]}>Fecha de la última factura: </Text>
                       <DatePicker
                           defaultDate={items.fecha_ultima_factura !== null? new Date(items.fecha_ultima_factura) : this.state.fecha_ultima_factura}
-                          minimumDate={new Date(2017, 0, 1)}
+                          minimumDate={new Date(2011, 0, 1)}
                           locale={"es"}
                           timeZoneOffsetInMinutes={undefined}
                           modalTransparent={false}
@@ -2348,7 +2349,7 @@ export default class Activity extends Component {
                               <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
                                 <DatePicker
                                   defaultDate={new Date(item.fecha_vencimiento)}
-                                  minimumDate={new Date(2017, 0, 1)}
+                                  minimumDate={new Date(2011, 0, 1)}
                                   locale={"es"}
                                   timeZoneOffsetInMinutes={undefined}
                                   modalTransparent={false}
@@ -2559,10 +2560,10 @@ export default class Activity extends Component {
                 </Form>
               </Card>
               {
-                items.estado === 'Activo' || items.estado === 'activo' ?
-                  <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => this.FinishActivity(this.props.handler2)}><Text style={styles.textButton}> Finalizar </Text></Button>
+                items.estado === 1 ?
+                  <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => Alert.alert('Confirmar','Desea finalizar la actividad?',[{text: 'Cancelar',onPress: () => console.log('Cancel Pressed'),style: 'cancel',},{text: 'OK', onPress: () => { this.FinishActivity(this.props.handler2)}},],{cancelable: false},)}><Text style={styles.textButton}> Finalizar </Text></Button>
                 :              
-                  <Button info regular block style={[styles.boton, styles.actualizar]} onPress={() => this.FinishActivity(this.props.handler2)}><Text style={styles.textButton}> Modificar </Text></Button>
+                  <Button info regular block style={[styles.boton, styles.actualizar]} onPress={() => Alert.alert('Confirmar','Desea finalizar la actividad?',[{text: 'Cancelar',onPress: () => console.log('Cancel Pressed'),style: 'cancel',},{text: 'OK', onPress: () => { this.FinishActivity(this.props.handler2)}},],{cancelable: false},)}><Text style={styles.textButton}> Actualizar </Text></Button>
               }
             </Content>
           </KeyboardAvoidingView>
@@ -2624,7 +2625,7 @@ export default class Activity extends Component {
                       <Form>
                         <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
                       </Form>
-                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); this.UpdateData()}}><Text> Actualizar </Text></Button>
+                      <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10,marginLeft:20,marginRight:20}]} onPress={() => {this.setState({disable:true}); Keyboard.dismiss; this.UpdateData()}}><Text> Actualizar </Text></Button>
                     </ScrollView>
                   </View>
                 }

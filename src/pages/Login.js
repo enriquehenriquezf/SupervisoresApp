@@ -34,6 +34,7 @@ export default class Login extends Component {
                 ],
       tuto: [Imagen.tuto1,Imagen.tuto2,Imagen.tuto1],
       showReloadDialog: false,
+      secure:true,
       showToast: false
     };
     this._OnLogin = this._OnLogin.bind(this);
@@ -346,7 +347,8 @@ export default class Login extends Component {
                 <Item regular style={styles.form}>
                   {/*<Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>*/}
                   <Image style={styles.icon} source={Imagen.pass}/>
-                  <Input placeholder='Contraseña' placeholderTextColor={COLOR.gris} defaultValue={this.state.password} secureTextEntry={true}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.pass}/>
+                  <Input placeholder='Contraseña' placeholderTextColor={COLOR.gris} defaultValue={this.state.password} secureTextEntry={this.state.secure}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.pass}/>
+                  <Button transparent success style={{paddingTop:0,paddingBottom:0, height:40}} onPress={() => this.setState({secure: !this.state.secure})}><Text style={{fontFamily:'BebasNeueBold'}}>{this.state.secure? 'Mostrar' : 'Ocultar'}</Text></Button>
                 </Item>
                 
                 {fail >= 1 && <Text style={styles.forgotPass} onPress={() => this.ChangePass(this.props.handler2)}>Olvidaste tu contraseña?</Text>}              

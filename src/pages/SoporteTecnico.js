@@ -146,7 +146,8 @@ export default class Stats extends Component {
           </Header>
           <KeyboardAvoidingView behavior="padding" enabled style={{flex: .9}}>
             <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
-                <View style={{marginTop:60}}>
+                <View style={{marginTop:40}}>
+                  <Text style={{fontFamily:'BebasNeueBold', paddingHorizontal:20,marginBottom:20,textAlign:'justify'}}>Envíanos un mensaje con respecto a algún error evidenciado en la aplicación.</Text>
                     <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
                     <Form>
                         <Textarea bordered placeholder="Mensaje" style={[styles.observaciones,{height:200}]} onChangeText={(text) => this.setState({mensaje: text})} />
