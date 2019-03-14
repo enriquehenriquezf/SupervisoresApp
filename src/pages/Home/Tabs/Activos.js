@@ -302,7 +302,7 @@ export default class Home extends Component {
             colors={[COLOR.azul]}
           />
         }>
-        <Accordion dataArray={this.state.actividades} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}} animation={false}/>
+        <Accordion expanded={0} dataArray={this.state.actividades} renderHeader={this._renderHeader} renderContent={this._renderContent} style={{marginTop:15}} animation={false}/>
       </Content>
     );
   }

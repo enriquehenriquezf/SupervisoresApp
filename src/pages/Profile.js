@@ -137,6 +137,7 @@ export default class Profile extends Component {
         else
         {
           console.log(response);
+          const auth = bodyInit.token_type + " " + bodyInit.access_token;
           var newToken = JSON.parse(response._bodyInit);
           var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
           var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
