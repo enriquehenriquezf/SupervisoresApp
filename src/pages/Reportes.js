@@ -753,7 +753,7 @@ export default class Reportes extends Component {
                 :
                   <View style={{justifyContent:'space-between', width:"100%"}}>
                     <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleDetalleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
-                    <ScrollView>                    
+                    <ScrollView style={{height:"90%"}}>                    
                       {
                         this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
                           <ListItem key={Math.floor(Math.random() * 200) + 201} thumbnail style={{backgroundColor:COLOR.verde70, borderRadius:10,marginBottom:10, marginLeft:0}}>
