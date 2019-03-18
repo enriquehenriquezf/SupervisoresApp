@@ -348,7 +348,7 @@ export default class Login extends Component {
                   {/*<Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>*/}
                   <Image style={styles.icon} source={Imagen.pass}/>
                   <Input placeholder='Contraseña' placeholderTextColor={COLOR.gris} defaultValue={this.state.password} secureTextEntry={this.state.secure}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.pass}/>
-                  <Button transparent success style={{paddingTop:0,paddingBottom:0, height:40}} onPress={() => this.setState({secure: !this.state.secure})}><Text style={{fontFamily:'BebasNeueBold'}}>{this.state.secure? 'Mostrar' : 'Ocultar'}</Text></Button>
+                  <Button transparent success style={{paddingTop:0,paddingBottom:0, height:40}} onPress={() => this.setState({secure: !this.state.secure})}><Text style={{fontFamily:'BebasNeueBold', color:COLOR.verde}}>{this.state.secure? 'Mostrar' : 'Ocultar'}</Text></Button>
                 </Item>
                 
                 {fail >= 1 && <Text style={styles.forgotPass} onPress={() => this.ChangePass(this.props.handler2)}>Olvidaste tu contraseña?</Text>}              

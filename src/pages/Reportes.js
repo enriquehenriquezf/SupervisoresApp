@@ -709,8 +709,8 @@ export default class Reportes extends Component {
               >
                 <View style={{justifyContent:'space-between', width:"100%"}}>
                   <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
-                  <ScrollView>
-                    <Input style={[styles.asunto,{width:"82%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
+                  <ScrollView style={{height:"90%"}}>
+                    <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20, marginBottom:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
                     <Autocomplete
                         autoCapitalize="none"
                         data={sucursales}
@@ -726,12 +726,12 @@ export default class Reportes extends Component {
                         )}
                       />
                     <Form>
-                        <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{marginTop:0, height:100}]} onChangeText={(text) => this.setState({observacion: text})} />
+                        <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{height:100, marginBottom:10}]} onChangeText={(text) => this.setState({observacion: text})} />
                     </Form>
                     <TouchableOpacity onPress={() => this.verImagen()} style={{width:64, alignSelf:'center',marginBottom:10}}>
                       <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isVisibleReporte ? this.state.imgReporte : Imagen.noDisponible}}></Image>
                     </TouchableOpacity>
-                    <Button regular block info style={[styles.boton, styles.actualizar,{marginBottom:0}]} onPress={() => this.openFilePicker()}><Text>Cargar Imagen</Text></Button>
+                    <Button regular block info style={[styles.boton, styles.actualizar]} onPress={() => this.openFilePicker()}><Text>Cargar Imagen</Text></Button>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.CrearReporte()}}><Text> Enviar </Text></Button>
                   </ScrollView>
                 </View>
