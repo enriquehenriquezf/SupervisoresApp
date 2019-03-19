@@ -726,13 +726,13 @@ export default class Reportes extends Component {
                         )}
                       />
                     <Form>
-                        <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{height:100, marginBottom:10}]} onChangeText={(text) => this.setState({observacion: text})} />
+                        <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{height:100, marginBottom:15}]} onChangeText={(text) => this.setState({observacion: text})} />
                     </Form>
-                    <TouchableOpacity onPress={() => this.verImagen()} style={{width:64, alignSelf:'center',marginBottom:10}}>
+                    <TouchableOpacity onPress={() => this.verImagen()} style={{width:64, alignSelf:'center',marginBottom:20}}>
                       <Image ref={component => this._img1 = component} style={{width: 50, height: 50}} source={{uri: this.state.isVisibleReporte ? this.state.imgReporte : Imagen.noDisponible}}></Image>
                     </TouchableOpacity>
-                    <Button regular block info style={[styles.boton, styles.actualizar]} onPress={() => this.openFilePicker()}><Text>Cargar Imagen</Text></Button>
-                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:10}]} onPress={() => {this.setState({disable:true}); this.CrearReporte()}}><Text> Enviar </Text></Button>
+                    <Button regular block info style={[styles.boton, styles.actualizar,{marginBottom:15}]} onPress={() => this.openFilePicker()}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:15}]} onPress={() => {this.setState({disable:true}); this.CrearReporte()}}><Text> Enviar </Text></Button>
                   </ScrollView>
                 </View>
             </Overlay>

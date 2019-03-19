@@ -27,4 +27,5 @@ export const Imagen = {
     profileBorder: require('../../assets/Icons/icono-sup-01.png'),
     tuto1: require('../../assets/Images/tuto1.png'),
     tuto2: require('../../assets/Images/tuto2.png'),
+    tuto3: require('../../assets/Images/tuto3.png'),
 }

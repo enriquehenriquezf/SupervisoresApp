@@ -29,5 +29,6 @@ export const Preload = {
     Imagen.profileBorder;
     Imagen.tuto1;
     Imagen.tuto2;
+    Imagen.tuto3;
   }
 }

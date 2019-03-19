@@ -76,7 +76,8 @@ export default class Index extends Component {
         Imagen.equis,
         Imagen.profileBorder,
         Imagen.tuto1,
-        Imagen.tuto2
+        Imagen.tuto2,
+        Imagen.tuto3
       ]);
     }catch(error){console.log(error)}
     this.setState({ loading: false });

@@ -8,6 +8,7 @@ import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
 import { COLOR } from '../components/Colores';
 import Overlay from 'react-native-modal-overlay';
+import Slideshow from 'react-native-image-slider-show';
 import { logError } from '../components/logError';
 
 let fail = 0;
@@ -32,7 +33,7 @@ export default class Login extends Component {
                   'Si  bien  el  Responsable,  realiza  copias  de  seguridad  de  los  contenidos  alojados  en  sus  servidores,  sin  embargo  no  se responsabiliza de la pérdida o el borrado accidental de los datos por parte de los Usuarios. De igual manera, no garantiza la  reposición  total  de  los  datos  borrados  por  los  Usuarios,  ya  que los  citados  datos  podrían  haber  sido  suprimidos  y/o modificados durante el periodo de tiempo transcurrido desde la última copia de seguridad.',
                   'Los  servicios  facilitados  o  prestados  a  través  de  la  Aplicación, excepto  los  servicios  específicos  de  backup,  no  incluyen  la reposición de los contenidos conservados en las copias de seguridad realizadas por el Responsable del Tratamiento, cuando esta  pérdida  sea  imputable  al  usuario;  en  este  caso,  se  determinará  una  tarifa  acorde  a  la  complejidad  y  volumen  de  la recuperación,  siempre  previa  aceptación  del  usuario.  La  reposición  de  datos  borrados  sólo  está  incluida  en  el  precio  del servicio cuando la pérdida del contenido sea debida a causas atribuibles al Responsable.'
                 ],
-      tuto: [Imagen.tuto1,Imagen.tuto2,Imagen.tuto1],
+      tuto: [{url: Imagen.tuto1},{url: Imagen.tuto2},{url: Imagen.tuto3}],
       showReloadDialog: false,
       secure:true,
       showToast: false
@@ -139,6 +140,8 @@ export default class Login extends Component {
       //console.log(response);
       if(response.ok === true)
       {
+        console.log(Expo.Constants.deviceName);
+        console.log(Expo.Constants.deviceId);
         token = response;
         fail = 0;
         that.getPorcentaje(token,handler);
@@ -397,7 +400,8 @@ export default class Login extends Component {
           childrenWrapperStyle={{backgroundColor: "rgba(0,0,0, .5)", borderRadius: 10,padding:10,paddingTop:20,paddingBottom:20}}
         >
           <View style={{justifyContent:'space-between', width:"100%"}}>
-            <Image style={{width:300,height:500}} source={this.state.tuto[this.state.tutorial]}/>
+            {/* <Image style={{width:300,height:500}} source={this.state.tuto[this.state.tutorial]}/> */}
+            <Slideshow dataSource={this.state.tuto} containerStyle={{width:"100%"}} height={500} arrowSize={32} indicatorSize={16} position={parseInt(this.state.tutorial)} onPositionChanged={position => this.setState({ tutorial: ''+position })} indicatorColor='#BDC3C9' indicatorSelectedColor='#97C023' />
             <View style={{flexDirection:'row', justifyContent:'space-between'}}>
               <Button disabled={this.state.tutorial !== '2'} style={{backgroundColor:this.state.tutorial === '2'?COLOR.verde:COLOR.gris,alignSelf:'center'}} onPress={() => {this._storeData(); this.setState({isVisibleTutorial: false}, () => this.props.handler(1,token))} }>
                 <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Aceptar</Text>
