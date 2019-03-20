@@ -19,9 +19,6 @@ export default class Profile extends Component {
     this.state = {
       loading: true,
       loading2:false,
-      isVisibleTutorial:false,
-      tutorial:'0',
-      tuto: [Imagen.tuto1,Imagen.tuto2,Imagen.tuto1],
       showToast: false,
       estado : true
     };
@@ -221,32 +218,9 @@ export default class Profile extends Component {
                       <Text style={styles.text}>{items.telefono}</Text>
                   </Item>
                   <Button info regular block style={styles.boton} onPress={() => this.ChangePass(this.props.handler2)}><Text style={styles.textoBoton}> Cambiar Contraseña </Text></Button>
-                  <Button info regular block style={[styles.boton,{backgroundColor:COLOR.amarillo}]} onPress={() => this.setState({tutorial:'0',isVisibleTutorial:true})}><Text style={styles.textoBoton}> Ver Tutorial </Text></Button>
+                  <Button info regular block style={[styles.boton,{backgroundColor:COLOR.amarillo}]} onPress={() => this.props.handler2(10,this.props.token,true)}><Text style={styles.textoBoton}> Ver Tutorial </Text></Button>
               </View>
             </Content>
-            <Overlay
-              visible={this.state.isVisibleTutorial}
-              animationType="zoomIn"
-              closeOnTouchOutside={false}
-              onClose={() => this.setState({isVisibleTutorial: true})}
-              containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
-              childrenWrapperStyle={{backgroundColor: "rgba(0,0,0, .5)", borderRadius: 10,padding:10,paddingTop:20,paddingBottom:20}}
-            >
-              <View style={{justifyContent:'space-between', width:"100%"}}>
-                <Image style={{width:300,height:500}} source={this.state.tuto[this.state.tutorial]}/>
-                <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                  <Button disabled={this.state.tutorial !== '2'} style={{backgroundColor:this.state.tutorial === '2'?COLOR.verde:COLOR.gris,alignSelf:'center'}} onPress={() => {this.setState({isVisibleTutorial: false})} }>
-                    <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Aceptar</Text>
-                  </Button>
-                  <Button disabled={this.state.tutorial <= '0'} style={{backgroundColor:this.state.tutorial > '0'?COLOR.azul:COLOR.gris,alignSelf:'flex-end'}} onPress={() => {var tuto = parseInt(this.state.tutorial); if(tuto>0){ this.setState({tutorial:(tuto-1).toString()})}} }>
-                    <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Atrás</Text>
-                  </Button>
-                  <Button disabled={this.state.tutorial >= '2'} style={{backgroundColor:this.state.tutorial < '2'?COLOR.verde:COLOR.gris,alignSelf:'flex-end'}} onPress={() => {var tuto = parseInt(this.state.tutorial); if(tuto<2){ this.setState({tutorial:(tuto+1).toString()})}} }>
-                    <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Siguiente</Text>
-                  </Button>
-                </View>
-              </View>
-            </Overlay>
             <Overlay
               visible={this.state.loading2}
               closeOnTouchOutside={false}

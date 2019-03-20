@@ -12,6 +12,7 @@ import ShowActivities from './ShowActivities';
 import Stats from './Stats';
 import Reportes from './Reportes';
 import SoporteTecnico from './SoporteTecnico';
+import Tutorial from './Tutorial';
 import {api} from '../services/api'
 import { Imagen } from '../components/Imagenes';
 
@@ -174,6 +175,8 @@ export default class Index extends Component {
       AppComponent = Reportes
     } else if(this.state.index == 9){
       AppComponent = SoporteTecnico
+    } else if(this.state.index == 10){
+      AppComponent = Tutorial
     } else if(this.state.index == -1){
       this._OnLogout();
       AppComponent = Login

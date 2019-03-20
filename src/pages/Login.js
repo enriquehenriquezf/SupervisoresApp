@@ -28,12 +28,10 @@ export default class Login extends Component {
       privacidad:'0',
       tutorial:'0',
       isVisiblePrivacidad:false,
-      isVisibleTutorial:false,
       politicas: ['El Responsable del Tratamiento, adopta las medidas necesarias para garantizar la seguridad, integridad y confidencialidad de los datos conforme a lo dispuesto en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo, de 27 de abril de 2016,  relativo  a  la  protección  de  las  personas  físicas  en  lo  que  respecta  al  tratamiento  de  datos  personales  y  a  la  libre circulación de los mismos.',
                   'Si  bien  el  Responsable,  realiza  copias  de  seguridad  de  los  contenidos  alojados  en  sus  servidores,  sin  embargo  no  se responsabiliza de la pérdida o el borrado accidental de los datos por parte de los Usuarios. De igual manera, no garantiza la  reposición  total  de  los  datos  borrados  por  los  Usuarios,  ya  que los  citados  datos  podrían  haber  sido  suprimidos  y/o modificados durante el periodo de tiempo transcurrido desde la última copia de seguridad.',
                   'Los  servicios  facilitados  o  prestados  a  través  de  la  Aplicación, excepto  los  servicios  específicos  de  backup,  no  incluyen  la reposición de los contenidos conservados en las copias de seguridad realizadas por el Responsable del Tratamiento, cuando esta  pérdida  sea  imputable  al  usuario;  en  este  caso,  se  determinará  una  tarifa  acorde  a  la  complejidad  y  volumen  de  la recuperación,  siempre  previa  aceptación  del  usuario.  La  reposición  de  datos  borrados  sólo  está  incluida  en  el  precio  del servicio cuando la pérdida del contenido sea debida a causas atribuibles al Responsable.'
                 ],
-      tuto: [{url: Imagen.tuto1},{url: Imagen.tuto2},{url: Imagen.tuto3}],
       showReloadDialog: false,
       secure:true,
       showToast: false
@@ -145,7 +143,7 @@ export default class Login extends Component {
         token = response;
         fail = 0;
         that.getPorcentaje(token,handler);
-        toastr.showToast('Ha iniciado sesión!','success');
+        // toastr.showToast('Ha iniciado sesión!','success');
       }
       else
       {
@@ -192,8 +190,9 @@ export default class Login extends Component {
           var porcentajes = JSON.parse(response._bodyInit);
           var general = (porcentajes.porcentaje_general.actividades_completas / porcentajes.porcentaje_general.todas_las_actividades) * 100;
           that._storeDataPorcentajes(Math.floor(general),porcentajes);
-          if(that.state.tutorial < '2'){that.setState({isVisibleTutorial:true})}
-          else{handler(1,token);}
+          that._storeData();
+          if(that.state.tutorial < '2'){handler(10,token);}
+          else{toastr.showToast('Ha iniciado sesión!','success');handler(1,token);}
           //console.log(Math.floor(general));
         }
         else
@@ -385,31 +384,6 @@ export default class Login extends Component {
                 <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Aceptar</Text>
               </Button>
               <Button disabled={this.state.privacidad >= '2'} style={{backgroundColor:this.state.privacidad < '2'?COLOR.verde:COLOR.gris,alignSelf:'flex-end'}} onPress={() => {var priv = parseInt(this.state.privacidad); this.setState({privacidad:(priv+1).toString()})}}>
-                <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Siguiente</Text>
-              </Button>
-            </View>
-          </View>
-        </Overlay>
-
-        <Overlay
-          visible={this.state.isVisibleTutorial}
-          animationType="zoomIn"
-          closeOnTouchOutside={false}
-          onClose={() => this.setState({isVisibleTutorial: true})}
-          containerStyle={{backgroundColor: "rgba(0, 0, 0, .8)", width:"auto",height:"auto"}}
-          childrenWrapperStyle={{backgroundColor: "rgba(0,0,0, .5)", borderRadius: 10,padding:10,paddingTop:20,paddingBottom:20}}
-        >
-          <View style={{justifyContent:'space-between', width:"100%"}}>
-            {/* <Image style={{width:300,height:500}} source={this.state.tuto[this.state.tutorial]}/> */}
-            <Slideshow dataSource={this.state.tuto} containerStyle={{width:"100%"}} height={500} arrowSize={32} indicatorSize={16} position={parseInt(this.state.tutorial)} onPositionChanged={position => this.setState({ tutorial: ''+position })} indicatorColor='#BDC3C9' indicatorSelectedColor='#97C023' />
-            <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-              <Button disabled={this.state.tutorial !== '2'} style={{backgroundColor:this.state.tutorial === '2'?COLOR.verde:COLOR.gris,alignSelf:'center'}} onPress={() => {this._storeData(); this.setState({isVisibleTutorial: false}, () => this.props.handler(1,token))} }>
-                <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Aceptar</Text>
-              </Button>
-              <Button disabled={this.state.tutorial <= '0'} style={{backgroundColor:this.state.tutorial > '0'?COLOR.azul:COLOR.gris,alignSelf:'flex-end'}} onPress={() => {var tuto = parseInt(this.state.tutorial); if(tuto>0){ this.setState({tutorial:(tuto-1).toString()})}} }>
-                <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Atrás</Text>
-              </Button>
-              <Button disabled={this.state.tutorial >= '2'} style={{backgroundColor:this.state.tutorial < '2'?COLOR.verde:COLOR.gris,alignSelf:'flex-end'}} onPress={() => {var tuto = parseInt(this.state.tutorial); if(tuto<2){ this.setState({tutorial:(tuto+1).toString()})}} }>
                 <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Siguiente</Text>
               </Button>
             </View>
