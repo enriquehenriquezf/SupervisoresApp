@@ -30,5 +30,7 @@ export const Preload = {
     Imagen.tuto1;
     Imagen.tuto2;
     Imagen.tuto3;
+    Imagen.tuto4;
+    Imagen.tuto5;
   }
 }

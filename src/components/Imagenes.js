@@ -28,4 +28,6 @@ export const Imagen = {
     tuto1: require('../../assets/Images/tuto1.png'),
     tuto2: require('../../assets/Images/tuto2.png'),
     tuto3: require('../../assets/Images/tuto3.png'),
+    tuto4: require('../../assets/Images/tuto4.png'),
+    tuto5: require('../../assets/Images/tuto5.png'),
 }

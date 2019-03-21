@@ -8,7 +8,6 @@ import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
 import { COLOR } from '../components/Colores';
 import Overlay from 'react-native-modal-overlay';
-import Slideshow from 'react-native-image-slider-show';
 import { logError } from '../components/logError';
 
 let fail = 0;
@@ -191,7 +190,7 @@ export default class Login extends Component {
           var general = (porcentajes.porcentaje_general.actividades_completas / porcentajes.porcentaje_general.todas_las_actividades) * 100;
           that._storeDataPorcentajes(Math.floor(general),porcentajes);
           that._storeData();
-          if(that.state.tutorial < '2'){handler(10,token);}
+          if(that.state.tutorial < '4'){handler(10,token);}
           else{toastr.showToast('Ha iniciado sesión!','success');handler(1,token);}
           //console.log(Math.floor(general));
         }
