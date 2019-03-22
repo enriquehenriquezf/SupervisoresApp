@@ -805,10 +805,10 @@ export default class Activity extends Component {
           else
           {
             toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
-            //this.handleBackPress();
+            this.handleBackPress();
           }  
           if(position.coords.accuracy < 2){
-            toastr.showToast('Precisión del GPS muy baja','warning');            
+            toastr.showToast('Precisión del GPS muy baja','warning');
           }
         }
         else if(position.mocked === true){

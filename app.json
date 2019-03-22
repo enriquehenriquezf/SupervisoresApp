@@ -6,7 +6,7 @@
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "platforms": ["ios", "android"],
-    "version": "1.2.5",
+    "version": "1.2.5.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "primaryColor": "#00A1E4",
@@ -28,7 +28,8 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.binar10.supervisores"
+      "package": "com.binar10.supervisores",
+      "versionCode": 2
     }
   },
   "android": {
