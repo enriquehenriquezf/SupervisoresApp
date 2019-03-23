@@ -4,8 +4,8 @@
  */
 var baseUrl ='http://192.168.1.4';// Servidor Privada
 //var baseUrl ='http://200.116.66.129'; // Servidor Publica // sistemas.binar10.co
-//var baseUrl2 ='http://192.168.1.185';//cudris
-//var baseUrl3 ='http://192.168.1.136';//ronaldo
+//var baseUrl ='http://192.168.1.185';//cudris
+//var baseUrl ='http://192.168.1.136';//ronaldo
 export const api = {
  ipLogin : baseUrl + "/supervisores_api/public/api/login",
  ipLogout : baseUrl + "/supervisores_api/public/api/logout",
