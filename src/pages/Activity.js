@@ -2596,6 +2596,7 @@ export default class Activity extends Component {
                   <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
                 :
                   <View style={{justifyContent:'space-between', width:"100%"}}>
+                    <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleActividad: false,isLoadActividad:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                     <ScrollView>
                       <Text style={[styles.textDocumento,{marginTop:0,marginLeft:0}]}>{this.state.isLoadActividad ? this.state.documentos.documento : ''}</Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Si'} checked={this.state.checked2}></RadioButton>
@@ -2650,6 +2651,7 @@ export default class Activity extends Component {
                   <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
                 :
                   <View style={{justifyContent:'space-between', width:"100%"}}>
+                    <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleActividad2: false,isLoadActividad:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                     <ScrollView>
                       <Text style={[styles.textDocumento,{marginTop:0,marginLeft:0}]}>{this.state.isLoadActividad ? this.state.documentos.condicion : ''}</Text>
                       <RadioButton SetChecked={this.SetChecked} i={5} value={'Bueno'} checked={this.state.checked2}></RadioButton>
@@ -2686,6 +2688,7 @@ export default class Activity extends Component {
                 childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
               >
                 <View style={{justifyContent:'space-between', width:"100%"}}>
+                  <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleActividad3: false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                   <ScrollView>
                     <Text style={[styles.textDocumento,{marginLeft:0,marginTop:0}]}>{this.state.isVisibleActividad3 && this.state.examen[this.state.selected].vendedor}</Text>
                     <RadioButton SetChecked={this.SetChecked} i={5} value={'Favorable'} checked={this.state.checked2}></RadioButton>
@@ -2734,6 +2737,7 @@ export default class Activity extends Component {
                 childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
               >
                 <View style={{justifyContent:'space-between', width:"100%"}}>
+                  <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleActividad3: false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                   <ScrollView>
                     <Text style={[styles.textDocumento,{marginLeft:0,marginTop:0}]}>{this.state.isVisibleActividad3 && this.state.relacion_vendedores[this.state.selected].vendedor}</Text>
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>Conoce sus objetivos y proyecciones de VENTA a la fecha:</Text>
@@ -2793,6 +2797,7 @@ export default class Activity extends Component {
                 childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", borderRadius: 10}}
               >
                 <View style={{justifyContent:'space-between', width:"100%"}}>
+                  <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleActividad3: false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                   <ScrollView>
                     <Text style={[styles.textDescFoto,{marginBottom:10}]}>{this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].senalizacion} tiene señalización?</Text>
                     <RadioButton SetChecked={this.SetChecked} i={5} value={'  Si'} checked={this.state.isVisibleActividad3 && this.state.senalizacion[this.state.selected].respuesta}></RadioButton>
