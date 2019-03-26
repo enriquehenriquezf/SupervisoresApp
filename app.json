@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "SupervisoresUnidrogas",
+    "name": "SuperAT",
     "description": "Administrador de planes de trabajos para los supervisores de Unidrogas.",
-    "slug": "supervisoresUnidrogas",
+    "slug": "SuperAT",
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "platforms": ["ios", "android"],
