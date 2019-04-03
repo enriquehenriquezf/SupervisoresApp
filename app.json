@@ -6,12 +6,12 @@
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "platforms": ["ios", "android"],
-    "version": "1.2.7",
+    "version": "1.2.78",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "primaryColor": "#00A1E4",
     "splash": {
-      "image": "./assets/unidrogas.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -26,7 +26,7 @@
     "ios": {
       "bundleIdentifier": "com.binar10.supervisores",
       "supportsTablet": true,
-      "buildNumber": "2"
+      "buildNumber": "4"
     },
     "android": {
       "package": "com.binar10.supervisores",
