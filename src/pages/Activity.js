@@ -1550,7 +1550,7 @@ export default class Activity extends Component {
               </Button>
             </Right>
           </Header>
-          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 0.7 : 1}}>
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 1 : 1}}>
             <Content keyboardShouldPersistTaps='true'>
               <Text style={styles.sucursal}>{items.sucursal}</Text>
               <H2 style={styles.actividad}>{items.name}</H2>
