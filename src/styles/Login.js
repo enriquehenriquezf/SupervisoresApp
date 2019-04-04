@@ -1,5 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { COLOR } from '../components/Colores';
+var widthScreen = Dimensions.get('window').width;
 export default StyleSheet.create({
     form: {
         backgroundColor: 'rgba(255,255,255,0.1)',
@@ -64,7 +65,7 @@ export default StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0)',
         borderColor: 'rgba(255,255,255,0)',
         justifyContent:'center',
-        marginLeft: 80,
+        marginLeft: widthScreen/4,
         marginRight: 20,
         paddingTop:-5,
         paddingBottom:-5,
