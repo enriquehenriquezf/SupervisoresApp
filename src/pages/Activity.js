@@ -1657,6 +1657,8 @@ export default class Activity extends Component {
                       <Picker
                           textStyle={styles.picker}
                           mode="dropdown"
+                          iosIcon={<Icon name="arrow-down" />}
+                          placeholder="Selecciona una opción"
                           selectedValue={this.state.selected}
                           style={{ width: undefined,marginLeft:15, marginRight:15 }}
                           itemStyle={styles.picker}
@@ -1914,6 +1916,8 @@ export default class Activity extends Component {
                         <Picker
                           textStyle={styles.picker}
                           mode="dropdown"
+                          iosIcon={<Icon name="arrow-down" />}
+                          placeholder="Selecciona una opción"
                           selectedValue={this.state.selected}
                           style={{ width: undefined,marginLeft:15, marginRight:15 }}
                           itemStyle={styles.picker}
@@ -2223,6 +2227,8 @@ export default class Activity extends Component {
                       <Picker
                         textStyle={styles.picker}
                         mode="dropdown"
+                        iosIcon={<Icon name="arrow-down" />}
+                        placeholder="Selecciona una opción"
                         selectedValue={this.state.selected}
                         style={{ width: undefined,marginLeft:15, marginRight:15}}
                         itemStyle={styles.picker}
@@ -2449,6 +2455,8 @@ export default class Activity extends Component {
                       <Picker
                         textStyle={styles.picker}
                         mode="dropdown"
+                        iosIcon={<Icon name="arrow-down" />}
+                        placeholder="Selecciona una opción"
                         selectedValue={this.state.selected}
                         style={{ width: undefined,marginLeft:15, marginRight:15}}
                         itemStyle={styles.picker}
@@ -2474,6 +2482,8 @@ export default class Activity extends Component {
                       <Picker
                         textStyle={styles.picker}
                         mode="dropdown"
+                        iosIcon={<Icon name="arrow-down" />}
+                        placeholder="Selecciona una opción"
                         selectedValue={this.state.selected}
                         style={{ width: undefined,marginLeft:15, marginRight:15}}
                         itemStyle={styles.picker}
