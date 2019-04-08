@@ -1,6 +1,6 @@
 import * as Expo from 'expo';
 import React, { Component } from 'react';
-import { Container, Content, Header, Left, Body, Right, Icon, Button, Spinner,Drawer, Text, Input, Form, Textarea,ListItem, Badge } from 'native-base';
+import { Container, Content, Header, Left, Body, Right, Icon, Button, Spinner,Drawer, Text, Input, Form, Textarea,ListItem, Badge, Picker } from 'native-base';
 import Overlay from 'react-native-modal-overlay';
 import Autocomplete from 'react-native-autocomplete-input';
 import IconStyles from '../styles/Icons';
@@ -43,6 +43,11 @@ export default class Reportes extends Component {
         mensajes:[],
         mensajeInit:{},
         mensaje:'',
+        tipoReporte:[],
+        tipo:'1',
+        ancla:1,
+        coordinadores:[],
+        cord:'1',
         notificaciones: []
     };
     let token = this.props.token;
@@ -279,6 +284,100 @@ export default class Reportes extends Component {
     else{this.props.handler2(-1,token,[]);}
   }
 
+
+  /**
+   * Obtener lista de tipos de reportes
+   */
+  async getTipoReportes(){
+    var that = this;
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    await fetch(api.ipTipoReporteList, {
+      method: 'GET',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
+      },
+      body: ''
+    }).then(function(response) {
+      // console.log(response);
+      newToken = JSON.parse(response._bodyInit);
+      if(response.ok === true && response.status === 200)
+      {
+        that.setState({tipoReporte: newToken,imgReporte:Imagen.noDisponible,isVisibleReporte:true});
+      }
+      else
+      {
+        console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        if(response.status === 500){
+          logError.sendError(header,body,auth);
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+        }
+        else{
+          //toastr.showToast(newToken,'warning');
+        }
+      }
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+
+  /**
+   * Obtener lista de coordinadores
+   */
+  async getCoordinadoresList(){
+    var that = this;
+    let bodyInit = JSON.parse(token._bodyInit);
+    const auth = bodyInit.token_type + " " + bodyInit.access_token;
+    await fetch(api.ipCoordinadoresList, {
+      method: 'GET',
+      headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept':'application/json'
+      },
+      body: ''
+    }).then(function(response) {
+      // console.log(response);
+      newToken = JSON.parse(response._bodyInit);
+      if(response.ok === true && response.status === 200)
+      {
+        that.setState({coordinadores: newToken});
+        //console.log(newToken);
+      }
+      else
+      {
+        console.log(response);
+        var newToken = JSON.parse(response._bodyInit);
+        var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
+        var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
+        if(response.status === 500){
+          logError.sendError(header,body,auth);
+          toastr.showToast('Error con el servidor','danger');
+        }
+        else if(response.status === 401){
+          toastr.showToast('Su sesión expiró','danger');
+        }
+        else{
+          //toastr.showToast(newToken,'warning');
+        }
+      }
+    }).catch(function(error){
+      toastr.showToast('Su sesión expiró','danger');
+      console.log(error);
+    });
+  }
+
+
   /**
    * Crear reporte con asunto, observaciones e imagen
    */
@@ -309,6 +408,8 @@ export default class Reportes extends Component {
         nombre_reporte: this.state.asunto,
         foto: file1,
         observaciones: this.state.observacion,
+        id_coordinador: this.state.cord,
+        categoria: this.state.tipo
       })
     }).then(function(response) {
       //console.log(response);
@@ -651,7 +752,7 @@ export default class Reportes extends Component {
                   colors={[COLOR.azul]}
                 />
                 }>
-                <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => this.setState({imgReporte:Imagen.noDisponible,isVisibleReporte:true})}><Text style={styles.textButton}> Crear Nuevo </Text></Button>
+                <Button success regular block style={[styles.boton, styles.finalizar]} onPress={() => {this.getCoordinadoresList(); this.getTipoReportes();} }><Text style={styles.textButton}> Crear Nuevo </Text></Button>
                 {
                   this.state.reportes.map((data,index) => {
                     return(
@@ -709,22 +810,67 @@ export default class Reportes extends Component {
               >
                 <View style={{justifyContent:'space-between', width:"100%"}}>
                   <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
-                  <ScrollView style={{height:"90%"}}>
-                    <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20, marginBottom:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
-                    <Autocomplete
-                        autoCapitalize="none"
-                        data={sucursales}
-                        defaultValue={query}
-                        onChangeText={text => this.BuscarSucursales(text)}
-                        placeholder="Sucursal"
-                        inputContainerStyle={styles.autocompletar}
-                        listStyle={styles.autocompletarLista}
-                        renderItem={item => (
-                          <TouchableOpacity onPress={() => {this.setState({suc_nombre: item.nombre, suc_id: item.id, query: item.nombre}); this.BuscarSucursales(item.nombre)} }>
-                            <Text style={styles.producto}> {item.nombre}</Text>
-                          </TouchableOpacity>
-                        )}
-                      />
+                  <ScrollView style={{height:"100%"}}>
+                    <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20, marginBottom:10}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
+                    
+                    <Picker
+                      mode="dropdown"
+                      iosIcon={<Icon name="arrow-down" />}
+                      placeholder="Tipo de reporte"
+                      placeholderStyle={{ color: "#bfc6ea" }}
+                      placeholderIconColor="#007aff"
+                      style={{ width: undefined,marginLeft:15, marginRight:15,marginBottom:10, color:COLOR.verde }}
+                      itemStyle={{fontFamily:'BebasKai',color:COLOR.azul}}
+                      itemTextStyle={{fontFamily:'BebasKai',color:COLOR.azul}}
+                      selectedValue={this.state.tipo}
+                      onValueChange={(value) => {var ancla = this.state.tipoReporte.find(element => ''+element.id === value).ancla; this.setState({tipo:value,ancla:ancla})} }
+                    >
+                    {
+                      this.state.tipoReporte.map((value,index) => {
+                        return(
+                          <Picker.Item key={index} label={value.name} value={''+value.id}/>
+                        )
+                      })
+                    }
+                    </Picker>
+                    
+                    {this.state.ancla === 1 ?
+                      <Autocomplete
+                          autoCapitalize="none"
+                          data={sucursales}
+                          defaultValue={query}
+                          onChangeText={text => this.BuscarSucursales(text)}
+                          placeholder={ this.state.ancla === 1 ? 'Sucursal' : 'Coordinador'}
+                          inputContainerStyle={styles.autocompletar}
+                          listStyle={styles.autocompletarLista}
+                          renderItem={item => (
+                            <TouchableOpacity onPress={() => {this.setState({suc_nombre: item.nombre, suc_id: item.id, query: item.nombre}); this.BuscarSucursales(item.nombre)} }>
+                              <Text style={styles.producto}> {item.nombre}</Text>
+                            </TouchableOpacity>
+                          )}
+                        />
+                      :
+                        <Picker
+                          mode="dropdown"
+                          iosIcon={<Icon name="arrow-down" />}
+                          placeholder="Coordinador"
+                          placeholderStyle={{ color: "#bfc6ea" }}
+                          placeholderIconColor="#007aff"
+                          style={{ width: undefined,marginLeft:15, marginRight:15, color:COLOR.verde }}
+                          itemStyle={{fontFamily:'BebasKai',color:COLOR.azul}}
+                          itemTextStyle={{fontFamily:'BebasKai',color:COLOR.azul}}
+                          selectedValue={this.state.cord}
+                          onValueChange={(value) => {this.setState({cord:value})} }
+                        >
+                        {
+                          this.state.coordinadores.map((value,index) => {
+                            return(
+                              <Picker.Item key={index} label={value.nombre + ' ' + value.apellido} value={''+value.id_cordinador}/>
+                            )
+                          })
+                        }
+                        </Picker>
+                    }
                     <Form>
                         <Textarea bordered placeholder="Observaciones" style={[styles.observaciones,{height:100, marginBottom:15}]} onChangeText={(text) => this.setState({observacion: text})} />
                     </Form>
@@ -755,7 +901,7 @@ export default class Reportes extends Component {
                     <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleDetalleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
                     <ScrollView style={{height:"90%"}}>                    
                       {
-                        this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
+                        this.state.mensajeInit.hasOwnProperty('nombre_reporte') ?
                           <ListItem key={Math.floor(Math.random() * 200) + 201} thumbnail style={{backgroundColor:COLOR.verde70, borderRadius:10,marginBottom:10, marginLeft:0}}>
                             <Left style={{flexDirection:'column'}}>
                               <Text style={{color:'white', fontSize:12, paddingTop:5, paddingLeft:5}}>{this.state.mensajeInit.nombre} {this.state.mensajeInit.apellido}</Text>
@@ -771,7 +917,7 @@ export default class Reportes extends Component {
                         : null
                       }
                       {
-                        this.state.mensajeInit.hasOwnProperty('nombre_sucursal') ?
+                        this.state.mensajeInit.hasOwnProperty('nombre_reporte') ?
                           this.state.mensajes.map((data,index) => {
                             return(
                             data.tipo_usuario === 1 ?
