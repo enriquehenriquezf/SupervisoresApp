@@ -141,8 +141,8 @@ export default class Home extends Component {
               motivo_ausencia: element.motivo_ausencia,
               tiempoInactivo: tiempoInactivo,
               tiempoInactivoInit: tiempoInactivoInit,
-              latitud: 11.0041235,
-              longitud: -74.8130534,
+              latitud: element.latitud,
+              longitud: element.longitud,
               separador: false
             };
             if(item.titulo !== undefined){item.name = item.titulo;}

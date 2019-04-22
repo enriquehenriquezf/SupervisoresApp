@@ -10,6 +10,7 @@ import SideBar from './SideBar';
 import { Imagen } from '../components/Imagenes';
 import Overlay from 'react-native-modal-overlay';
 import { logError } from '../components/logError';
+import { COLOR } from '../components/Colores';
 
 let items = null;
 export default class Stats extends Component {
@@ -147,10 +148,10 @@ export default class Stats extends Component {
           <KeyboardAvoidingView behavior="padding" enabled style={{flex: .9}}>
             <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
                 <View style={{marginTop:40}}>
-                  <Text style={{fontFamily:'BebasNeueBold', paddingHorizontal:20,marginBottom:20,textAlign:'justify'}}>Envíanos un mensaje con respecto a algún error evidenciado en la aplicación.</Text>
+                  <Text style={{fontFamily:'BebasNeueBold', paddingHorizontal:20,marginBottom:20,textAlign:'justify',color:COLOR.azul}}>Envíanos un mensaje con respecto a algún error evidenciado en la aplicación.</Text>
                     <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
                     <Form>
-                        <Textarea bordered placeholder="Mensaje" style={[styles.observaciones,{height:200}]} onChangeText={(text) => this.setState({mensaje: text})} />
+                        <Textarea bordered placeholder="Mensaje" style={[styles.observaciones,{height:200,fontSize:20,textAlign:'auto', textAlignVertical:'top', paddingTop:5}]} onChangeText={(text) => this.setState({mensaje: text})} />
                     </Form>
                     <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:20}]} onPress={() => {this.setState({disable:true}); this.EnviarBug()}}><Text> Enviar </Text></Button>
                 </View>
