@@ -14,6 +14,7 @@ import { RadioButton } from '../components/RadioButton';
 import SideBar from './SideBar';
 import { COLOR } from '../components/Colores';
 import { logError } from '../components/logError';
+import Camara from '../components/Camara';
 
 var BUTTONS = ["SINIESTRO","VISITAS DE ENTIDADES PÚBLICAS","REQUERIMIENTO GERENCIAL", "AUSENCIA ADMINISTRADOR", "TRABAJO ESPECIAL"];
 let items = null;
@@ -48,6 +49,7 @@ export default class Activity extends Component {
       error:null,
       isVisible: false,
       isVisible2: false,
+      isVisibleCam: false,
       isVisibleActividad: false,
       isVisibleActividad2: false,
       isVisibleActividad3: false,
@@ -115,6 +117,7 @@ export default class Activity extends Component {
     this.ModificarProducto = this.ModificarProducto.bind(this);
     this.setDate = this.setDate.bind(this);
     this.closeDrawer = this.closeDrawer.bind(this);
+    this.setImage = this.setImage.bind(this);
     console.ignoredYellowBox = ['Require cycle:'];
   }
 
@@ -246,7 +249,7 @@ export default class Activity extends Component {
       },      
       body: JSON.stringify({id_sucursal:items.id_sucursal,nombre:''})
     }).then(function(response) {
-      //console.log(response);
+      console.log(response);
       if(response.ok === true)
       {
         var token2 = JSON.parse(response._bodyInit)
@@ -1242,6 +1245,12 @@ export default class Activity extends Component {
     catch(error){
       console.log(error);
     }
+  }
+
+  setImage(attachment){
+    imgTemp1 = attachment.base64;
+    this._img1.setNativeProps({src: [{uri: imgTemp1}]});
+    this.setState({archivo: attachment, imgVencido: imgTemp1, isVisibleCam:false});
   }
 
   /**
@@ -2619,8 +2628,11 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                         </Body>
+                        <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
+                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true})}><Image style={styles.iconoBoton} source={Imagen.find}></Image></Button>
+                        </Right>
                       </ListItem>
                       <Text style={styles.textDescFoto}>Documento Renovado</Text>
                       <ListItem thumbnail style={{marginLeft:0}}>
@@ -2842,6 +2854,18 @@ export default class Activity extends Component {
             :
               null
           }
+          <Overlay
+            visible={this.state.isVisibleCam}
+            closeOnTouchOutside 
+            animationType="zoomIn"
+            onClose={() => this.setState({isVisibleCam: false})}
+            containerStyle={{backgroundColor: "rgba(0, 0, 0, 1)", width:"auto",height:"auto",padding:0}}
+            childrenWrapperStyle={{backgroundColor: "rgba(255, 255, 255, 1)", padding:0}}
+          >
+            <View style={{height:"100%",width:"100%"}}>
+              <Camara setImage={this.setImage}></Camara>
+            </View>
+          </Overlay>
           <Overlay
             visible={this.state.loading2}
             closeOnTouchOutside={false}
