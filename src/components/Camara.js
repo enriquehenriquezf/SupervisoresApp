@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
+import {Icon} from 'native-base'
 import { Camera, Permissions } from 'expo';
 
 export default class Camara extends React.Component {
@@ -20,7 +21,7 @@ export default class Camara extends React.Component {
   snap = async () => {
     if (this.camera) {
       this.setState({disable:true});
-      let photo = await this.camera.takePictureAsync();//{base64:true}
+      let photo = await this.camera.takePictureAsync({skipProcessing:true});//{base64:true}
       this.props.setImage(photo);
     //   console.log(photo)
     }
@@ -44,9 +45,23 @@ export default class Camara extends React.Component {
               }}>
               <TouchableOpacity
                 style={{
-                  flex: 0.1,
+                  flex: 0.58,
                   alignSelf: 'flex-end',
-                  alignItems: 'center',
+                  alignItems: 'flex-end',
+                }}
+                disabled={this.state.disable}
+                onPress={() => {this.snap();}}>
+                <Icon ios="ios-aperture" android="md-aperture" style={{marginBottom:10, color: 'white', fontSize:64}}></Icon>
+                {/* <Text
+                  style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
+                  {' '}Snap{' '}
+                </Text> */}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  flex: 0.42,
+                  alignSelf: 'flex-start',
+                  alignItems: 'flex-end',
                 }}
                 disabled={this.state.disable}
                 onPress={() => {
@@ -56,23 +71,11 @@ export default class Camara extends React.Component {
                       : Camera.Constants.Type.back,
                   });
                 }}>
-                <Text
+                <Icon ios="ios-reverse-camera" android="md-reverse-camera" style={{marginTop:10,marginRight:10, color: 'white'}}></Icon>
+                {/* <Text
                   style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
                   {' '}Flip{' '}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  flex: 0.3,
-                  alignSelf: 'flex-end',
-                  alignItems: 'flex-end',
-                }}
-                disabled={this.state.disable}
-                onPress={() => {this.snap();}}>
-                <Text
-                  style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
-                  {' '}Snap{' '}
-                </Text>
+                </Text> */}
               </TouchableOpacity>
             </View>
           </Camera>

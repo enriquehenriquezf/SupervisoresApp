@@ -101,6 +101,7 @@ export default class Activity extends Component {
       fecha_ultima_factura: new Date(),
       ptc:[],
       updated:false,
+      takePicture:{vencido:true,index:-1},
       showToast: false
     };
     let token = this.props.token;
@@ -1239,7 +1240,8 @@ export default class Activity extends Component {
           });
           arr[index].respuesta = file64;
           this._imgs[index].setNativeProps({src: [{uri: imgTemp1}]});
-          this.setState({ptc: arr, archivo: attachment, imgVencido: imgTemp1});}
+          this.setState({ptc: arr, archivo: attachment, imgVencido: imgTemp1});
+        }
       }
     }
     catch(error){
@@ -1247,11 +1249,30 @@ export default class Activity extends Component {
     }
   }
 
-  setImage(attachment){
+  async setImage(attachment){
     this.setState({isVisibleCam:false})
     imgTemp1 = attachment.uri;
-    this._img1.setNativeProps({src: [{uri: imgTemp1}]});
-    this.setState({archivo: attachment, imgVencido: imgTemp1});    
+    imgTemp2 = attachment.uri;
+    if(this.state.takePicture.index === -1){
+      if(this.state.takePicture.vencido){
+        this._img1.setNativeProps({src: [{uri: imgTemp1}]});
+        this.setState({archivo: attachment, imgVencido: imgTemp1});
+      }
+      else{
+        this._img2.setNativeProps({src: [{uri: imgTemp2}]});
+        this.setState({archivo2: attachment, imgRenovado: imgTemp2});
+      }
+    }
+    else{
+      var file64;
+      var arr = this.state.ptc;
+      await Expo.FileSystem.readAsStringAsync(imgTemp1, {encoding: Expo.FileSystem.EncodingTypes.Base64}).then(function(response){
+        file64 = response;
+      });
+      arr[index].respuesta = file64;
+      this._imgs[index].setNativeProps({src: [{uri: imgTemp1}]});
+      this.setState({ptc: arr, archivo: attachment, imgVencido: imgTemp1});
+    }
   }
 
   /**
@@ -1861,8 +1882,11 @@ export default class Activity extends Component {
                                             </TouchableOpacity>
                                           </Left>
                                           <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                                            <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,index)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                                            <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(true,index)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                                           </Body>
+                                          <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
+                                            <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true,takePicture:{vencido:true,index:index}})}><Icon style={styles.iconoBoton} ios="ios-camera" android="md-camera"></Icon></Button>
+                                          </Right>
                                         </ListItem>
                                       </View>
                                     : null
@@ -2521,8 +2545,11 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                         </Body>
+                        <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
+                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true,takePicture:{vencido:true,index:-1}})}><Icon style={styles.iconoBoton} ios="ios-camera" android="md-camera"></Icon></Button>
+                        </Right>
                       </ListItem>
                     </View>
                   :
@@ -2542,8 +2569,11 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                         </Body>
+                        <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
+                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true,takePicture:{vencido:true,index:-1}})}><Icon style={styles.iconoBoton} ios="ios-camera" android="md-camera"></Icon></Button>
+                        </Right>
                       </ListItem>
                     </View>
                   :
@@ -2632,7 +2662,7 @@ export default class Activity extends Component {
                           <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                         </Body>
                         <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
-                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0,borderRadius:0}]} onPress={() => this.setState({isVisibleCam:true})}><Image style={styles.iconoBoton} source={Imagen.find}></Image></Button>
+                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true,takePicture:{vencido:true,index:-1}})}><Icon style={styles.iconoBoton} ios="ios-camera" android="md-camera"></Icon></Button>
                         </Right>
                       </ListItem>
                       <Text style={styles.textDescFoto}>Documento Renovado</Text>
@@ -2643,8 +2673,11 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(false,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(false,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                         </Body>
+                        <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
+                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true,takePicture:{vencido:false,index:-1}})}><Icon style={styles.iconoBoton} ios="ios-camera" android="md-camera"></Icon></Button>
+                        </Right>
                       </ListItem>
                       <Form>
                         <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
@@ -2687,8 +2720,11 @@ export default class Activity extends Component {
                           </TouchableOpacity>
                         </Left>
                         <Body style={{borderBottomColor: 'rgba(255,255,255,0)'}}>
-                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar Imagen</Text></Button>
+                          <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                         </Body>
+                        <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
+                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true,takePicture:{vencido:true,index:-1}})}><Icon style={styles.iconoBoton} ios="ios-camera" android="md-camera"></Icon></Button>
+                        </Right>
                       </ListItem>
                       <Form>
                         <Textarea bordered placeholder="Observaciones" defaultValue={this.state.isLoadActividad ? this.state.documentos.observaciones : ''} style={[styles.observaciones,{marginTop:0,marginLeft:0,marginRight:0}]} onChangeText={(text) => this.setState({observacion2: text})} />
@@ -2845,7 +2881,7 @@ export default class Activity extends Component {
                 animationType="zoomIn"
                 onClose={() => this.setState({isVisible2: false})}
                 containerStyle={{backgroundColor: "rgba(0, 0, 0, .5)", width:"auto",height:"auto"}}
-                childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, .5)", borderRadius: 10}}
+                childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
               >
                 <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center'}}>
                   <Text onPress={() => this.setState({isVisible2: false})} style={{color: 'white', textAlign:'right', alignSelf:'flex-end'}}>X</Text>
