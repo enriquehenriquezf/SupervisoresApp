@@ -1,11 +1,12 @@
+import getEnvVars from '../config/env';
+
 /**
  * url de la api
- * @example: localhost: 192.168.1.4 | public: 200.116.66.129
  */
-// var baseUrl ='http://192.168.1.4';// Servidor Privada
-var baseUrl ='http://200.116.66.129'; // Servidor Publica // sistemas.binar10.co
-//var baseUrl ='http://192.168.1.185';//cudris
-// var baseUrl ='http://192.168.1.136';//ronaldo
+var ENV = getEnvVars;
+var port = ENV.port;
+var baseUrl = ENV.apiUrl;
+
 export const api = {
  ipLogin : baseUrl + "/supervisores_api/public/api/login",
  ipLogout : baseUrl + "/supervisores_api/public/api/logout",

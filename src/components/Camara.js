@@ -6,6 +6,7 @@ export default class Camara extends React.Component {
   state = {
     hasCameraPermission: null,
     type: Camera.Constants.Type.back,
+    disable: false,
   };
 
   async componentDidMount() {
@@ -18,7 +19,8 @@ export default class Camara extends React.Component {
    */
   snap = async () => {
     if (this.camera) {
-      let photo = await this.camera.takePictureAsync({base64:true});
+      this.setState({disable:true});
+      let photo = await this.camera.takePictureAsync();//{base64:true}
       this.props.setImage(photo);
     //   console.log(photo)
     }
@@ -46,6 +48,7 @@ export default class Camara extends React.Component {
                   alignSelf: 'flex-end',
                   alignItems: 'center',
                 }}
+                disabled={this.state.disable}
                 onPress={() => {
                   this.setState({
                     type: this.state.type === Camera.Constants.Type.back
@@ -64,6 +67,7 @@ export default class Camara extends React.Component {
                   alignSelf: 'flex-end',
                   alignItems: 'flex-end',
                 }}
+                disabled={this.state.disable}
                 onPress={() => {this.snap();}}>
                 <Text
                   style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>

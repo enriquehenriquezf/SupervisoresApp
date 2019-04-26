@@ -1248,9 +1248,10 @@ export default class Activity extends Component {
   }
 
   setImage(attachment){
-    imgTemp1 = attachment.base64;
+    this.setState({isVisibleCam:false})
+    imgTemp1 = attachment.uri;
     this._img1.setNativeProps({src: [{uri: imgTemp1}]});
-    this.setState({archivo: attachment, imgVencido: imgTemp1, isVisibleCam:false});
+    this.setState({archivo: attachment, imgVencido: imgTemp1});    
   }
 
   /**
@@ -2631,7 +2632,7 @@ export default class Activity extends Component {
                           <Button iconLeft regular block info style={[styles.boton, styles.actualizar,{marginLeft:10,marginRight:10,marginBottom:0}]} onPress={() => this.openFilePicker(true,-1)}><Image style={styles.iconoBoton} source={Imagen.find}></Image><Text>Cargar</Text></Button>
                         </Body>
                         <Right style={{borderBottomColor: 'rgba(255,255,255,0)',paddingRight:0}}>
-                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0}]} onPress={() => this.setState({isVisibleCam:true})}><Image style={styles.iconoBoton} source={Imagen.find}></Image></Button>
+                          <Button regular block info style={[styles.boton, styles.actualizar,{marginLeft:0,marginRight:0,marginBottom:0,borderRadius:0}]} onPress={() => this.setState({isVisibleCam:true})}><Image style={styles.iconoBoton} source={Imagen.find}></Image></Button>
                         </Right>
                       </ListItem>
                       <Text style={styles.textDescFoto}>Documento Renovado</Text>
