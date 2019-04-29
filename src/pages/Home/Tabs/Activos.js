@@ -98,6 +98,7 @@ export default class Home extends Component {
               productos: element.productos,
               laboratorios_asignados: element.laboratorios_asignados,
               laboratorios_realizados: element.laboratorios_realizados,
+              laboratorios: element.laboratorios,
               numero_consecutivo: element.numero_consecutivo,
               ano_actual: element.ano_actual,
               ano_anterior: element.ano_anterior,

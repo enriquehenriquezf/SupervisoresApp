@@ -762,6 +762,13 @@ export default class Activity extends Component {
         array3.push({index:index});
       });
     }
+    else if(items.laboratorios !== undefined && items.laboratorios !== null && items.laboratorios !== ""){
+      //console.log(JSON.parse(items.laboratorios_asignados));
+      JSON.parse(items.laboratorios).forEach((element,index) =>{
+        array2.push({dk:element.dk, nombre: element.nombre, prods: element.prods, nuevo: element.nuevo});
+        array3.push({index:index});
+      });
+    }
 
     var horario = items.nombre_tabla === 'apertura' ? ((items.horario !== '' && items.horario !== null) ? JSON.parse(items.horario) : {dias_habiles:{apertura:'',cierre:''},domingos_feriados:{apertura:'',cierre:'',primer_turno:'',segundo_turno:'',tercer_turno:''}}) : ''
     var domicilios = this.state.domicilios;
@@ -1001,6 +1008,7 @@ export default class Activity extends Component {
         productos: JSON.stringify(this.state.PRODUCTS),
         numero_consecutivo:this.state.numero_consecutivo,
         laboratorios_realizados: JSON.stringify(this.state.PRODUCTS2),
+        laboratorios: JSON.stringify(this.state.PRODUCTS2),
         ano_actual:this.state.ano_actual,
         ano_anterior:this.state.ano_anterior,
         base:this.state.base,
@@ -1329,7 +1337,7 @@ export default class Activity extends Component {
           //console.log(prods)
           if(index !== -1){
             array[index] = {...array[index], prods: prods};
-            that.setState({productos: prods, query: query, query2, productos2: array});
+            that.setState({productos: prods, query: lab === '' ? query : (items.nombre_tabla === 'gimed' || items.nombre_tabla === 'examen_gimed' ? query : ''), query2, productos2: array});
           }else{that.setState({productos: prods, query3: query, query2, productos2: array});}
         }
         else
@@ -1617,43 +1625,43 @@ export default class Activity extends Component {
                         extraData={this.state}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({item,index}) =>
-                            <View key={Math.floor(Math.random() * 1000) + 1}>
+                          <View key={Math.floor(Math.random() * 1000) + 1}>
 
-                              <Text style={styles.textDocumento}>{item.nuevo ?<Icon onPress={() => {var array = [...this.state.LABORATORIES]; var array2 = [...this.state.productos2]; array.splice(index,1); array2.splice(index,1); this.setState({LABORATORIES: array, PRODUCTS2: array, productos2:array2});}} ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>:null} Laboratorio: {item.nombre}</Text>
-                              <Text style={styles.textDocumento}>Productos faltantes o sobrantes: </Text>
-                              <Autocomplete
-                                autoCapitalize="none"
-                                data={this.state.productos2[index].prods}
-                                defaultValue={this.state.query2[index]}
-                                onChangeText={() => this.closeKeyBoard(1)}
-                                onEndEditing={text => this.BuscarProducto(text.nativeEvent.text,item.dk,index)}
-                                placeholder="Producto a buscar"
-                                inputContainerStyle={styles.autocompletar}
-                                listStyle={styles.autocompletarLista}
-                                renderItem={item => 
-                                  (
-                                    <TouchableOpacity onPress={() => {let {query2,PRODUCTS2,productos2} = this.state; query2[index] = ''; productos2[index].prods = []; var prods = PRODUCTS2[index].prods; prods.push({nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}); PRODUCTS2[index] = {...PRODUCTS2[index], prods: prods }; this.setState({ query2 , PRODUCTS2, productos2 }) } }>
-                                      <Text style={styles.producto}>{item.nombre_comercial}</Text>
-                                    </TouchableOpacity>
-                                  )
-                                }
-                              />
-                              <List key={Math.floor(Math.random() * 1000) + 1} dataArray={this.state.PRODUCTS2[index].prods}
-                                renderRow={(item) =>
-                                  <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
-                                    <View style={{flex:2, justifyContent:'flex-start'}}>
-                                      <ListItem button onPress={() => this.BorrarProducto(item,index)}>
-                                        <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
-                                        <Text style={styles.productosList}>{item.nombre_comercial}</Text>
-                                      </ListItem>
-                                    </View>
-                                    <View style={{flex:1, justifyContent:'center'}}>
-                                      <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value,index)}/>
-                                    </View>
+                            <Text style={styles.textDocumento}>{item.nuevo ?<Icon onPress={() => {var array = [...this.state.LABORATORIES]; var array2 = [...this.state.productos2]; array.splice(index,1); array2.splice(index,1); this.setState({LABORATORIES: array, PRODUCTS2: array, productos2:array2});}} ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>:null} Laboratorio: {item.nombre}</Text>
+                            <Text style={styles.textDocumento}>Productos faltantes o sobrantes: </Text>
+                            <Autocomplete
+                              autoCapitalize="none"
+                              data={this.state.productos2[index].prods}
+                              defaultValue={this.state.query2[index]}
+                              onChangeText={() => this.closeKeyBoard(1)}
+                              onEndEditing={text => this.BuscarProducto(text.nativeEvent.text,item.dk,index)}
+                              placeholder="Producto a buscar"
+                              inputContainerStyle={styles.autocompletar}
+                              listStyle={styles.autocompletarLista}
+                              renderItem={item => 
+                                (
+                                  <TouchableOpacity onPress={() => {let {query2,PRODUCTS2,productos2} = this.state; query2[index] = ''; productos2[index].prods = []; var prods = PRODUCTS2[index].prods; prods.push({nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}); PRODUCTS2[index] = {...PRODUCTS2[index], prods: prods }; this.setState({ query2 , PRODUCTS2, productos2 }) } }>
+                                    <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                                  </TouchableOpacity>
+                                )
+                              }
+                            />
+                            <List key={Math.floor(Math.random() * 1000) + 1} dataArray={this.state.PRODUCTS2[index].prods}
+                              renderRow={(item) =>
+                                <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                                  <View style={{flex:2, justifyContent:'flex-start'}}>
+                                    <ListItem button onPress={() => this.BorrarProducto(item,index)}>
+                                      <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                      <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                                    </ListItem>
                                   </View>
-                                }>
-                              </List>
-                            </View>
+                                  <View style={{flex:1, justifyContent:'center'}}>
+                                    <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={-999} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value,index)}/>
+                                  </View>
+                                </View>
+                              }>
+                            </List>
+                          </View>
                         }>
                       </FlatList>
                       <Text style={styles.textDocumento}>Agregar Laboratorio: </Text>
@@ -1735,7 +1743,74 @@ export default class Activity extends Component {
                             </View>
                           </View>
                         }>
-                      </List> 
+                      </List>
+                      <FlatList data={this.state.LABORATORIES}
+                        extraData={this.state}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({item,index}) =>
+                          <View key={Math.floor(Math.random() * 1000) + 1}>
+                            <Text style={styles.textDocumento}>{item.nuevo ?<Icon onPress={() => {var array = [...this.state.LABORATORIES]; var array2 = [...this.state.productos2]; array.splice(index,1); array2.splice(index,1); this.setState({LABORATORIES: array, PRODUCTS2: array, productos2:array2});}} ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>:null} Laboratorio: {item.nombre}</Text>
+                            <View style={{flexDirection:'row'}}>
+                              <View style={{flex:1, justifyContent:'center',alignItems:'center'}}>
+                                <Text style={[styles.textDescFoto,{marginTop:0}]}>Estantes</Text>//TODO: hacer ModificarLaboratorio
+                                <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={0} maxValue={999} initValue={item.estantes} value={item.estantes} onChange={value => this.ModificarProducto(item,value,index)}/>
+                              </View>
+                              <View style={{flex:1, justifyContent:'center',alignItems:'center'}}>
+                                <Text style={[styles.textDescFoto,{marginTop:0}]}>Entrepaños</Text>
+                                <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={0} maxValue={999} initValue={item.entrepa} value={item.entrepa} onChange={value => this.ModificarProducto(item,value,index)}/>
+                              </View>
+                            </View>
+                            <Text style={styles.textDocumento}>Productos: </Text>
+                            <Autocomplete
+                              autoCapitalize="none"
+                              data={this.state.productos2[index].prods}
+                              defaultValue={this.state.query2[index]}
+                              onChangeText={() => this.closeKeyBoard(1)}
+                              onEndEditing={text => this.BuscarProducto(text.nativeEvent.text,item.dk,index)}
+                              placeholder="Producto a buscar"
+                              inputContainerStyle={styles.autocompletar}
+                              listStyle={styles.autocompletarLista}
+                              renderItem={item => 
+                                (
+                                  <TouchableOpacity onPress={() => {let {query2,PRODUCTS2,productos2} = this.state; query2[index] = ''; productos2[index].prods = []; var prods = PRODUCTS2[index].prods; prods.push({nombre_comercial:item.nombre_comercial,cant:1,codigo:item.codigo,laboratorio_id:item.laboratorio_id}); PRODUCTS2[index] = {...PRODUCTS2[index], prods: prods }; this.setState({ query2 , PRODUCTS2, productos2 }) } }>
+                                    <Text style={styles.producto}>{item.nombre_comercial}</Text>
+                                  </TouchableOpacity>
+                                )
+                              }
+                            />
+                            <List key={Math.floor(Math.random() * 1000) + 1} dataArray={this.state.PRODUCTS2[index].prods}
+                              renderRow={(item) =>
+                                <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                                  <View style={{flex:2, justifyContent:'flex-start'}}>
+                                    <ListItem button onPress={() => this.BorrarProducto(item,index)}>
+                                      <Icon ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>
+                                      <Text style={styles.productosList}>{item.nombre_comercial}</Text>
+                                    </ListItem>
+                                  </View>
+                                  <View style={{flex:1, justifyContent:'center'}}>
+                                    <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={1} maxValue={999} initValue={item.cant} value={item.cant} onChange={value => this.ModificarProducto(item,value,index)}/>
+                                  </View>
+                                </View>
+                              }>
+                            </List>
+                          </View>
+                        }>
+                      </FlatList>
+                      <Text style={styles.textDocumento}>Agregar Laboratorio: </Text>
+                      <Autocomplete
+                        autoCapitalize="none"
+                        data={labs}
+                        defaultValue={query3}
+                        onChangeText={text => this.BuscarLaboratorio(text)}
+                        placeholder="Laboratorio a buscar"
+                        inputContainerStyle={styles.autocompletar}
+                        listStyle={styles.autocompletarLista}
+                        renderItem={item => (
+                          <TouchableOpacity onPress={() => {var array = [...this.state.PRODUCTS2]; var array2 = [...this.state.productos2]; array.push({dk:item.dk, nombre:item.nombre,prods:[],nuevo:true,entrepa:0,estantes:0}); array2.push({index: array2.length,prods:[]}); this.setState({ query3: '', laboratorios:[], PRODUCTS2:array, LABORATORIES:array,productos2:array2 })} }>
+                            <Text style={styles.producto}><Icon ios='ios-add-circle-outline' android="md-add-circle-outline" style={{color: COLOR.verde, fontSize: 20}}></Icon> {item.nombre}</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
                     </View>
                   :
                     null
@@ -2061,9 +2136,9 @@ export default class Activity extends Component {
                             </View>
                             <View style={{flex:1, flexDirection:'row', justifyContent:'space-between', borderBottomWidth:1}}>
                               <View style={{flex:5, justifyContent:'flex-start'}}>
-                                <Text style={[styles.textInfo,{margin:0,marginLeft: 5}]}>Fecha de Vencimiento: </Text>
+                                <Text style={[styles.textInfo,{margin:0,marginLeft: 17}]}>Fecha de Vencimiento: </Text>
                               </View>
-                              <View style={{flex:4, justifyContent:'flex-start', marginTop:-10}}>
+                              <View style={{flex:4, justifyContent:'center',alignItems:'center', marginTop:-10}}>
                                 <DatePicker
                                   defaultDate={new Date(item.fecha_vencimiento)}
                                   minimumDate={new Date(2011, 0, 1)}
@@ -2077,7 +2152,7 @@ export default class Activity extends Component {
                                   placeHolderTextStyle={{ color: "#d3d3d3" }}
                                   onDateChange={newDate => this.setDate(newDate,item)}
                                   disabled={false}
-                              />
+                                />
                               </View>
                             </View>
                           </View>
