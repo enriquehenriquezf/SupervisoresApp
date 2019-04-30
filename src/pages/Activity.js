@@ -765,7 +765,7 @@ export default class Activity extends Component {
     else if(items.laboratorios !== undefined && items.laboratorios !== null && items.laboratorios !== ""){
       //console.log(JSON.parse(items.laboratorios_asignados));
       JSON.parse(items.laboratorios).forEach((element,index) =>{
-        array2.push({dk:element.dk, nombre: element.nombre, prods: element.prods, nuevo: element.nuevo});
+        array2.push({dk:element.dk, nombre: element.nombre, prods: element.prods, nuevo: element.nuevo, estantes:element.estantes,entrepa:element.entrepa});
         array3.push({index:index});
       });
     }
@@ -1008,7 +1008,7 @@ export default class Activity extends Component {
         productos: JSON.stringify(this.state.PRODUCTS),
         numero_consecutivo:this.state.numero_consecutivo,
         laboratorios_realizados: JSON.stringify(this.state.PRODUCTS2),
-        laboratorios: JSON.stringify(this.state.PRODUCTS2),
+        laboratorios: JSON.stringify(this.state.LABORATORIES),
         ano_actual:this.state.ano_actual,
         ano_anterior:this.state.ano_anterior,
         base:this.state.base,
@@ -1484,6 +1484,25 @@ export default class Activity extends Component {
   }
 
   /**
+   * Modificar Lab de la lista LABORATORIES
+   */
+  ModificarLab(item,value,tipo){
+    var array = [...this.state.LABORATORIES];
+    var index = array.indexOf(item);
+
+    if (index !== -1) {
+      if(tipo === 1){
+        array[index] = {...array[index], entrepa: value};
+      }
+      else{
+        array[index] = {...array[index], estantes: value};
+      }
+    }
+    this.setState({LABORATORIES: array});
+    this.forceUpdate();
+  }
+
+  /**
    * Modificar datos del ptc
    * @param index posicion del item a modificar en el array del ptc
    * @param tipo tipo de modificacion @example tipo: 1 = productos , tipo: 2 = laboratorios
@@ -1752,12 +1771,12 @@ export default class Activity extends Component {
                             <Text style={styles.textDocumento}>{item.nuevo ?<Icon onPress={() => {var array = [...this.state.LABORATORIES]; var array2 = [...this.state.productos2]; array.splice(index,1); array2.splice(index,1); this.setState({LABORATORIES: array, PRODUCTS2: array, productos2:array2});}} ios='ios-trash' android="md-trash" style={{color: '#d9534f', fontSize: 20}}></Icon>:null} Laboratorio: {item.nombre}</Text>
                             <View style={{flexDirection:'row'}}>
                               <View style={{flex:1, justifyContent:'center',alignItems:'center'}}>
-                                <Text style={[styles.textDescFoto,{marginTop:0}]}>Estantes</Text>//TODO: hacer ModificarLaboratorio
-                                <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={0} maxValue={999} initValue={item.estantes} value={item.estantes} onChange={value => this.ModificarProducto(item,value,index)}/>
+                                <Text style={[styles.textDescFoto,{marginTop:0}]}>Estantes</Text> 
+                                <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={0} maxValue={999} initValue={item.estantes} value={item.estantes} onChange={value => this.ModificarLab(item,value,2)}/>
                               </View>
                               <View style={{flex:1, justifyContent:'center',alignItems:'center'}}>
                                 <Text style={[styles.textDescFoto,{marginTop:0}]}>Entrepaños</Text>
-                                <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={0} maxValue={999} initValue={item.entrepa} value={item.entrepa} onChange={value => this.ModificarProducto(item,value,index)}/>
+                                <NumericInput borderColor={'rgba(255,255,255,0)'} textColor={COLOR.azul} iconStyle={{color:'white'}} rightButtonBackgroundColor={COLOR.azul} leftButtonBackgroundColor={COLOR.azul} rounded minValue={0} maxValue={999} initValue={item.entrepa} value={item.entrepa} onChange={value => this.ModificarLab(item,value,1)}/>
                               </View>
                             </View>
                             <Text style={styles.textDocumento}>Productos: </Text>
