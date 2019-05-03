@@ -4,7 +4,7 @@ import getEnvVars from '../config/env';
  * url de la api
  */
 var ENV = getEnvVars;
-var port = ENV.port;
+// var port = ENV.port;
 var baseUrl = ENV.apiUrl;
 
 export const api = {

@@ -1878,6 +1878,7 @@ export default class Activity extends Component {
                 {
                   items.nombre_tabla === 'actividades_ptc' ?
                     <View>
+                      <Text style={[styles.textDocumento,{marginTop:5,marginBottom:5}]}>{items.descripcion_ptc}</Text>
                       {this.state.ptc.map((data,index) => {
                         return(
                           data.tipo === 1 ?
