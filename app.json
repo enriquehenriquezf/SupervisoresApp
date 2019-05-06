@@ -26,11 +26,11 @@
     "ios": {
       "bundleIdentifier": "com.binar10.supervisores",
       "supportsTablet": true,
-      "buildNumber": "5"
+      "buildNumber": "6"
     },
     "android": {
       "package": "com.binar10.supervisores",
-      "versionCode": 5
+      "versionCode": 6
     }
   },
   "android": {
