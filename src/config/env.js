@@ -5,8 +5,8 @@ import {Constants} from 'expo';
  * @example: localhost: 192.168.1.4 | public: 200.116.66.129
  */
 var devUrl ='http://192.168.1.136';//Ronaldo
-var stagingUrl ='http://192.168.1.4';// Servidor Privada
-var prodUrl ='http://200.116.66.129'; // Servidor Publica // sistemas.binar10.co
+var stagingUrl ='http://sistemas.binar10.co';// Servidor Privada http://sistemas.binar10.co
+var prodUrl ='http://31.220.60.151'; // Servidor Publica
 var port = '8000';
 
 const ENV = {
