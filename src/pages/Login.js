@@ -2,7 +2,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import {toastr} from '../components/Toast';
 import { Container, Body, Content, Form, Item, Input,Text, Button, Spinner, CheckBox, ListItem } from 'native-base';
-import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image,AppState, Alert,WebView } from 'react-native';
+import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image,AppState, Alert,WebView,Linking } from 'react-native';
 import styles from '../styles/Login';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
@@ -21,6 +21,7 @@ export default class Login extends Component {
       email: '', 
       password: '',
       loading: true,
+      updating:false,
       error:null,
       checked:true,
       estado:true,
@@ -59,35 +60,54 @@ export default class Login extends Component {
    */
   _checkUpdates = async () => {
     if (this._checking_update !== true) {
-      console.log('Checking for an update...');
-      //toastr.showToast('Buscando una actualización...','warning');
-      consola += 'Buscando una actualización... \n'
+      console.log('Verificando por actualizaciones...');
       this._checking_update = true;
       try {
-        const update = await Expo.Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-          console.log('An update was found, downloading...');
-          //toastr.showToast('Actualización encontrada, Descargando...','success');
-          consola += 'Actualización encontrada, Descargando... \n'
-          await Expo.Updates.fetchUpdateAsync();
-          this.setState({
-            showReloadDialog: true,
-          });
-        } else {
-          console.log('No updates were found');
-          //toastr.showToast('No hay actualización disponible','warning');
-          consola += 'No hay actualización disponible \n'
+        const update = await fetch(api.ipInfoApp, {
+          method: 'GET',
+          headers: {
+              'Authorization': 'Access',
+              'Content-Type': 'application/json',
+              'Accept':'application/json'
+          },
+          body: ''
+        });
+        // console.log(JSON.parse(update._bodyInit));
+        // console.log(Expo.Constants.manifest.releaseChannel);
+        // console.log(Expo.Constants.manifest.version);
+        // console.log(Platform.OS);
+        var data = JSON.parse(update._bodyInit);
+        if(Expo.Constants.manifest.releaseChannel.indexOf(data.Release) !== -1){//Expo.Constants.manifest.releaseChannel.indexOf(data.Release)
+          if(Platform.OS === 'ios' ? (data.version_ios > Expo.Constants.manifest.version) : (data.version_android > Expo.Constants.manifest.version)){
+            console.log('Se ha encontrado una actualización...');
+            this.setState({updating:true});
+            Alert.alert(
+              'Nueva Versión Disponible',
+              'Actualización encontrada, favor descargarla para continuar.',
+              [
+                {
+                  text: 'Descargar',
+                  onPress: () => {
+                    Linking.openURL(api.ipGoToStore);//Platform.OS === 'ios' ? Linking.openURL(api.ipGoToAppStore); : Linking.openURL(api.ipGoToPlayStore);
+                  }
+                },
+              ],
+              { cancelable: false }
+            );
+          }
+          else{
+            console.log('No se encontraron actualizaciones');
+          }
+        }
+        else{
+          console.log('No se puede buscar actualizaciones en modo debug')
         }
       } catch (e) {
         console.log('Error while trying to check for updates', e);
-        //toastr.showToast('Error buscando actualizaciones: ' + e,'danger');
-        consola += 'Error buscando actualizaciones:' + e + '\n'
       }
       delete this._checking_update;
     } else {
       console.log('Currently checking for an update');
-      //toastr.showToast('Actualmente se está buscando una actualización','warning');
-      consola += 'Actualmente se está buscando una actualización \n'
     }
   }
 
@@ -112,12 +132,12 @@ export default class Login extends Component {
     if (showReloadDialog === true && showReloadDialog !== prevState.showReloadDialog) {
       Alert.alert(
         'Update',
-        'Nueva actualización encontrada, debe reiniciar la aplicación.',
+        'Nuevo update.',
         [
           {
             text: 'Aceptar',
             onPress: () => {
-              Updates.reloadFromCache();
+              Linking.openURL(api.ipGoToStore);//Updates.reloadFromCache();
             }
           },
         ],
@@ -366,8 +386,8 @@ export default class Login extends Component {
                   <Button transparent success style={{paddingTop:0,paddingBottom:0, height:40}} onPress={() => this.setState({secure: !this.state.secure})}><Text style={{fontFamily:'BebasNeueBold', color:COLOR.verde}}>{this.state.secure? 'Mostrar' : 'Ocultar'}</Text></Button>
                 </Item>
                 
-                {fail >= 1 && <Text style={styles.forgotPass} onPress={() => this.ChangePass(this.props.handler2)}>Olvidaste tu contraseña?</Text>}              
-                <Button block onPress={() => this._OnLogin(this.props.handler)} style={styles.boton2}>
+                {fail >= 1 && <Text style={styles.forgotPass} onPress={() => { !this.state.updating ? this.ChangePass(this.props.handler2) : this._checkUpdates()}}>Olvidaste tu contraseña?</Text>}              
+                <Button block onPress={() => { !this.state.updating ? this._OnLogin(this.props.handler) : this._checkUpdates()}} style={styles.boton2}>
                   <Text style={styles.text}>Ingresar</Text>
                 </Button>
                 <ListItem underlayColor={COLOR.azul} style={styles.checkbox2} button onPress={() => this.setState({checked: !this.state.checked})}>
@@ -382,7 +402,7 @@ export default class Login extends Component {
             </View>
           </Content>
         </KeyboardAvoidingView>
-        {this.state.isPrivacidad &&
+        {this.state.isPrivacidad && !this.state.updating &&
           <Overlay
             visible={this.state.isVisiblePrivacidad}
             animationType="zoomIn"

@@ -43,4 +43,8 @@ export const api = {
  ipOcultarReporte: baseUrl + "/supervisores_api/public/api/ocultarReporte",
  ipTipoReporteList: baseUrl + "/supervisores_api/public/api/tipoReporteList",
  ipCoordinadoresList: baseUrl + "/supervisores_api/public/api/coordinadoresList",
+ ipInfoApp: baseUrl + "/supervisores_api/public/api/infoApp",
+ ipGoToStore: "http://sistemas.binar10.co/supervisores_redirect.html",
+ ipGoToPlayStore: "https://play.google.com/store/apps/details?id=com.binar10.supervisores",
+ ipGoToAppStore: "https://itunes.apple.com/co/app/superat/id1451732869?mt=8",
 }

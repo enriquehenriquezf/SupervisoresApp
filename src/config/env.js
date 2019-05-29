@@ -11,7 +11,7 @@ var port = '8000';
 
 const ENV = {
     dev: {
-        apiUrl: devUrl,
+        apiUrl: prodUrl,
         port: port,
     },
     staging: {
