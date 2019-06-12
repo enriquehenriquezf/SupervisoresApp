@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import { StyleSheet } from 'react-native';
 import { COLOR } from '../components/Colores';
 export default StyleSheet.create({

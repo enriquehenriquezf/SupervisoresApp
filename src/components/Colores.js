@@ -1,4 +1,8 @@
 /**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
+/**
  * Gama de colores
  */
 export const COLOR = {

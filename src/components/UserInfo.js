@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import React, { Component } from 'react';
 import { Left, Body, Right, List,ListItem,Text, Icon, Thumbnail, Card } from 'native-base';
 import {View, Image} from 'react-native';

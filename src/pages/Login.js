@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import {toastr} from '../components/Toast';
@@ -197,7 +201,7 @@ export default class Login extends Component {
     }).catch(function(error){
       console.log(error);
       toastr.showToast('Verifique su conexión a internet','warning');
-      if(error.toString().includes('Network request failed')){toastr.showToast('Contactese con el administrador','warning');}
+      if(error.toString().includes('Network request failed')){toastr.showToast('Verifique su conexión a internet ó Contactese con el administrador','warning');}
     });
   }
 
@@ -247,7 +251,7 @@ export default class Login extends Component {
       }).catch(function(error){
         console.log(error);
         toastr.showToast('Verifique su conexión a internet','warning');
-        if(error.toString().includes('Network request failed')){toastr.showToast('Contactese con el administrador','warning');}
+        if(error.toString().includes('Network request failed')){toastr.showToast('Verifique su conexión a internet ó Contactese con el administrador','warning');}
     });
   }
 

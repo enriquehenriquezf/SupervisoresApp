@@ -1,4 +1,9 @@
-import getEnvVars from '../config/env';
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
+
+ import getEnvVars from '../config/env';
 
 /**
  * url de la api

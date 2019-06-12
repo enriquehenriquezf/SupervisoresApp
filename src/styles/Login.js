@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import { StyleSheet, Dimensions } from 'react-native';
 import { COLOR } from '../components/Colores';
 var widthScreen = Dimensions.get('window').width;

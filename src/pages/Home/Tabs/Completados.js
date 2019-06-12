@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Left, Body, Right, Content, List,ListItem,Text, Badge, Icon, Spinner, Card } from 'native-base';

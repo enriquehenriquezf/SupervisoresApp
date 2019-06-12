@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import React from "react";
 import { Image, View, TouchableOpacity, Dimensions, AsyncStorage } from "react-native";
 import { Text, Container, Content, Badge} from "native-base";

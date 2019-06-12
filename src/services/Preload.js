@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import {Image} from 'react-native';
 import { Imagen } from '../components/Imagenes';
 

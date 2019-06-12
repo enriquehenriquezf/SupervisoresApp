@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import * as Expo from 'expo';
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Text, Icon, Button, Tabs, Tab, TabHeading, Drawer } from 'native-base';

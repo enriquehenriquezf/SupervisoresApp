@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import {Toast} from 'native-base';
 export const toastr = {
   /***

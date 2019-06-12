@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import React from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
 import {Icon} from 'native-base'

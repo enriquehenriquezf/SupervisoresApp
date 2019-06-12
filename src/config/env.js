@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import {Constants} from 'expo';
 
 /**
@@ -11,7 +15,7 @@ var port = '8000';
 
 const ENV = {
     dev: {
-        apiUrl: prodUrl,
+        apiUrl: devUrl,
         port: port,
     },
     staging: {

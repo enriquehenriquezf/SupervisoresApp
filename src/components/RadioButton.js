@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import React, { Component } from 'react';
 import { Left, Right, ListItem,Text,Radio } from 'native-base';
 import { COLOR } from './Colores';

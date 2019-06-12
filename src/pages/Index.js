@@ -1,3 +1,7 @@
+/**
+ * @author Enrique Henriquez Figueroa
+ * @copyright Binar10
+ */
 import React, { Component } from 'react';
 import { Root, Spinner } from 'native-base';
 import { View } from 'react-native';

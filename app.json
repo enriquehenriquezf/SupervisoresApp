@@ -1,4 +1,5 @@
 {
+  "author": "Enrique Henriquez",
   "expo": {
     "name": "SuperAT",
     "description": "Administrador de planes de trabajos para los supervisores de Unidrogas.",
