@@ -820,7 +820,7 @@ export default class Activity extends Component {
           else
           {
             toastr.showToast('Está fuera del rango de ' + items.sucursal,'danger');
-            //this.handleBackPress();
+            this.handleBackPress();
           }  
           if(position.coords.accuracy < 2){
             toastr.showToast('Precisión del GPS muy baja','warning');
@@ -1350,9 +1350,9 @@ export default class Activity extends Component {
           var newToken = JSON.parse(response._bodyInit);
           var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
           var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
-          logError.sendError(header,body,auth);
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
+            logError.sendError(header,body,auth);
           }
           else if(response.status === 401){
             toastr.showToast('Su sesión expiró','danger');
@@ -1410,9 +1410,9 @@ export default class Activity extends Component {
           var newToken = JSON.parse(response._bodyInit);
           var header = JSON.stringify({ok:response.ok, status:response.status, statusText:response.statusText, type:response.type, url:response.url});
           var body = JSON.stringify({message:newToken.message,exception:newToken.exception,file:newToken.file,line:newToken.line});
-          logError.sendError(header,body,auth);
           if(response.status === 500){
             toastr.showToast('Error con el servidor','danger');
+            logError.sendError(header,body,auth);
           }
           else if(response.status === 401){
             toastr.showToast('Su sesión expiró','danger');
