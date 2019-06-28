@@ -804,16 +804,16 @@ export default class Activity extends Component {
      */
     var lat = 0;
     var long = 0;
-    var RANGO = 0.0005000
+    var RANGO = 0.0005000;
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
         //console.log("Pos:");
-        //console.log(position);
+        // console.log(position);
         lat = position.coords.latitude;
         long = position.coords.longitude;
         if(position.mocked === false)// verificar que no tenga un fake gps
         {
-          if((lat >= items.latitud-RANGO && lat <= items.latitud+RANGO) && (long >= items.longitud-RANGO && long <= items.longitud+RANGO))
+          if((lat >= parseFloat(items.latitud)-RANGO && lat <= parseFloat(items.latitud)+RANGO) && (long >= parseFloat(items.longitud)-RANGO && long <= parseFloat(items.longitud)+RANGO))
           {
             toastr.showToast('Se encuentra dentro de ' + items.sucursal,'info');
           }
