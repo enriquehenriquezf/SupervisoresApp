@@ -376,7 +376,7 @@ export default class Login extends Component {
         <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 1 : 1}}>
           <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
             <View>
-              <Image style={{height: 192, width: 192, marginLeft: 'auto', marginRight:'auto',marginBottom:15}} source={Imagen.unidrogas}/>
+              <Image style={{height: 192, width: 192, marginLeft: 'auto', marginRight:'auto',marginBottom:15}} source={Imagen.icon}/>
               <Form >
                 <Item regular style={styles.form}>
                   {/*<Icon active ios='ios-person' android='md-person' style={styles.icon}/>*/}

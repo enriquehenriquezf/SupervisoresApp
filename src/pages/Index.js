@@ -59,7 +59,7 @@ export default class Index extends Component {
         BebasKai: require('../../assets/Fonts/BebasKai.ttf'),
       });
       await Expo.Asset.loadAsync([
-        Imagen.unidrogas,
+        Imagen.icon,
         Imagen.home,
         Imagen.actividad,
         Imagen.perfil,

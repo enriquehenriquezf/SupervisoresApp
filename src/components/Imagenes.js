@@ -8,7 +8,7 @@ export const Imagen = {
     avatar: 'https://png.pngtree.com/svg/20160304/ajb_address_book_user_avatar_183015.png',
     avatar2: 'https://assets4.domestika.org/project-items/001/228/844/sesion-estudio-barcelona-10-big.jpg?1425034585',
     noDisponible: api.ipIcons + 'icono-supp-01.png',
-    unidrogas: require('../../assets/unidrogas.png'),
+    icon: require('../../assets/icon.png'),
     home: require('../../assets/Icons/icono-supp-03.png'),
     actividad: require('../../assets/Icons/icono-sup-02.png'),
     perfil: require('../../assets/Icons/icono-sup-08.png'),

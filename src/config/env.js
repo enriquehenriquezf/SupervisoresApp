@@ -8,9 +8,9 @@ import {Constants} from 'expo';
  * url de la api
  * @example: localhost: 192.168.1.4 | public: 200.116.66.129
  */
-var devUrl ='http://192.168.1.136';//Ronaldo
+var devUrl ='https://superat.com.co';//'http://192.168.1.136';//Ronaldo
 var stagingUrl ='http://sistemas.binar10.co';// Servidor Privada http://sistemas.binar10.co
-var prodUrl ='http://31.220.60.151'; // Servidor Publica
+var prodUrl ='https://superat.com.co';//'http://31.220.60.151'; // Servidor Publica
 var port = '8000';
 
 const ENV = {
