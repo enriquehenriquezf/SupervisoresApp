@@ -720,7 +720,7 @@ export default class Reportes extends Component {
      * Mostrar layout luego de cargar los datos
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     const { query } = this.state;
     const sucursales = this.state.SUCURSALES;
@@ -736,6 +736,11 @@ export default class Reportes extends Component {
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
         <Container>
+          <Expo.LinearGradient
+            colors={['#FD0047', '#FDBB01']}
+            start={[0,.5]}
+            end={[1,.5]}
+            style={IconStyles.gradient}>
             <Header hasTabs style={IconStyles.navbar}>
                 <Left>
                     <Button transparent onPress={() => this.drawer._root.open()}>
@@ -748,6 +753,7 @@ export default class Reportes extends Component {
                 <Right>
                 </Right>
             </Header>
+          </Expo.LinearGradient>
             <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
             <Content refreshControl={
                 <RefreshControl
@@ -899,7 +905,7 @@ export default class Reportes extends Component {
                 * Mostrar layout luego de cargar los datos
                 */
                 !this.state.isLoadReporte && this.state.isVisibleDetalleReporte?
-                  <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
+                  <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>
                 :
                   <View style={{justifyContent:'space-between', width:"100%"}}>
                     <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleDetalleReporte: false,isLoadReporte:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
@@ -972,7 +978,7 @@ export default class Reportes extends Component {
               containerStyle={{backgroundColor: "rgba(0, 0, 0, .3)", width:"auto",height:"auto"}}
               childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
             >
-              {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>}
+              {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>}
             </Overlay>
         </Container>
       </Drawer>

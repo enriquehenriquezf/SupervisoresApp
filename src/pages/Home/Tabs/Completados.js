@@ -228,7 +228,7 @@ export default class Home extends Component {
      * Mostrar layout luego de cargar tipos de fuente
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     return (
       <Content refreshControl={

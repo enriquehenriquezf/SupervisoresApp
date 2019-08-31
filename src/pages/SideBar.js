@@ -72,13 +72,18 @@ export default class SideBar extends React.Component {
       <Container>
         <Content>
             <View style={{width:"100%", height:Dimensions.get('window').height, paddingLeft:20, paddingRight:20}}>
-                <View style={styles.header}>
-                    <TouchableOpacity style={{marginLeft:20, marginTop:30}} onPress={() => this.props.closeDrawer()}>
-                        {/* <Icon ios="ios-menu" android="md-menu" style={{fontSize: 40, color: 'white'}}></Icon> */}
-                        <Image style={IconStyles.menu2} source={Imagen.home}></Image>
-                    </TouchableOpacity>
-                </View>
-
+                <Expo.LinearGradient
+                    colors={['#FD0047', '#FDBB01']}
+                    start={[0,.5]}
+                    end={[1,.5]}
+                    style={styles.gradient}>
+                    <View style={styles.header}>
+                        <TouchableOpacity style={{marginLeft:20, marginTop:30}} onPress={() => this.props.closeDrawer()}>
+                            {/* <Icon ios="ios-menu" android="md-menu" style={{fontSize: 40, color: 'white'}}></Icon> */}
+                            <Image style={IconStyles.menu2} source={Imagen.home}></Image>
+                        </TouchableOpacity>
+                    </View>
+                </Expo.LinearGradient>
                 <View style={styles.threeButtons}>
                     <View style={[styles.rectangulo, styles.actividades, this.props.layout === 1 ?{shadowOffset:{height:8}, elevation: 8} : null]}>
                         <TouchableOpacity style={{flex:1,justifyContent:'space-between', alignItems:'center'}} onPress={() => {this.props.layout === 1 ? this.props.closeDrawer() : this.props.handler2(1,token,[])}} disabled={this.props.rol === 4 ? true : false}>

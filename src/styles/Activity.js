@@ -28,7 +28,7 @@ export default StyleSheet.create({
         marginBottom:10
     },
     finalizar:{
-        backgroundColor:COLOR.verde
+        backgroundColor:COLOR.secundary
     },
     actualizar:{
         backgroundColor:COLOR.azul
@@ -67,7 +67,7 @@ export default StyleSheet.create({
         marginBottom:15,
         marginLeft:20,
         fontFamily:'BebasKai',
-        color:COLOR.verde
+        color:COLOR.secundary
     },
     textDescFoto:{
         marginTop:15,

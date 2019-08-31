@@ -96,7 +96,7 @@ export default class ShowActivities extends Component {
      * Mostrar layout luego de cargar los datos
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     /**
      * mostrar las fechas de una actividad dentro de un solo componente
@@ -136,19 +136,25 @@ export default class ShowActivities extends Component {
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
         <Container>
-          <Header hasTabs style={IconStyles.navbar}>
-            <Left>
-              <Button transparent onPress={() => this.drawer._root.open()}>
-                {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
-                <Image style={IconStyles.menu2} source={Imagen.home}></Image>
-              </Button>
-            </Left>             
-            <Body>
-              {/* <Title>{SUCURSAL.substring(0,1) + SUCURSAL.substring(1,SUCURSAL.length).toLowerCase()}</Title> */}
-            </Body>
-            <Right>
-            </Right>
-          </Header>
+          <Expo.LinearGradient
+            colors={['#FD0047', '#FDBB01']}
+            start={[0,.5]}
+            end={[1,.5]}
+            style={IconStyles.gradient}>
+            <Header hasTabs style={IconStyles.navbar}>
+              <Left>
+                <Button transparent onPress={() => this.drawer._root.open()}>
+                  {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                  <Image style={IconStyles.menu2} source={Imagen.home}></Image>
+                </Button>
+              </Left>             
+              <Body>
+                {/* <Title>{SUCURSAL.substring(0,1) + SUCURSAL.substring(1,SUCURSAL.length).toLowerCase()}</Title> */}
+              </Body>
+              <Right>
+              </Right>
+            </Header>
+          </Expo.LinearGradient>
           <Content>
             <Text style={{fontFamily:'BebasNeueBold',color: COLOR.azul,fontSize: 28, marginLeft:20, marginTop:10}}>{SUCURSAL}</Text>
             {activities}

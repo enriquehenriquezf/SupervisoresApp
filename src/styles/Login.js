@@ -29,7 +29,7 @@ export default StyleSheet.create({
         marginTop: 10
     },
     boton2: {
-        backgroundColor: COLOR.verdeTransparente,
+        backgroundColor: COLOR.secundary,
         borderColor: 'rgba(255,255,255,0)',
         elevation:0,
         borderWidth:0,

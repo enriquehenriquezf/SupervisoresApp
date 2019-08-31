@@ -6,13 +6,20 @@ import { StyleSheet } from 'react-native';
 import {Platform} from 'react-native';
 import { COLOR } from '../components/Colores';
 export default StyleSheet.create({
+    gradient:{
+        // paddingTop: 50,
+        // paddingBottom:30,
+        height:"12.5%",
+        elevation:0,
+        borderBottomRightRadius:100,
+    },
     navbar:{
         paddingTop: 50,
         paddingBottom:30,
-        height:"10%",
-        elevation:0,
-        borderBottomRightRadius:100,
-        backgroundColor:COLOR.azul
+        // height:"10%",
+        // elevation:0,
+        // borderBottomRightRadius:100,
+        backgroundColor:'transparent'
     },
     menu: {
         fontSize: 40,

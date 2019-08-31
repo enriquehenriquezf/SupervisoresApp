@@ -193,18 +193,24 @@ export default class Home extends Component {
         panCloseMask={.02}
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
-        <Container>     
+        <Container>
+          <Expo.LinearGradient
+            colors={['#FD0047', '#FDBB01']}
+            start={[0,.5]}
+            end={[1,.5]}
+            style={IconStyles.gradient}>
             <Header hasTabs style={IconStyles.navbar}>
-              <Left>
-                  <Button transparent onPress={() => {this.drawer._root.open()}}>
-                    {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
-                    <Image style={IconStyles.menu2} source={Imagen.home}></Image>
-                  </Button>
-              </Left>          
-              <Body>
-                {/*<Title>Actividades</Title>*/}
-              </Body>
+                <Left>
+                    <Button transparent onPress={() => {this.drawer._root.open()}}>
+                      {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                      <Image style={IconStyles.menu2} source={Imagen.home}></Image>
+                    </Button>
+                </Left>          
+                <Body>
+                  {/*<Title>Actividades</Title>*/}
+                </Body>
             </Header>
+          </Expo.LinearGradient>
           <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
           <Tabs tabContainerStyle={{elevation:0, shadowOpacity:0}} tabBarUnderlineStyle={{backgroundColor:'transparent',elevation:0, shadowOpacity:0}}>
             <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading activeTextStyle={{color:'#ff0000'}} style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginLeft:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Activos</Text></View></TabHeading>}>

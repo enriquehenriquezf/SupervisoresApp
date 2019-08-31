@@ -368,7 +368,7 @@ export default class Login extends Component {
      * Mostrar layout luego de cargar los componentes
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     var height = Dimensions.get('window').height;
     return (
@@ -387,7 +387,7 @@ export default class Login extends Component {
                   {/*<Icon active ios='ios-lock' android='md-lock'  style={styles.icon}/>*/}
                   <Image style={styles.icon} source={Imagen.pass}/>
                   <Input placeholder='Contraseña' placeholderTextColor={COLOR.gris} defaultValue={this.state.password} secureTextEntry={this.state.secure}  onChangeText={(text) => this.setState({password: text})} autoCapitalize='none'  style={styles.pass}/>
-                  <Button transparent style={{paddingTop:0,paddingBottom:0, height:40}} onPress={() => this.setState({secure: !this.state.secure})}><Text style={{fontFamily:'BebasNeueBold', color:COLOR.verde}}>{this.state.secure? 'Mostrar' : 'Ocultar'}</Text></Button>
+                  <Button transparent style={{paddingTop:0,paddingBottom:0, height:40}} onPress={() => this.setState({secure: !this.state.secure})}><Text style={{fontFamily:'BebasNeueBold', color:COLOR.secundary}}>{this.state.secure? 'Mostrar' : 'Ocultar'}</Text></Button>
                 </Item>
                 
                 {fail >= 1 && <Text style={styles.forgotPass} onPress={() => { !this.state.updating ? this.ChangePass(this.props.handler2) : this._checkUpdates()}}>Olvidaste tu contraseña?</Text>}              

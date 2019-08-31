@@ -9,7 +9,7 @@ import IconStyles from '../styles/Icons';
 import styles from '../styles/Reportes';
 import {toastr} from '../components/Toast';
 import {api} from '../services/api'
-import {View, BackHandler,Image,KeyboardAvoidingView} from 'react-native';
+import {View, BackHandler,Image,KeyboardAvoidingView,WebView} from 'react-native';
 import SideBar from './SideBar';
 import { Imagen } from '../components/Imagenes';
 import Overlay from 'react-native-modal-overlay';
@@ -23,6 +23,7 @@ export default class Stats extends Component {
     this.state = {
       loading: true,
       loading2:false,
+      loadingTawk:false,
       asunto:'',
       mensaje:'',
       showToast: false
@@ -123,7 +124,7 @@ export default class Stats extends Component {
      * Mostrar layout luego de cargar los datos
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     return (
       <Drawer
@@ -137,28 +138,43 @@ export default class Stats extends Component {
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
         <Container>
-          <Header style={IconStyles.navbar}>
-            <Left>
-              <Button transparent onPress={() => this.drawer._root.open()}>
-                {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
-                <Image style={IconStyles.menu2} source={Imagen.home}></Image>
-              </Button>
-            </Left>       
-            <Body>
-            </Body>
-            <Right>
-            </Right>
-          </Header>
-          <KeyboardAvoidingView behavior="padding" enabled style={{flex: .9}}>
+          <Expo.LinearGradient
+            colors={['#FD0047', '#FDBB01']}
+            start={[0,.5]}
+            end={[1,.5]}
+            style={IconStyles.gradient}>
+            <Header style={IconStyles.navbar}>
+              <Left>
+                <Button transparent onPress={() => this.drawer._root.open()}>
+                  {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                  <Image style={IconStyles.menu2} source={Imagen.home}></Image>
+                </Button>
+              </Left>       
+              <Body>
+              </Body>
+              <Right>
+              </Right>
+            </Header>
+          </Expo.LinearGradient>
+          <KeyboardAvoidingView behavior="padding" enabled style={{flex: 1}}>
             <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
-                <View style={{marginTop:40}}>
+                <WebView
+                  style={{width:"100%"}}
+                  source={{uri: 'https://tawk.to/chat/5d1e14a87a48df6da242fa24/default' }}
+                  startInLoadingState={true}
+                  renderLoading={() => {return(<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='#FD3533' /></View>);}}
+                  onLoadEnd={(load) => {/*console.log(load);*/}}
+                  onError={(error) => {console.log('error: ');console.log(error)}}
+                />
+
+                {/* <View style={{marginTop:40}}>
                   <Text style={{fontFamily:'BebasNeueBold', paddingHorizontal:20,marginBottom:20,textAlign:'justify',color:COLOR.azul}}>Envíanos un mensaje con respecto a algún error evidenciado en la aplicación.</Text>
-                    <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
-                    <Form>
-                        <Textarea bordered placeholder="Mensaje" style={[styles.observaciones,{height:200,fontSize:20,textAlign:'auto', textAlignVertical:'top', paddingTop:5}]} onChangeText={(text) => this.setState({mensaje: text})} />
-                    </Form>
-                    <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:20}]} onPress={() => {this.setState({disable:true}); this.EnviarBug()}}><Text> Enviar </Text></Button>
-                </View>
+                  <Input style={[styles.asunto,{width:"85%", fontFamily:'BebasNeueBold', marginLeft:20}]} placeholder="Asunto" onChangeText={(text) => this.setState({asunto: text})}></Input>
+                  <Form>
+                      <Textarea bordered placeholder="Mensaje" style={[styles.observaciones,{height:200,fontSize:20,textAlign:'auto', textAlignVertical:'top', paddingTop:5}]} onChangeText={(text) => this.setState({mensaje: text})} />
+                  </Form>
+                  <Button disabled={this.state.disable} success regular block style={[styles.boton, styles.finalizar, {marginTop:20}]} onPress={() => {this.setState({disable:true}); this.EnviarBug()}}><Text> Enviar </Text></Button>
+                </View> */}
             </Content>
           </KeyboardAvoidingView>
           <Overlay
@@ -169,7 +185,7 @@ export default class Stats extends Component {
             containerStyle={{backgroundColor: "rgba(0, 0, 0, .3)", width:"auto",height:"auto"}}
             childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
           >
-            {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>}
+            {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>}
           </Overlay>
         </Container>
       </Drawer>

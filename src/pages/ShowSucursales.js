@@ -149,7 +149,7 @@ export default class ShowSucursales extends Component {
      * Mostrar layout luego de cargar las sucursales con planes de trabajo
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     return (
       <Drawer
@@ -163,19 +163,25 @@ export default class ShowSucursales extends Component {
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
         <Container>
-          <Header hasTabs style={IconStyles.navbar}>
-            <Left>
-              <Button transparent onPress={() => this.drawer._root.open()}>
-                {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
-                <Image style={IconStyles.menu2} source={Imagen.home}></Image>
-              </Button>
-            </Left>           
-            <Body>
-              {/* <Title>Actividades</Title> */}
-            </Body>
-            <Right>
-            </Right>
-          </Header>
+          <Expo.LinearGradient
+            colors={['#FD0047', '#FDBB01']}
+            start={[0,.5]}
+            end={[1,.5]}
+            style={IconStyles.gradient}>
+            <Header hasTabs style={IconStyles.navbar}>
+              <Left>
+                <Button transparent onPress={() => this.drawer._root.open()}>
+                  {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                  <Image style={IconStyles.menu2} source={Imagen.home}></Image>
+                </Button>
+              </Left>           
+              <Body>
+                {/* <Title>Actividades</Title> */}
+              </Body>
+              <Right>
+              </Right>
+            </Header>
+          </Expo.LinearGradient>
           <Content>
             {
               dataArray.length > 0 ?

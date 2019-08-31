@@ -13,7 +13,7 @@ export class RadioButton extends Component {
 
     render() {
         return (
-            <ListItem button onPress={() => this.props.SetChecked(this.props.i,this.props.value)} style={{backgroundColor:COLOR.verde,borderRadius:10,borderBottomColor: 'rgba(255,255,255,0)', paddingBottom:5, paddingTop:5,paddingLeft:18, marginBottom:5, marginTop:5, marginRight:18}}>
+            <ListItem button onPress={() => this.props.SetChecked(this.props.i,this.props.value)} style={{backgroundColor:COLOR.secundary,borderRadius:10,borderBottomColor: 'rgba(255,255,255,0)', paddingBottom:5, paddingTop:5,paddingLeft:18, marginBottom:5, marginTop:5, marginRight:18}}>
                 <Left>
                     <Text style={{color:'white', fontFamily:'BebasNeueBold', fontSize:20}}>{this.props.value}</Text>
                 </Left>

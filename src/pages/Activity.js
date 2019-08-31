@@ -1576,7 +1576,7 @@ export default class Activity extends Component {
      * Mostrar layout luego de cargar los datos
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     
     const { query,query3 } = this.state;
@@ -1596,22 +1596,28 @@ export default class Activity extends Component {
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
         <Container>
-          <Header hasTabs style={IconStyles.navbar}>
-            <Left>
-              <Button transparent onPress={() => this.drawer._root.open()}>
-                {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
-                <Image style={IconStyles.menu2} source={Imagen.home}></Image>
-              </Button>
-            </Left>
-            <Body>
-              {/* <Title>{items.sucursal}</Title> */}
-            </Body>
-            <Right style={{marginRight:10}}>          
-              <Button transparent onPress={() => this.setState({isVisible: true})}>
-                  <Icon ios="ios-help" android="md-help" style={IconStyles.help}></Icon>
-              </Button>
-            </Right>
-          </Header>
+          <Expo.LinearGradient
+            colors={['#FD0047', '#FDBB01']}
+            start={[0,.5]}
+            end={[1,.5]}
+            style={IconStyles.gradient}>
+            <Header hasTabs style={IconStyles.navbar}>
+              <Left>
+                <Button transparent onPress={() => this.drawer._root.open()}>
+                  {/* <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon> */}
+                  <Image style={IconStyles.menu2} source={Imagen.home}></Image>
+                </Button>
+              </Left>
+              <Body>
+                {/* <Title>{items.sucursal}</Title> */}
+              </Body>
+              <Right style={{marginRight:10}}>          
+                <Button transparent onPress={() => this.setState({isVisible: true})}>
+                    <Icon ios="ios-help" android="md-help" style={IconStyles.help}></Icon>
+                </Button>
+              </Right>
+            </Header>
+          </Expo.LinearGradient>
           <KeyboardAvoidingView behavior="padding" enabled style={{flex: Platform.OS === 'ios' ? 1 : 1}}>
             <Content keyboardShouldPersistTaps='true'>
               <Text style={styles.sucursal}>{items.sucursal}</Text>
@@ -2742,7 +2748,7 @@ export default class Activity extends Component {
                 * Mostrar layout luego de cargar los datos
                 */
                 !this.state.isLoadActividad && this.state.isVisibleActividad?
-                  <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
+                  <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>
                 :
                   <View style={{justifyContent:'space-between', width:"100%"}}>
                     <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleActividad: false,isLoadActividad:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
@@ -2803,7 +2809,7 @@ export default class Activity extends Component {
                 * Mostrar layout luego de cargar los datos
                 */
                 !this.state.isLoadActividad && this.state.isVisibleActividad2?
-                  <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>
+                  <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>
                 :
                   <View style={{justifyContent:'space-between', width:"100%"}}>
                     <TouchableOpacity style={{marginBottom:10, width:50}} onPress={() => this.setState({isVisibleActividad2: false,isLoadActividad:false})}><Image style={styles.iconoBoton} source={Imagen.back}></Image></TouchableOpacity>
@@ -3010,7 +3016,7 @@ export default class Activity extends Component {
             containerStyle={{backgroundColor: "rgba(0, 0, 0, .3)", width:"auto",height:"auto"}}
             childrenWrapperStyle={{backgroundColor: "rgba(0, 0, 0, 0)", borderRadius: 10}}
           >
-            {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>}
+            {this.state.loading2 && <View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>}
           </Overlay>
         </Container>
       </Drawer>

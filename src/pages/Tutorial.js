@@ -42,7 +42,7 @@ export default class Tutorial extends Component {
      * Mostrar layout luego de cargar los componentes
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     var height = Dimensions.get('window').height;
     return (

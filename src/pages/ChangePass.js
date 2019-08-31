@@ -121,7 +121,7 @@ export default class ChangePass extends Component {
      * Mostrar layout luego de cargar los datos
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='blue' /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);
     }
     return (
       <Drawer
@@ -135,18 +135,24 @@ export default class ChangePass extends Component {
         styles={{ drawer: { shadowColor: "#000000",shadowOpacity: 0,shadowRadius: 0,elevation: 5,},mainOverlay:{opacity: 0,backgroundColor:'#00000000', elevation:8}}}
         >
         <Container>
-          <Header hasTabs style={IconStyles.navbar}>
-            <Left>
-              <Button transparent onPress={() => items.FromLogin ? null : this.drawer._root.open()}>
-                <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
-              </Button>
-            </Left>       
-            <Body>
-              {/*<Title>Cambiar Contraseña</Title>*/}
-            </Body>
-            <Right>
-            </Right>
-          </Header>
+          <Expo.LinearGradient
+            colors={['#FD0047', '#FDBB01']}
+            start={[0,.5]}
+            end={[1,.5]}
+            style={IconStyles.gradient}>
+            <Header hasTabs style={IconStyles.navbar}>
+              <Left>
+                <Button transparent onPress={() => items.FromLogin ? null : this.drawer._root.open()}>
+                  <Icon ios="ios-menu" android="md-menu" style={IconStyles.menu}></Icon>
+                </Button>
+              </Left>       
+              <Body>
+                {/*<Title>Cambiar Contraseña</Title>*/}
+              </Body>
+              <Right>
+              </Right>
+            </Header>
+          </Expo.LinearGradient>
           <KeyboardAvoidingView behavior="padding" enabled style={{flex: 1}}>
             <Content>
               <View style={{marginTop: 10, marginLeft:'auto', marginRight:'auto'}}>

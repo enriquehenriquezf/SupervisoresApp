@@ -5,12 +5,18 @@
 import { StyleSheet } from 'react-native';
 import { COLOR } from '../components/Colores';
 export default StyleSheet.create({
-    header:{
-        backgroundColor:COLOR.azul,
+    gradient:{
         width:"115%",
         borderBottomRightRadius:100,
-        height:"15%",//78
+        height:"12.5%",
         marginLeft:-20
+    },
+    header:{
+        backgroundColor:'transparent',
+        // width:"115%",
+        // borderBottomRightRadius:100,
+        // height:"12.5%",//78
+        // marginLeft:-20
     },
     threeButtons:{
         width:"100%",
@@ -56,16 +62,16 @@ export default StyleSheet.create({
         borderRadius:10
     },
     actividades:{
-        backgroundColor:'#00645C'
+        backgroundColor:'#FF4418'
     },
     perfil:{
-        backgroundColor:'#8CD7DF'
+        backgroundColor:'#FF7F01'
     },
     agenda:{
-        backgroundColor:'#0E303F'
+        backgroundColor:'#E8D62B'
     },
     activo:{
-        backgroundColor:'#8CD7DF'
+        backgroundColor:'#B6B42C'
     },
     completado10:{
         backgroundColor:COLOR.completado10
@@ -98,16 +104,16 @@ export default StyleSheet.create({
         backgroundColor:COLOR.completado100
     },
     reportes:{
-        backgroundColor:'#5A8B91',
+        backgroundColor:'#ADC35E',
         width:"100%",
         height:"100%",
         borderRadius:10
     },
     servicioTecnico:{
-        backgroundColor:'#476800'
+        backgroundColor:'#F9D807'
     },
     cerrarSesion:{
-        backgroundColor:COLOR.verde//'#7EB700'
+        backgroundColor:'#EAE6A7'//'#7EB700'
     },
     text:{
         fontFamily:'BebasNeueBold',

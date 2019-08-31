@@ -33,7 +33,7 @@ export default StyleSheet.create({
         marginBottom:10
     },
     finalizar:{
-        backgroundColor:COLOR.verde
+        backgroundColor:COLOR.secundary
     },
     actualizar:{
         backgroundColor:COLOR.azul
