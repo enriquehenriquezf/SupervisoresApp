@@ -6,7 +6,7 @@ import * as Expo from 'expo';
 import React, { Component } from 'react';
 import {toastr} from '../components/Toast';
 import { Container, Body, Content, Form, Item, Input,Text, Button, Spinner, CheckBox, ListItem } from 'native-base';
-import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image,AppState, Alert,WebView,Linking } from 'react-native';
+import {View, Dimensions, KeyboardAvoidingView, AsyncStorage, Platform, Image,AppState, Alert,WebView,Linking,Modal } from 'react-native';
 import styles from '../styles/Login';
 import {api} from '../services/api';
 import {Imagen} from '../components/Imagenes';
@@ -32,6 +32,7 @@ export default class Login extends Component {
       privacidad:'0',
       tutorial:'0',
       isVisiblePrivacidad:false,
+      isVisibleTerminos:false,
       isPrivacidad:true,
       politicas: [
                       '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"> <HTML> <HEAD> <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8"> <TITLE></TITLE> <META NAME="GENERATOR" CONTENT="LibreOffice 4.1.6.2 (Linux)"> <META NAME="AUTHOR" CONTENT="Usuario de Windows"> <META NAME="CREATED" CONTENT="20190403;203300000000000"> <META NAME="CHANGEDBY" CONTENT="Enrique Henriquez"> <META NAME="CHANGED" CONTENT="20190403;203300000000000"> <META NAME="AppVersion" CONTENT="16.0000"> <META NAME="DocSecurity" CONTENT="0"> <META NAME="HyperlinksChanged" CONTENT="false"> <META NAME="LinksUpToDate" CONTENT="false"> <META NAME="ScaleCrop" CONTENT="false"> <META NAME="ShareDoc" CONTENT="false"> <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"> <STYLE TYPE="text/css"> <!-- @page { size: 8.5in 11in; margin-left: 1.18in; margin-right: 1.18in; margin-top: 0.98in; margin-bottom: 0.98in } P { margin-bottom: 0.08in; direction: ltr; line-height: 115%; widows: 2; orphans: 2 } --> </STYLE> </HEAD> <BODY LANG="es-CO" DIR="LTR"> <P ALIGN=CENTER STYLE="margin-bottom: 0.14in"><FONT FACE="Arial, serif"><I><B>AUTORIZACIÓN TRATAMIENTO, PROTECCION, USO DE DATOS PERSONALES, HABEAS DATA Y CONFIDENCIALIDAD DE LA INFORMACIÓN.</B></I></FONT></P> <P ALIGN=JUSTIFY STYLE="margin-bottom: 0.14in"> <FONT FACE="Arial, serif"><I>Con el registro de sus datos personales en esta aplicación, usted está manifestando su consentimiento libre, expreso e informado, en los términos de la Ley de Protección de Datos Personales en la República de Colombia (Ley 1581 de 2012 y demás normas complementarias.), para que Unidrogas S.A, almacene, administre y utilice los datos suministrados por Usted en una base de datos de su propiedad, la cual tiene como finalidad enviarle información relacionada y/o en conexión con encuestas de opinión, estadísticas, eventos, páginas web, ofertas de nuestros productos o cualquier otra información relacionada con temas salud y bienestar. Asimismo, Usted declara expresamente que la finalidad de la utilización de sus datos personales, le ha sido plenamente informada</I></FONT></P> </BODY> </HTML>',
@@ -401,7 +402,8 @@ export default class Login extends Component {
                   </Body>
                 </ListItem>        
               </Form>
-              <Text style={{alignSelf:'center', fontSize:12, marginTop:50}}>v {Expo.Constants.manifest.version}</Text>
+              <Text style={{alignSelf:'center', marginTop:20,color:COLOR.azul}} onPress={() => this.setState({isVisibleTerminos:true})}>Términos y Condiciones</Text>
+              <Text style={{alignSelf:'center', fontSize:12, marginTop:30}}>v {Expo.Constants.manifest.version}</Text>
               {/* <Text style={{alignSelf:'center', fontSize:12, marginTop:50}}>{consola}</Text> */}
             </View>
           </Content>
@@ -431,6 +433,28 @@ export default class Login extends Component {
               </View>
             </View>
           </Overlay>
+        }
+        {this.state.isVisibleTerminos &&
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={this.state.isVisibleTerminos}
+            onRequestClose={() => {
+              // Alert.alert('Modal has been closed.');
+            }}>
+            <View style={{flex:1,justifyContent:'center',backgroundColor:'rgba(0,0,0,.8)'}}>
+              <View style={{margin: 22,padding:10,borderRadius:10,justifyContent:'center',backgroundColor:'white',flex:1}}>
+                <View style={{justifyContent:'space-between', width:"100%", height:"100%"}}>
+                  <WebView style={{flex:1}} source={{uri: 'https://superat.co/terms.html'}}/>
+                  <View style={{justifyContent:'center',marginTop:5}}>
+                    <Button disabled={false} style={{backgroundColor:COLOR.verde,alignSelf:'center'}} onPress={() => {this.setState({isVisibleTerminos: false})}}>
+                      <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>Aceptar</Text>
+                    </Button>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
         }
       </Container>
     );
