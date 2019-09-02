@@ -229,7 +229,7 @@ export default class Login extends Component {
           var general = (porcentajes.porcentaje_general.actividades_completas / porcentajes.porcentaje_general.todas_las_actividades) * 100;
           that._storeDataPorcentajes(Math.floor(general),porcentajes);
           that._storeData();
-          if(that.state.tutorial < '4'){handler(10,token);}
+          if(that.state.tutorial < '3'){handler(10,token);}
           else{toastr.showToast('Ha iniciado sesión!','success');handler(1,token);}
           //console.log(Math.floor(general));
         }

@@ -18,7 +18,7 @@ export default class Tutorial extends Component {
       loading: true,
       tutorial:'0',
       isVisibleTutorial:false,
-      tuto: [{url: Imagen.tuto1},{url: Imagen.tuto2},{url: Imagen.tuto3},{url: Imagen.tuto4},{url: Imagen.tuto5}],
+      tuto: [{url: Imagen.tuto1},{url: Imagen.tuto2},{url: Imagen.tuto3},{url: Imagen.tuto4}],
     };
   }
 
@@ -58,8 +58,8 @@ export default class Tutorial extends Component {
                 indicatorColor='#BDC3C9'
                 indicatorSelectedColor='#97C023' />
             <View style={{position: 'absolute',bottom: 50,left: 0,right: 0,justifyContent: 'center',alignItems: 'center',flexDirection: 'row',backgroundColor: 'transparent'}}>
-              {this.state.tutorial === '4' && 
-              <Button disabled={this.state.tutorial !== '4'} style={{borderRadius:25,backgroundColor:this.state.tutorial === '4'?COLOR.verde:COLOR.gris,alignSelf:'center'}} onPress={() => {this._storeData(); (!this.props.data?toastr.showToast('Ha iniciado sesión!','success'):null); this.props.handler(1,this.props.token);} }>
+              {this.state.tutorial === '3' && 
+              <Button disabled={this.state.tutorial !== '3'} style={{borderRadius:25,backgroundColor:this.state.tutorial === '3'?COLOR.verde:COLOR.gris,alignSelf:'center'}} onPress={() => {this._storeData(); (!this.props.data?toastr.showToast('Ha iniciado sesión!','success'):null); this.props.handler(1,this.props.token);} }>
                 <Text style={{fontFamily:'BebasNeueBold', fontSize:20}}>      Comencemos!      </Text>
               </Button>}
             </View>         

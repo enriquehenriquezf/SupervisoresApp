@@ -139,7 +139,7 @@ export default class Stats extends Component {
         >
         <Container>
           <Expo.LinearGradient
-            colors={['#FD0047', '#FDBB01']}
+            colors={['#FF3153', '#FF7B3D']}
             start={[0,.5]}
             end={[1,.5]}
             style={IconStyles.gradient}>
@@ -162,7 +162,7 @@ export default class Stats extends Component {
                   style={{width:"100%"}}
                   source={{uri: 'https://tawk.to/chat/5d1e14a87a48df6da242fa24/default' }}
                   startInLoadingState={true}
-                  renderLoading={() => {return(<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color='#FD3533' /></View>);}}
+                  renderLoading={() => {return(<View style={{marginTop: 'auto', marginBottom: 'auto'}}><Spinner color={COLOR.azul} /></View>);}}
                   onLoadEnd={(load) => {/*console.log(load);*/}}
                   onError={(error) => {console.log('error: ');console.log(error)}}
                 />

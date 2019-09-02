@@ -271,7 +271,7 @@ export default class Home extends Component {
         return (
           <ListItem key={index} button underlayColor={COLOR.azulTransparente} onPress={() => itemPress(2,hand, element)} style={styles.SinBorde}>
             <Left >
-              <View style={[styles.ActividadBackground,{backgroundColor: element.estado === 3? COLOR.destiempo : COLOR.azul, height: element.name.length > 30 ? 55 : 40 }]}>
+              <View style={[styles.ActividadBackground,{backgroundColor: element.estado === 3? COLOR.destiempo : COLOR.secundary, height: element.name.length > 30 ? 55 : 40 }]}>
                 <Text style={styles.ActividadText}>{element.name}</Text>
               </View>
             </Left>

@@ -33,10 +33,10 @@ export default StyleSheet.create({
         marginBottom:10
     },
     finalizar:{
-        backgroundColor:COLOR.secundary
+        backgroundColor:COLOR.azul
     },
     actualizar:{
-        backgroundColor:COLOR.azul
+        backgroundColor:COLOR.secundary
     },
     textButton:{
         fontFamily:'BebasNeueBold',

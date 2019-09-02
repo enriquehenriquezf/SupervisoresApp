@@ -103,20 +103,20 @@ export default class ShowActivities extends Component {
      */
     const activities = items.map((data,index) => {
       return(
-        <Card key={index} style={{borderRadius:10,backgroundColor:COLOR.azul, borderColor:COLOR.azul, borderWidth:1, marginTop:25, marginLeft:20, marginRight:20}}>
+        <Card key={index} style={{borderRadius:10,backgroundColor:COLOR.secundary, borderColor:COLOR.secundary, borderWidth:1, marginTop:25, marginLeft:20, marginRight:20}}>
           <Text style={{color:'white', fontSize:24, fontFamily:'BebasNeueBold', textAlign:'center'}}> {data.title}</Text>
           {
             data.content.map((data2,index2) => {
               return(
                 index2 !== data.content.length-1?
                   <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,marginTop:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0}}>
-                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha inicio: {data2.fecha_inicio}</Text>
-                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha fin: {data2.fecha_fin}</Text>
+                    <Text style={{color:COLOR.texto,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha inicio: {data2.fecha_inicio}</Text>
+                    <Text style={{color:COLOR.texto,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha fin: {data2.fecha_fin}</Text>
                   </Card>
                 :
                   <Card key={Math.floor(Math.random() * 1000) + 1001} style={{borderColor: "rgba(255,255,255,0)", elevation:0, shadowOpacity:0,marginLeft:0,marginRight:0,marginBottom:0,borderLeftWidth:0,borderRightWidth:0,borderBottomWidth:0,borderRadius:0,borderBottomLeftRadius:10,borderBottomRightRadius:10}}>
-                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha inicio: {data2.fecha_inicio}</Text>
-                    <Text style={{color:COLOR.azul,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha fin: {data2.fecha_fin}</Text>
+                    <Text style={{color:COLOR.texto,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha inicio: {data2.fecha_inicio}</Text>
+                    <Text style={{color:COLOR.texto,fontFamily:'BebasKai', fontSize:18, paddingLeft:15}}> Fecha fin: {data2.fecha_fin}</Text>
                   </Card>
               )
             })
@@ -137,7 +137,7 @@ export default class ShowActivities extends Component {
         >
         <Container>
           <Expo.LinearGradient
-            colors={['#FD0047', '#FDBB01']}
+            colors={['#FF3153', '#FF7B3D']}
             start={[0,.5]}
             end={[1,.5]}
             style={IconStyles.gradient}>

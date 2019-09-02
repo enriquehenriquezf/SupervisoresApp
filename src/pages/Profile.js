@@ -185,7 +185,7 @@ export default class Profile extends Component {
         >
         <Container>
           <Expo.LinearGradient
-            colors={['#FD0047', '#FDBB01']}
+            colors={['#FF3153', '#FF7B3D']}
             start={[0,.5]}
             end={[1,.5]}
             style={IconStyles.gradient}>
@@ -228,7 +228,7 @@ export default class Profile extends Component {
                       <Text style={styles.text}>{items.telefono}</Text>
                   </Item>
                   <Button info regular block style={styles.boton} onPress={() => this.ChangePass(this.props.handler2)}><Text style={styles.textoBoton}> Cambiar Contraseña </Text></Button>
-                  <Button info regular block style={[styles.boton,{backgroundColor:COLOR.amarillo}]} onPress={() => this.props.handler2(10,this.props.token,true)}><Text style={styles.textoBoton}> Ver Tutorial </Text></Button>
+                  <Button info regular block style={[styles.boton,{backgroundColor:COLOR.secundary}]} onPress={() => this.props.handler2(10,this.props.token,true)}><Text style={styles.textoBoton}> Ver Tutorial </Text></Button>
               </View>
             </Content>
             <Overlay

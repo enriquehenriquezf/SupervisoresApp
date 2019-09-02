@@ -252,7 +252,7 @@ export default class Home extends Component {
               </ListItem>
             </View>
           :
-            <ListItem button underlayColor={COLOR.azulTransparente} onPress={() => this._OnItemPress(2,this.props.handler2, item)} style={styles.SinBorde}>
+            <ListItem button underlayColor={COLOR.secundary} onPress={() => this._OnItemPress(2,this.props.handler2, item)} style={styles.SinBorde}>
               <Left >
                 <View style={[styles.ActividadBackground,{height: item.name.length > 30 ? 55 : 40 }]}>
                   <Text style={styles.ActividadText}>{item.name}</Text>

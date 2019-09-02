@@ -62,16 +62,16 @@ export default StyleSheet.create({
         borderRadius:10
     },
     actividades:{
-        backgroundColor:'#FF4418'
+        backgroundColor:'#BDFAC9'
     },
     perfil:{
-        backgroundColor:'#FF7F01'
+        backgroundColor:'#A3EAEC'
     },
     agenda:{
-        backgroundColor:'#E8D62B'
+        backgroundColor:'#F1C5FF'
     },
     activo:{
-        backgroundColor:'#B6B42C'
+        backgroundColor:'#C9A4FF'
     },
     completado10:{
         backgroundColor:COLOR.completado10
@@ -104,16 +104,16 @@ export default StyleSheet.create({
         backgroundColor:COLOR.completado100
     },
     reportes:{
-        backgroundColor:'#ADC35E',
+        backgroundColor:'#FAD4BF',
         width:"100%",
         height:"100%",
         borderRadius:10
     },
     servicioTecnico:{
-        backgroundColor:'#F9D807'
+        backgroundColor:'#FDE396'
     },
     cerrarSesion:{
-        backgroundColor:'#EAE6A7'//'#7EB700'
+        backgroundColor:'#BDE26E'//'#7EB700'
     },
     text:{
         fontFamily:'BebasNeueBold',

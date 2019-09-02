@@ -164,7 +164,7 @@ export default class ShowSucursales extends Component {
         >
         <Container>
           <Expo.LinearGradient
-            colors={['#FD0047', '#FDBB01']}
+            colors={['#FF3153', '#FF7B3D']}
             start={[0,.5]}
             end={[1,.5]}
             style={IconStyles.gradient}>

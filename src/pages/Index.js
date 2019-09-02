@@ -154,7 +154,7 @@ export default class Index extends Component {
      * mostrar un spinner mientras la aplicación carga.
      */
     if (this.state.loading) {
-      return (<View style={{marginTop: 'auto', marginBottom: 'auto',backgroundColor:'white'}}><Spinner color='#FD3533' /><Expo.AppLoading /></View>);
+      return (<View style={{marginTop: 'auto', marginBottom: 'auto',backgroundColor:'white'}}><Spinner color='#FF8891' /><Expo.AppLoading /></View>);
     }
     let AppComponent = null;
 

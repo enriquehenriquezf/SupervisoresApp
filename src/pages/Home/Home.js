@@ -23,6 +23,7 @@ export default class Home extends Component {
     this.state = {
       loading: true,
       showToast: false,
+      selected:true,
       estado: true
     };
     let token = this.props.token;
@@ -195,7 +196,7 @@ export default class Home extends Component {
         >
         <Container>
           <Expo.LinearGradient
-            colors={['#FD0047', '#FDBB01']}
+            colors={['#FF3153', '#FF7B3D']}
             start={[0,.5]}
             end={[1,.5]}
             style={IconStyles.gradient}>
@@ -212,11 +213,11 @@ export default class Home extends Component {
             </Header>
           </Expo.LinearGradient>
           <UserInfo handler2={this.props.handler2} user={user} estado={this.state.estado}></UserInfo>
-          <Tabs tabContainerStyle={{elevation:0, shadowOpacity:0}} tabBarUnderlineStyle={{backgroundColor:'transparent',elevation:0, shadowOpacity:0}}>
-            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading activeTextStyle={{color:'#ff0000'}} style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginLeft:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Activos</Text></View></TabHeading>}>
+          <Tabs onChangeTab={() => this.setState({selected:!this.state.selected})} tabContainerStyle={{elevation:0, shadowOpacity:0}} tabBarUnderlineStyle={{backgroundColor:'transparent',elevation:0, shadowOpacity:0}}>
+            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading activeTextStyle={{color:'#ff0000'}} style={{backgroundColor: '#fff'}}><View style={{backgroundColor:this.state.selected ? COLOR.tab1 : COLOR.tab2, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginLeft:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20,color:'white'}}>Activos</Text></View></TabHeading>}>
               <Activos handler2={this.props.handler2} token={token} data={this.props.data} estado={this.state.estado}/>
             </Tab>
-            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:COLOR.azul, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginRight:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20}}>Completados</Text></View></TabHeading>}>
+            <Tab style={{backgroundColor: '#fff'}} heading={ <TabHeading style={{backgroundColor: '#fff'}}><View style={{backgroundColor:this.state.selected ? COLOR.tab2 : COLOR.tab1, flex:.95, borderRadius: 10, justifyContent: 'center', alignItems: 'center',marginRight:10}}><Text style={{marginTop:10, marginBottom:10,fontFamily:'BebasNeueBold', fontWeight:'normal', fontSize:20,color:'white'}}>Completados</Text></View></TabHeading>}>
               <Completados handler2={this.props.handler2} token={token} data={this.props.data} estado={this.state.estado}/>
             </Tab>
           </Tabs>

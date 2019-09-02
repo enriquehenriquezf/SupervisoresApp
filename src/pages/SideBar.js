@@ -73,7 +73,7 @@ export default class SideBar extends React.Component {
         <Content>
             <View style={{width:"100%", height:Dimensions.get('window').height, paddingLeft:20, paddingRight:20}}>
                 <Expo.LinearGradient
-                    colors={['#FD0047', '#FDBB01']}
+                    colors={['#FF3153', '#FF7B3D']}
                     start={[0,.5]}
                     end={[1,.5]}
                     style={styles.gradient}>

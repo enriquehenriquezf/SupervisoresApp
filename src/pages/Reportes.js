@@ -737,7 +737,7 @@ export default class Reportes extends Component {
         >
         <Container>
           <Expo.LinearGradient
-            colors={['#FD0047', '#FDBB01']}
+            colors={['#FF3153', '#FF7B3D']}
             start={[0,.5]}
             end={[1,.5]}
             style={IconStyles.gradient}>
@@ -766,7 +766,7 @@ export default class Reportes extends Component {
                 {
                   this.state.reportes.map((data,index) => {
                     return(
-                      <ListItem key={index} button underlayColor={COLOR.azulTransparente} style={styles.SinBorde}>
+                      <ListItem key={index} button underlayColor={COLOR.secundary} style={styles.SinBorde}>
                         <Left>
                             <View style={styles.ReporteBackground}>
                               <TouchableOpacity style={{width:"100%", height: "100%", justifyContent:'center'}} onPress={() => this.getDetalleReporte(data)}>

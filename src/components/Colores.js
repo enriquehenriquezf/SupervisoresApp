@@ -6,17 +6,20 @@
  * Gama de colores
  */
 export const COLOR = {
- azul : '#FD3533',
- azul70 : '#FD3533A6',
- azulTransparente : '#FD3533',//'rgba(0,161,228,0.65)',//A6
- verde: '#5BB700',
- verde70: '#FFC200A6',
+ azul : '#FF8891',//primary
+ azul70 : '#FF8891A6',
+ azulTransparente : '#FF8891',//'rgba(0,161,228,0.65)',//A6
+ verde: '#BDE26E',
+ verde70: '#FCC2A4A6',
  verdeTransparente: 'rgba(126,183,0,0.65)',//A6
- secundary:'#FFC200',
- destiempo:'#8E8E8E',
+ secundary:'#FCC2A4',
+ destiempo:'#AAAAAA',
+ tab1:'#FF7676',
+ tab2:'#FF9292',
  gris: '#8f8f8f',
- rojo: '#E50000',
- amarillo: '#FFC200',
+ texto:'#919191',
+ rojo: '#FF4343',
+ amarillo: '#F9F07D',
  completado10: '#F53F3F',
  completado20: '#F26041',
  completado30: '#F07143',
